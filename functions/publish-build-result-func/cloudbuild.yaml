@@ -3,7 +3,9 @@ steps:
   args:
   - 'functions'
   - 'deploy'
-  - 'publish-build-result-func'
+  - 'publish_build_result_func'
   - '--runtime=python37'
   - '--trigger-topic=cloud-builds'
+  - '--region=${_DEPLOYMENT_REGION}'
+  - '--set-env-vars=PUBLISH_PROJECT_ID=${_PUBLISH_PROJECT_ID},PUBLISH_TOPIC_NAME=${_PUBLISH_TOPIC_NAME}'
   dir: 'functions/publish-build-result-func'

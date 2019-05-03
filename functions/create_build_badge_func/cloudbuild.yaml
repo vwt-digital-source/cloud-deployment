@@ -9,9 +9,8 @@ steps:
   args:
   - 'functions'
   - 'deploy'
-  - 'publish_build_result_func'
+  - 'create_build_badge_func'
   - '--runtime=python37'
-  - '--entry-point=publish_build_result_func'
-  - '--trigger-topic=cloud-builds'
+  - '--trigger-topic=${_TOPIC_NAME}'
   - '--region=${_DEPLOYMENT_REGION}'
   - '--set-env-vars=STORAGE_BUCKET=${_STORAGE_BUCKET}'

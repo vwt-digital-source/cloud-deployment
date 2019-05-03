@@ -24,6 +24,6 @@ def create_build_badge_func(data, context):
                 status = 'failing'
             if buildstatusmessage['status'] == 'SUCCESS':
                 status = 'passing'
-            bucket.copy_blob('badge-{}.png'.format(status), '{}{}status.png'.format(
+            bucket.copy_blob('badge-{}.png'.format(status), 'status/{}-{}-status.png'.format(
                 buildstatusmessage['source']['repoSource'].get('repoName',''),
                 buildstatusmessage['source']['repoSource'].get('branchName','')))

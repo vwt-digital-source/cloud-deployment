@@ -1,0 +1,8 @@
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+  - 'functions'
+  - 'deploy'
+  - 'publish-build-result-func'
+  - '--runtime=python37'
+  - '--trigger-topic=cloud-builds'
+  dir: 'functions/publish-build-result-func'

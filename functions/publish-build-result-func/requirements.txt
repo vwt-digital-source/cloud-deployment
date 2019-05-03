@@ -1,1 +1,0 @@
-goolge-cloud-pubsub == 0.40.0

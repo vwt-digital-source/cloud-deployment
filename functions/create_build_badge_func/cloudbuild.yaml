@@ -1,0 +1,18 @@
+steps:
+- name: 'gcr.io/cloud-builders/gsutil'
+  args:
+  - 'cp'
+  - 'badge-*.png'
+  - 'gs://${_STORAGE_BUCKET}'
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+  - 'functions'
+  - 'deploy'
+  - 'publish_build_result_func'
+  - '--runtime=python37'
+  - '--entry-point=publish_build_result_func'
+  - '--trigger-topic=cloud-builds'
+  - '--region=${_DEPLOYMENT_REGION}'
+  - '--set-env-vars=STORAGE_BUCKET=${_STORAGE_BUCKET}'
+  dir: 'functions/publish-build-result-func'

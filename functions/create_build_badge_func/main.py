@@ -15,7 +15,8 @@ def create_build_badge_func(data, context):
         buildstatusmessage = json.loads(base64.b64decode(data['data']).decode('utf-8'))
         print(buildstatusmessage)
 
-        if 'status' in buildstatusmessage:
+        if 'status' in buildstatusmessage and 'source' in buildstatusmessage
+            and 'repoSource' in buildstatusmessage['source']:
             storage_client = storage.Client()
             bucket = storage_client.get_bucket(os.environ['STORAGE_BUCKET'])
             if buildstatusmessage['status'] == 'QUEUED' or buildstatusmessage['status'] == 'WORKING':
@@ -24,4 +25,6 @@ def create_build_badge_func(data, context):
                 status = 'failing'
             if buildstatusmessage['status'] == 'SUCCESS':
                 status = 'passing'
-            bucket.copy_blob('badge-{}.png'.format(status), 'buildstatus.png')
+            bucket.copy_blob('badge-{}.png'.format(status), '{}{}status.png'.format(
+                buildstatusmessage['source']['repoSource'].get('repoName',''),
+                buildstatusmessage['source']['repoSource'].get('branchName','')))

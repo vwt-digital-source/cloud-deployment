@@ -15,4 +15,3 @@ steps:
   - '--trigger-topic=cloud-builds'
   - '--region=${_DEPLOYMENT_REGION}'
   - '--set-env-vars=STORAGE_BUCKET=${_STORAGE_BUCKET}'
-  dir: 'functions/publish-build-result-func'

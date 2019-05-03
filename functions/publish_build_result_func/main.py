@@ -19,4 +19,4 @@ def publish_build_result_func(data, context):
             project_id=os.environ['PUBLISH_PROJECT_ID'],
             topic=os.environ['PUBLISH_TOPIC_NAME'],
         )
-        publisher.publish(topic_name, data['data'])
+        publisher.publish(topic_name, bytes(data['data']))

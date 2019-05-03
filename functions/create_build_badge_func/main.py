@@ -12,5 +12,9 @@ def create_build_badge_func(data, context):
     """
 
     if 'data' in data:
-        status = json.loads(base64.b64decode(data['data']).decode('utf-8'))
-        print(status)
+        buildstatusmessage = json.loads(base64.b64decode(data['data']).decode('utf-8'))
+        print(buildstatusmessage)
+        storage_client = storage.Client()
+        bucket = storage_client.get_bucket(os.environ['STORAGE_BUCKET'])
+        bucket.copy_blob('
+

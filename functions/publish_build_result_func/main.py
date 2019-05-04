@@ -1,5 +1,4 @@
 import base64
-import json
 import logging
 import os
 from google.cloud import pubsub_v1
@@ -21,4 +20,4 @@ def publish_build_result_func(data, context):
             project_id=os.environ['PUBLISH_PROJECT_ID'],
             topic=os.environ['PUBLISH_TOPIC_NAME'],
         )
-        publisher.publish(topic_name, bytes(json.dumps(buildstatusmessage).encode('utf-8')))
+        publisher.publish(topic_name, bytes(buildstatusmessage.encode('utf-8')))

@@ -1,5 +1,4 @@
 import base64
-import logging
 import os
 import json
 from google.cloud import storage
@@ -14,7 +13,7 @@ def create_build_badge_func(data, context):
 
     if 'data' in data:
         buildstatusmessage = json.loads(base64.b64decode(data['data']).decode('utf-8'))
-        logging.debug('Build status {}'.format(buildstatusmessage))
+        print('Build status {}'.format(buildstatusmessage))
 
         if 'status' in buildstatusmessage and 'source' in buildstatusmessage and 'repoSource' in buildstatusmessage['source']:
             storage_client = storage.Client()

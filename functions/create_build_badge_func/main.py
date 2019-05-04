@@ -12,18 +12,9 @@ def create_build_badge_func(data, context):
     """
 
     if 'data' in data:
-        print('DATA') 
-        print(data['data'])
-        print(type(data['data']))
         strdecoded = base64.b64decode(data['data']).decode('utf-8')
-        print('DECODED')
-        print(strdecoded)
-        print(type(strdecoded))
-        print('ENCODED: {}'.format(strdecoded.encode('utf-8')))
         buildstatusmessage = json.loads(strdecoded)
-        print('LOADS')
         print(buildstatusmessage)
-        print(type(buildstatusmessage))
 
         if 'status' in buildstatusmessage and 'source' in buildstatusmessage and 'repoSource' in buildstatusmessage['source']:
             if buildstatusmessage['status'] == 'QUEUED' or buildstatusmessage['status'] == 'WORKING':
@@ -39,4 +30,4 @@ def create_build_badge_func(data, context):
             print('Copy from {} to {}'.format(sourcefn, destfn))
             storage_client = storage.Client()
             bucket = storage_client.get_bucket(os.environ['STORAGE_BUCKET'])
-            bucket.copy_blob(sourcefn, destfn)
+            bucket.copy_blob(bucket.blob(sourcefn), bucket, destfn)

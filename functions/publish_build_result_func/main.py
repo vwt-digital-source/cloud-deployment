@@ -15,7 +15,7 @@ def publish_build_result_func(data, context):
 
     if 'data' in data:
         buildstatusmessage = base64.b64decode(data['data']).decode('utf-8')
-        logging.debug('Buildstatus {}'.format(buildstatusmessage))
+        print('Buildstatus {}'.format(buildstatusmessage))
         publisher = pubsub_v1.PublisherClient()
         topic_name = 'projects/{project_id}/topics/{topic}'.format(
             project_id=os.environ['PUBLISH_PROJECT_ID'],

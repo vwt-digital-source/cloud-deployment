@@ -17,9 +17,10 @@ def create_build_badge_func(data, context):
         print(buildstatusmessage)
 
         if 'status' in buildstatusmessage and 'source' in buildstatusmessage and 'repoSource' in buildstatusmessage['source']:
+            status = 'pending'
             if buildstatusmessage['status'] == 'QUEUED' or buildstatusmessage['status'] == 'WORKING':
                 status = 'pending'
-            if buildstatusmessage['status'] == 'FAILURE':
+            if buildstatusmessage['status'] in ['FAILURE', 'TIMEOUT']:
                 status = 'failing'
             if buildstatusmessage['status'] == 'SUCCESS':
                 status = 'passing'

@@ -21,9 +21,9 @@ steps:
   args:
   - '-c'
   - |
-    for pr in $(python3 ../../scripts/listprojects.py config/projects.json)
+    for pr in $(python3 ../../scripts/listprojects.py ../../config/projects.json)
     do
-        gcloud builds submit --project=${pr} --substitutions=$(config/publish_build_result_func.config.sh) .
+        gcloud builds submit --project=${pr} --substitutions=$(../../config/publish_build_result_func.config.sh) .
     done
   dir: 'functions/publish_build_result_func'
 
@@ -40,5 +40,5 @@ steps:
   args:
   - '-c'
   - |
-    gcloud builds submit --substitutions=$(config/create_build_badge_func.config.sh) .
-  dir: 'cloud-deployment/functions/create_build_badge_func'
+    gcloud builds submit --substitutions=$(../../config/create_build_badge_func.config.sh) .
+  dir: 'functions/create_build_badge_func'

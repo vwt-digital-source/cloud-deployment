@@ -1,0 +1,13 @@
+{
+    "projects": [
+        {
+            "projectId": "my-gcp-project"
+        },
+        {
+            "projectId": "my-second-gcp-project"
+        },
+        {
+            "projectId": "my-third-gcp-project"
+        }
+    ]
+}

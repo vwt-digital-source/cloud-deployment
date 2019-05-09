@@ -11,7 +11,6 @@ then
 fi
 
 gcp_access_token=$(gcloud config config-helper --format='value(credential.access_token)')
-echo $gcp_access_token
 curl -X GET -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${PROJECT_ID}/triggers" > triggers.json
 python3 gettriggertemplate.py triggers.json ${repoName} ${branchName} | tee triggertemplate.json
 triggerid=$(python3 gettriggerid.py triggers.json ${repoName} ${branchName})

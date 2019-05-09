@@ -1,0 +1,44 @@
+timeout: 1200s
+steps:
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+  - 'services'
+  - 'enable'
+  - 'cloudbuild.googleapis.com'
+  - 'pubsub.googleapis.com'
+  - 'deploymentmanager.googleapis.com'
+  - 'cloudfunctions.googleapis.com'
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    curl https://vwt-digital.github.io/project-company-data.github.io/gcp-templates/deploy_data_catalog.sh | bash /dev/stdin $PROJECT_ID-dcat-deploy ${_CONFIG_DIR}/data_catalog.json $PROJECT_ID
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    for pr in $(python3 ../../scripts/listprojects.py ${_CONFIG_DIR}/projects.json)
+    do
+        gcloud builds submit --project=${pr} --substitutions=$(${_CONFIG_DIR}/publish_build_result_func.config.sh) .
+    done
+  dir: 'functions/publish_build_result_func'
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    python3 scripts/create_cloudbuilds_topic_iam.py ${_CONFIG_DIR}/projects.json | tee cloudbuildtopiciam.json
+    gcloud beta pubsub topics set-iam-policy ${PROJECT_ID}-cloud-builds cloudbuildtopiciam.json -q
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    gcloud builds submit --substitutions=$(${_CONFIG_DIR}/create_build_badge_func.config.sh) .
+  dir: 'cloud-deployment/functions/create_build_badge_func'

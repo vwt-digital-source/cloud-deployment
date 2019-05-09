@@ -1,7 +1,8 @@
 #!/bin/bash
 
-repoName=${1}
-branchName=${2}
+project_id=${1}
+repoName=${2}
+branchName=${3}
 
 if [ -z "${repoName}" -o -z "${branchName}" ]
 then
@@ -11,9 +12,8 @@ then
 fi
 
 gcp_access_token=$(gcloud config config-helper --format='value(credential.access_token)')
-curl -X GET -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${PROJECT_ID}/triggers" > triggers.json
+curl -X GET -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers" > triggers.json
 python3 gettriggertemplate.py triggers.json ${repoName} ${branchName} | tee triggertemplate.json
 triggerid=$(python3 gettriggerid.py triggers.json ${repoName} ${branchName})
 echo "triggerid: ${triggerid}"
-echo "triggertemplate: ${triggertemplate}"
-curl -X POST -T triggertemplate.json -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${PROJECT_ID}/triggers/${triggerid}:run"
+curl -X POST -T triggertemplate.json -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers/${triggerid}:run"

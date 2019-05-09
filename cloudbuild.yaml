@@ -14,16 +14,16 @@ steps:
   args:
   - '-c'
   - |
-    curl https://vwt-digital.github.io/project-company-data.github.io/gcp-templates/deploy_data_catalog.sh | bash /dev/stdin $PROJECT_ID-dcat-deploy ${_CONFIG_DIR}/data_catalog.json $PROJECT_ID
+    curl https://vwt-digital.github.io/project-company-data.github.io/gcp-templates/deploy_data_catalog.sh | bash /dev/stdin $PROJECT_ID-dcat-deploy config/data_catalog.json $PROJECT_ID
 
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'
   args:
   - '-c'
   - |
-    for pr in $(python3 ../../scripts/listprojects.py ${_CONFIG_DIR}/projects.json)
+    for pr in $(python3 ../../scripts/listprojects.py config/projects.json)
     do
-        gcloud builds submit --project=${pr} --substitutions=$(${_CONFIG_DIR}/publish_build_result_func.config.sh) .
+        gcloud builds submit --project=${pr} --substitutions=$(config/publish_build_result_func.config.sh) .
     done
   dir: 'functions/publish_build_result_func'
 
@@ -32,7 +32,7 @@ steps:
   args:
   - '-c'
   - |
-    python3 scripts/create_cloudbuilds_topic_iam.py ${_CONFIG_DIR}/projects.json | tee cloudbuildtopiciam.json
+    python3 scripts/create_cloudbuilds_topic_iam.py config/projects.json | tee cloudbuildtopiciam.json
     gcloud beta pubsub topics set-iam-policy ${PROJECT_ID}-cloud-builds cloudbuildtopiciam.json -q
 
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -40,5 +40,5 @@ steps:
   args:
   - '-c'
   - |
-    gcloud builds submit --substitutions=$(${_CONFIG_DIR}/create_build_badge_func.config.sh) .
+    gcloud builds submit --substitutions=$(config/create_build_badge_func.config.sh) .
   dir: 'cloud-deployment/functions/create_build_badge_func'

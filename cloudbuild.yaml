@@ -42,3 +42,28 @@ steps:
   - |
     gcloud builds submit --substitutions=$(../../config/create_build_badge_func.config.sh) .
   dir: 'functions/create_build_badge_func'
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    gcp_access_token=$(gcloud config config-helper --format='value(credential.access_token)')
+    for project_id in $(python3 scripts/listprojects.py config/projects.json)
+    do
+        curl -X GET -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers" > project_triggers.json
+        python3 scripts/listprojecttriggers.py config/projects.json ${project_id} |
+        while read -r trigger
+        do
+            echo "Creating trigger in ${project_id}..."
+            echo ${trigger} | tee trigger.json
+            existing_id=$(python3 scripts/checktriggerexists.py project_triggers.json trigger.json)
+
+            if [ -n "${existing_id}" ]
+            then
+                curl -X DELETE -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers/${existing_id}"
+            fi
+
+            curl -X POST -T trigger.json -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers"
+        done
+    done

@@ -80,6 +80,6 @@ steps:
     done
 
 secrets:
-- kmsKeyName: projects/[PROJECT-ID]/locations/europe-west1/keyRings/github/cryptoKeys/github-access-token
+- kmsKeyName: projects/vwt-d-gew1-dat-deployment/locations/europe-west1/keyRings/github/cryptoKeys/github-access-token
   secretEnv:
     GITHUB_ACCESS_TOKEN: <base64-encoded encrypted github access token>

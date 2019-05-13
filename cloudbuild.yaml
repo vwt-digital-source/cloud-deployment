@@ -77,3 +77,6 @@ steps:
             curl -X POST -T trigger.json -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers"
         done
     done
+
+substitutions:
+    _GITHUB_ACCESS_TOKEN: github_access_token # default value

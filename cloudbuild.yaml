@@ -16,7 +16,7 @@ steps:
   - |
     for pr in $(python3 scripts/listrepos.py config/data_catalog.json)
     do
-        curl -d @set_github_restrictions.json -X PUT -L -H "Authorization:token $$GITHUB_ACCESS_TOKEN"  -H "Accept: application/vnd.github.luke-cage-preview+json" "https://api.github.com/repos/${pr}/branches/master/protection"
+        curl -d @config/set_github_restrictions.json -X PUT -L -H "Authorization:token $$GITHUB_ACCESS_TOKEN"  -H "Accept: application/vnd.github.luke-cage-preview+json" "https://api.github.com/repos/${pr}/branches/master/protection"
     done
   secretEnv: ['GITHUB_ACCESS_TOKEN']
 

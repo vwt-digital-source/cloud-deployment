@@ -14,6 +14,17 @@ steps:
   args:
   - '-c'
   - |
+    for pr in $(python3 ../../scripts/listrepos.py ../../config/data_catalog.json)
+    do
+        curl -d @set_github_restrictions.json -X PUT -L -H "Authorization:token $$GITHUB_ACCESS_TOKEN"  -H "Accept: application/vnd.github.luke-cage-preview+json" "https://api.github.com/repos/${pr}/branches/master/protection"
+    done
+  secretEnv: ['GITHUB_ACCESS_TOKEN']
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
     curl https://vwt-digital.github.io/project-company-data.github.io/gcp-templates/deploy_data_catalog.sh | bash /dev/stdin $PROJECT_ID-dcat-deploy config/data_catalog.json $PROJECT_ID
 
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -48,17 +59,6 @@ steps:
   args:
   - '-c'
   - |
-    for pr in $(python3 ../../scripts/listrepos.py ../../config/data_catalog.json)
-    do
-        curl -d @set_github_restrictions.json -X PUT -L -H "Authorization:token $$GITHUB_ACCESS_TOKEN"  -H "Accept: application/vnd.github.luke-cage-preview+json" "https://api.github.com/repos/${pr}/branches/master/protection"
-    done
-  secretEnv: ['GITHUB_ACCESS_TOKEN']
-
-- name: 'gcr.io/cloud-builders/gcloud'
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
     gcp_access_token=$(gcloud config config-helper --format='value(credential.access_token)')
     for project_id in $(python3 scripts/listprojects.py config/projects.json)
     do
@@ -82,4 +82,4 @@ steps:
 secrets:
 - kmsKeyName: projects/vwt-d-gew1-dat-deployment/locations/europe-west1/keyRings/github/cryptoKeys/github-access-token
   secretEnv:
-    GITHUB_ACCESS_TOKEN: <base64-encoded encrypted github access token>
+    GITHUB_ACCESS_TOKEN: CiQAg0mt2bV3B5H80SVYWs964cLP3DDOu4QhDopbhZf500y2UEYSUQDeOmHWxAiYGZfHvU9a6cZdIMNJvZKeLFhaGJsTvDX6RIdyMHSDRXNrHqQoP3PR9Uxd1G5N5TGJkxKy2Pj6XM7UaL6GIeaFa/c88OIDABzo7Q==

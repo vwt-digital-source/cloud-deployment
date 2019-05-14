@@ -10,7 +10,6 @@ steps:
   - 'cloudfunctions.googleapis.com'
 
 # Decrypt the file containing the key
-steps:
 - name: 'gcr.io/cloud-builders/gcloud'
   args:
   - kms

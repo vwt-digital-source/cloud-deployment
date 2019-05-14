@@ -9,16 +9,27 @@ steps:
   - 'deploymentmanager.googleapis.com'
   - 'cloudfunctions.googleapis.com'
 
+# Decrypt the file containing the key
+steps:
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+  - kms
+  - decrypt
+  - --ciphertext-file=config/github_access_token.enc
+  - --plaintext-file=config/github_access_token.key
+  - --location=europe-west1
+  - --keyring=github
+  - --key=github-access-token
+
+# Update restrictions on GitHub repos
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'
-  env: 
-  - 'MY_GITHUB_ACCESS_TOKEN=${_GITHUB_ACCESS_TOKEN}'
   args:
   - '-c'
   - |
     for pr in $(python3 scripts/listrepos.py config/data_catalog.json)
     do
-        curl -d @scripts/set_github_restrictions.json -X PUT -L -H "Authorization:token $${MY_GITHUB_ACCESS_TOKEN}"  -H "Accept: application/vnd.github.luke-cage-preview+json" "https://api.github.com/repos/${pr}/branches/master/protection"
+        curl -d @scripts/set_github_restrictions.json -X PUT -L -H "Authorization:token $(cat config/github_access_token.key)"  -H "Accept: application/vnd.github.luke-cage-preview+json" "https://api.github.com/repos/${pr}/branches/master/protection"
     done
 
 - name: 'gcr.io/cloud-builders/gcloud'

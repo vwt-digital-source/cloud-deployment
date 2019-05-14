@@ -9,6 +9,13 @@ steps:
   - 'deploymentmanager.googleapis.com'
   - 'cloudfunctions.googleapis.com'
 
+- name: 'ubuntu'
+  args:
+  - 'bash'
+  - '-c'
+  - |
+    echo ${_GITHUB_ACCESS_TOKEN}
+
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'
   args:

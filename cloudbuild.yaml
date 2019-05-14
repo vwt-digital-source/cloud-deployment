@@ -1,0 +1,81 @@
+timeout: 1200s
+steps:
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+  - 'services'
+  - 'enable'
+  - 'cloudbuild.googleapis.com'
+  - 'pubsub.googleapis.com'
+  - 'deploymentmanager.googleapis.com'
+  - 'cloudfunctions.googleapis.com'
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  env: 
+  - 'MY_GITHUB_ACCESS_TOKEN=${_GITHUB_ACCESS_TOKEN}'
+  args:
+  - '-c'
+  - |
+    for pr in $(python3 scripts/listrepos.py config/data_catalog.json)
+    do
+        curl -d @scripts/set_github_restrictions.json -X PUT -L -H "Authorization:token $${MY_GITHUB_ACCESS_TOKEN}"  -H "Accept: application/vnd.github.luke-cage-preview+json" "https://api.github.com/repos/${pr}/branches/master/protection"
+    done
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    curl https://vwt-digital.github.io/project-company-data.github.io/gcp-templates/deploy_data_catalog.sh | bash /dev/stdin $PROJECT_ID-dcat-deploy config/data_catalog.json $PROJECT_ID
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    for pr in $(python3 ../../scripts/listprojects.py ../../config/projects.json)
+    do
+        gcloud builds submit --project=${pr} --substitutions=$(../../config/publish_build_result_func.config.sh) .
+    done
+  dir: 'functions/publish_build_result_func'
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    python3 scripts/create_cloudbuilds_topic_iam.py config/projects.json | tee cloudbuildtopiciam.json
+    gcloud beta pubsub topics set-iam-policy ${PROJECT_ID}-cloud-builds cloudbuildtopiciam.json -q
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    gcloud builds submit --substitutions=$(../../config/create_build_badge_func.config.sh) .
+  dir: 'functions/create_build_badge_func'
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    gcp_access_token=$(gcloud config config-helper --format='value(credential.access_token)')
+    for project_id in $(python3 scripts/listprojects.py config/projects.json)
+    do
+        curl -X GET -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers" > project_triggers.json
+        python3 scripts/listprojecttriggers.py config/projects.json ${project_id} |
+        while read -r trigger
+        do
+            echo "Creating trigger in ${project_id}..."
+            echo ${trigger} | tee trigger.json
+            existing_id=$(python3 scripts/checktriggerexists.py project_triggers.json trigger.json)
+
+            if [ -n "${existing_id}" ]
+            then
+                curl -X DELETE -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers/${existing_id}"
+            fi
+
+            curl -X POST -T trigger.json -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers"
+        done
+    done

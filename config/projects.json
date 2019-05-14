@@ -1,0 +1,50 @@
+{
+    "projects": [
+        {
+            "projectId": "my-gcp-project",
+            "triggers": [
+                {
+                    "triggerTemplate": {
+                        "repoName": "github_my-github_my-gcp-project-repo",
+                        "branchName": "master"
+                    },
+                    "filename": "cloudbuild.yaml"
+                },
+                {
+                    "triggerTemplate": {
+                        "repoName": "github_otherguy_some-3rd-party-repo",
+                        "branchName": "master"
+                    },
+                    "runTrigger": {
+                        "repoName": "github_my-github_my-gcp-project-repo",
+                        "branchName": "master"
+                    }
+                }
+            ]
+        },
+        {
+            "projectId": "my-second-gcp-project",
+            "triggers": [
+                {
+                    "triggerTemplate": {
+                        "repoName": "github_my-github_my-gcp-project-repo",
+                        "branchName": "master"
+                    },
+                    "filename": "cloudbuild.yaml"
+                }
+            ]
+        },
+        {
+            "projectId": "my-third-gcp-project",
+            "triggers": [
+                {
+                    "triggerTemplate": {
+                        "repoName": "github_my-github_my-gcp-project-repo",
+                        "branchName": "master"
+                    },
+                    "filename": "cloudbuild.yaml"
+                }
+            ]
+        }
+    ]
+}

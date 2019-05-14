@@ -1,48 +1,143 @@
 {
     "projects": [
         {
-            "projectId": "my-gcp-project",
+            "projectId": "vwt-d-gew1-dat-deployment",
             "triggers": [
                 {
                     "triggerTemplate": {
-                        "repoName": "github_my-github_my-gcp-project-repo",
-                        "branchName": "master"
+                        "repoName": "github_vwt-digital_dat-deployment-config",
+                        "branchName": "develop"
+                    },
+                    "filename": "cloudbuild.yaml"
+                }
+        },
+        {
+            "projectId": "vwt-d-gew1-dev-zally"
+        },
+        {
+            "projectId": "vwt-d-gew1-hyrde-caringest",
+            "triggers": [
+                {
+                    "triggerTemplate": {
+                        "repoName": "github_vwt-digital_hyrde-caringest-config",
+                        "branchName": "develop"
                     },
                     "filename": "cloudbuild.yaml"
                 },
                 {
                     "triggerTemplate": {
-                        "repoName": "github_otherguy_some-3rd-party-repo",
-                        "branchName": "master"
+                        "repoName": "github_vwt-digital_restingest",
+                        "branchName": "develop"
                     },
                     "runTrigger": {
-                        "repoName": "github_my-github_my-gcp-project-repo",
-                        "branchName": "master"
+                        "repoName": "github_vwt-digital_hyrde-caringest-config",
+                        "branchName": "develop"
                     }
                 }
-            ]
         },
         {
-            "projectId": "my-second-gcp-project",
+            "projectId": "vwt-d-gew1-mendix-wha",
             "triggers": [
                 {
                     "triggerTemplate": {
-                        "repoName": "github_my-github_my-gcp-project-repo",
-                        "branchName": "master"
+                        "repoName": "github_vwt-digital_mendix-wha-config",
+                        "branchName": "develop"
+                    },
+                    "filename": "cloudbuild.yaml"
+                },
+                {
+                    "triggerTemplate": {
+                        "repoName": "github_vwt-digital_restingest",
+                        "branchName": "develop"
+                    },
+                    "runTrigger": {
+                        "repoName": "github_vwt-digital_mendix-wha-config",
+                        "branchName": "develop"
+                    }
+                }
+        },
+        {
+            "projectId": "vwt-d-gew1-ns-surveys"
+        },
+        {
+            "projectId": "vwt-d-gew1-ns-worf",
+            "triggers": [
+                {
+                    "triggerTemplate": {
+                        "repoName": "github_vwt-digital_worf-config",
+                        "branchName": "develop"
                     },
                     "filename": "cloudbuild.yaml"
                 }
-            ]
         },
         {
-            "projectId": "my-third-gcp-project",
+            "projectId": "vwt-d-gew1-odh-hub",
             "triggers": [
                 {
                     "triggerTemplate": {
-                        "repoName": "github_my-github_my-gcp-project-repo",
-                        "branchName": "master"
+                        "repoName": "github_vwt-digital_operational-data-hub-config",
+                        "branchName": "develop"
                     },
                     "filename": "cloudbuild.yaml"
+                }
+        },
+        {
+            "projectId": "vwt-d-gew1-snb-link2",
+            "triggers": [
+                {
+                    "triggerTemplate": {
+                        "repoName": "github_vwt-digital_snb-link2-config",
+                        "branchName": "develop"
+                    },
+                    "filename": "cloudbuild.yaml"
+                },
+                {
+                    "triggerTemplate": {
+                        "repoName": "github_vwt-digital_restingest",
+                        "branchName": "develop"
+                    },
+                    "runTrigger": {
+                        "repoName": "github_vwt-digital_snb-link2-config",
+                        "branchName": "develop"
+                    }
+                }
+        },
+        {
+            "projectId": "vwt-d-gew1-snb-planning",
+            "triggers": [
+                {
+                    "triggerTemplate": {
+                        "repoName": "github_vwt-digital_snbplanningapi-config",
+                        "branchName": "develop"
+                    },
+                    "filename": "cloudbuild.yaml"
+                },
+                {
+                    "triggerTemplate": {
+                        "repoName": "github_vwt-digital_snbplanningapi",
+                        "branchName": "develop"
+                    },
+                    "runTrigger": {
+                        "repoName": "github_vwt-digital_snbplanningapi-config",
+                        "branchName": "develop"
+                    }
+                },
+                {
+                    "triggerTemplate": {
+                        "repoName": "github_vwt-digital_snbplanningtool-frontend-config",
+                        "branchName": "develop"
+                    },
+                    "filename": "cloudbuild.yaml"
+                },
+                {
+                    "triggerTemplate": {
+                        "repoName": "github_vwt-digital_snbplanningtool",
+                        "branchName": "develop"
+                    },
+                    "runTrigger": {
+                        "repoName": "github_vwt-digital_snbplanningtool-frontend-config",
+                        "branchName": "develop"
+                    }
                 }
             ]
         }

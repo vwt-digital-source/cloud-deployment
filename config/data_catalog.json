@@ -2,18 +2,18 @@
   "conformsTo": "https://vwt-digital.github.io/project-company-data.github.io/v1.1/schema",
   "dataset": [
     {
-      "identifier": "my-deployment-status-stg",
-      "title": "Status overview of my deployments",
+      "identifier": "vwt/dat/deployment-status-stg",
+      "title": "Status overview of Digital Ambition Team deployments",
       "accessLevel": "public",
       "rights": "The dataset shows the deployment status of applications, which should be available for all users",
       "contactPoint": {
-        "fn": "My Name",
-        "hasEmail": "mailto:my@e.mail"
+        "fn": "Bernie van Veen",
+        "hasEmail": "mailto:b.vanveen@vwt.digital"
       },
       "publisher": {
-        "name": "My Team",
+        "name": "Digital Ambition Team",
         "subOrganizationOf": {
-          "name": "My Company"
+          "name": "VokerWessels Telecom"
         }
       },
       "keyword": [],
@@ -24,28 +24,28 @@
       "issued": "2019-05",
       "distribution": [
         {
-          "accessURL": "https://console.cloud.google.com/storage/browser/my-deployment-status-stg",
+          "accessURL": "https://console.cloud.google.com/storage/browser/vwt-d-gew1-dat-deployment-status-stg",
           "mediaType": "application/json",
 	  "deploymentZone": "europe-west1",
           "format": "blob-storage",
-          "title": "my-deployment-status-stg",
-          "description": "My environment at Google europe-west1 containing deployment status blob storage"
+          "title": "vwt-d-gew1-dat-deployment-status-stg",
+          "description": "VWT development environment at Google europe-west1 containing deployment status blob storage"
         }
       ]
     },
     {
-      "identifier": "my-cloud-builds-topic",
-      "title": "Status of cloud builds on my environment.",
+      "identifier": "vwt/dat/vwt-d-gew1-dat-deployment-cloud-builds",
+      "title": "Status of cloud builds on ODH.",
       "accessLevel": "internal",
-      "rights": "The dataset shows the status of builds on my environment, it does not contain PII, so no further restrictions required",
+      "rights": "The dataset shows the status of builds on the Operational Data Hub, it does not contain PII, so no further restrictions required",
       "contactPoint": {
-        "fn": "My Name",
-        "hasEmail": "mailto:my@e.mail"
+        "fn": "Bernie van Veen",
+        "hasEmail": "mailto:b.vanveen@vwt.digital"
       },
       "publisher": {
-        "name": "My Team",
+        "name": "Digital Ambition Team",
         "subOrganizationOf": {
-          "name": "My Company"
+          "name": "VokerWessels Telecom"
         }
       },
       "keyword": [],
@@ -56,11 +56,543 @@
       "issued": "2019-05",
       "distribution": [
         {
-          "accessURL": "https://console.cloud.google.com/cloudpubsub/topics/my-cloud-builds-topic",
+          "accessURL": "https://console.cloud.google.com/cloudpubsub/topics/vwt-d-gew1-dat-deployment-cloud-builds",
           "mediaType": "application/json",
           "format": "topic",
-          "title": "my-cloud-builds-topic",
-          "description": "My development environment at Google europe-west1 containing cloud build status topic"
+          "title": "vwt-d-gew1-dat-deployment-cloud-builds",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/restingest",
+      "title": "Source of restingest",
+      "accessLevel": "public",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/restingest",
+	  "downloadURL": "https://github.com/vwt-digital/restingest.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/restingest",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/dat-deployment-config",
+      "title": "Private deployment configuration repo",
+      "accessLevel": "internal",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/dat-deployment-config",
+	  "downloadURL": "https://github.com/vwt-digital/dat-deployment-config.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/dat-deployment-config",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/ns-surveysingest-config",
+      "title": "Private deployment configuration repo",
+      "accessLevel": "internal",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/ns-surveysingest-config",
+	  "downloadURL": "https://github.com/vwt-digital/ns-surveysingest-config.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/ns-surveysingest-config",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/cloud-deployment",
+      "title": "Source of cloud deployment",
+      "accessLevel": "public",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/cloud-deployment",
+	  "downloadURL": "https://github.com/vwt-digital/cloud-deployment.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/cloud-deployment",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/worf-config",
+      "title": "Private deployment configuration repo",
+      "accessLevel": "internal",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/worf-config",
+	  "downloadURL": "https://github.com/vwt-digital/worf-config.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/worf-config",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/soil-information",
+      "title": "Private deployment configuration repo",
+      "accessLevel": "internal",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/soil-information",
+	  "downloadURL": "https://github.com/vwt-digital/soil-information.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/soil-information",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/snbplanningtool-frontend-config",
+      "title": "Private deployment configuration repo",
+      "accessLevel": "internal",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/snbplanningtool-frontend-config",
+	  "downloadURL": "https://github.com/vwt-digital/snbplanningtool-frontend-config.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/snbplanningtool-frontend-config",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/snbplanningapi-config",
+      "title": "Private deployment configuration repo",
+      "accessLevel": "internal",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/snbplanningapi-config",
+	  "downloadURL": "https://github.com/vwt-digital/snbplanningapi-config.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/snbplanningapi-config",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/operational-data-hub-config",
+      "title": "Private deployment configuration repo",
+      "accessLevel": "internal",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/operational-data-hub-config",
+	  "downloadURL": "https://github.com/vwt-digital/operational-data-hub-config.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/operational-data-hub-config",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/mendix-wha-config",
+      "title": "Private deployment configuration repo",
+      "accessLevel": "internal",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/mendix-wha-config",
+	  "downloadURL": "https://github.com/vwt-digital/mendix-wha-config.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/mendix-wha-config",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/hyrde-caringest-config",
+      "title": "Private deployment configuration repo",
+      "accessLevel": "internal",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/hyrde-caringest-config",
+	  "downloadURL": "https://github.com/vwt-digital/hyrde-caringest-config.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/hyrde-caringest-config",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/snb-link2-config",
+      "title": "Private deployment configuration repo",
+      "accessLevel": "internal",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/snb-link2-config",
+	  "downloadURL": "https://github.com/vwt-digital/snb-link2-config.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/snb-link2-config",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/project-company-data.github.io",
+      "title": "Source of data catalog",
+      "accessLevel": "internal",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/project-company-data.github.io",
+	  "downloadURL": "https://github.com/vwt-digital/project-company-data.github.io.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/project-company-data.github.io",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/jwkaas",
+      "title": "Source of jwkaas",
+      "accessLevel": "public",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/jwkaas",
+	  "downloadURL": "https://github.com/vwt-digital/jwkaas.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/jwkaas",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/snbplanningapi",
+      "title": "Source fo Services&Beheer planning API",
+      "accessLevel": "public",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/snbplanningapi",
+	  "downloadURL": "https://github.com/vwt-digital/snbplanningapi.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/snbplanningapi",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/vwt-digital.github.io",
+      "title": "VWT Digital open source website",
+      "accessLevel": "public",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/vwt-digital.github.io",
+	  "downloadURL": "https://github.com/vwt-digital/vwt-digital.github.io.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/vwt-digital.github.io",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/zally",
+      "title": "Private deployment configuration repo",
+      "accessLevel": "internal",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/zally",
+	  "downloadURL": "https://github.com/vwt-digital/zally.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/zally",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/snbplanningtool",
+      "title": "Private deployment configuration repo",
+      "accessLevel": "internal",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/snbplanningtool",
+	  "downloadURL": "https://github.com/vwt-digital/snbplanningtool.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/snbplanningtool",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
+        }
+      ]
+    },
+    {
+      "identifier": "vwt/dat/repo/carpublish",
+      "title": "Source of carpublish repo",
+      "accessLevel": "public",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/carpublish",
+	  "downloadURL": "https://github.com/vwt-digital/carpublish.git",
+          "mediaType": "application/json",
+          "format": "gitrepo",
+          "title": "vwt-digital/carpublish",
+          "description": "VWT development environment at Google europe-west1 containing cloud build status topic"
         }
       ]
     }

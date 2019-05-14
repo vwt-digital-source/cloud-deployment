@@ -9,25 +9,16 @@ steps:
   - 'deploymentmanager.googleapis.com'
   - 'cloudfunctions.googleapis.com'
 
-- name: 'ubuntu'
-  env: 
-  - 'GITHUB_ACCESS_TOKEN=${_GITHUB_ACCESS_TOKEN}'
-  args:
-  - 'bash'
-  - '-c'
-  - |
-    echo ${GITHUB_ACCESS_TOKEN}
-
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'
   env: 
-  - 'GITHUB_ACCESS_TOKEN=${_GITHUB_ACCESS_TOKEN}'
+  - 'MY_GITHUB_ACCESS_TOKEN=${_GITHUB_ACCESS_TOKEN}'
   args:
   - '-c'
   - |
     for pr in $(python3 scripts/listrepos.py config/data_catalog.json)
     do
-        curl -d @scripts/set_github_restrictions.json -X PUT -L -H "Authorization:token ${GITHUB_ACCESS_TOKEN}"  -H "Accept: application/vnd.github.luke-cage-preview+json" "https://api.github.com/repos/${pr}/branches/master/protection"
+        curl -d @scripts/set_github_restrictions.json -X PUT -L -H "Authorization:token $${MY_GITHUB_ACCESS_TOKEN}"  -H "Accept: application/vnd.github.luke-cage-preview+json" "https://api.github.com/repos/${pr}/branches/master/protection"
     done
 
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -88,6 +79,3 @@ steps:
             curl -X POST -T trigger.json -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers"
         done
     done
-
-substitutions:
-    _GITHUB_ACCESS_TOKEN: 'github_access_token' # default value

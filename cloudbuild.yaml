@@ -5,7 +5,7 @@ steps:
   args:
   - '-c'
   - |
-    ./create_projects.sh
+    ./create_projects.sh ${PROJECT_ID}
   dir: 'scripts'
 
 # Decrypt the file containing the key

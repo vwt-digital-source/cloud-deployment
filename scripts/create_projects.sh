@@ -1,16 +1,18 @@
 #!/bin/sh
 
+PROJECT_ID=${1}
+
+if [ -z "${PROJECT_ID}" ]
+then
+    echo "PROJECT_ID parameter should be set to deployment manager project"
+    echo "Usage: ${0} <project_id>"
+    exit 1
+fi
+
 deployment_name="${PROJECT_ID}-projects-deploy"
 project_catalog="../config/projects.json"
 billing_account_name=$(cat ../config/billing_account_name.cfg)
 parent_folder_id=$(cat ../config/parent_folder_id.cfg)
-
-if [ -z "${PROJECT_ID}" ]
-then
-    echo "PROJECT_ID should be set to deployment manager project"
-    exit 1
-fi
-
 
 gcp_template=$(mktemp ${deployment_name}-XXXXX.py)
 

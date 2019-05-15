@@ -28,17 +28,22 @@ def generate_config(context):
                 'billingAccountName': context.properties['billing_account_name']
             }
         })
+        index = 0
         for service in project.get('services', []):
+            depends_on = [project['projectId'], 'billing_{}'.format(project['projectId'])]
+            if index != 0:
+                depends_on.append('{}-{}-api'.format(project['projectId'], project['services'][index-1]))
             resources.append({
                 'name': '{}-{}-api'.format(project['projectId'], service),
                 'type': 'deploymentmanager.v2.virtual.enableService',
                 'metadata': {
-                    'dependsOn': [project['projectId'], 'billing_{}'.format(project['projectId'])]
+                    'dependsOn': depends_on
                 },
                 'properties': {
                     'consumerId': 'project:{}'.format(project['projectId']),
                     'serviceName': service
                 }
             })
+            index += 1
 
     return {'resources': resources}

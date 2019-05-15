@@ -1,13 +1,12 @@
 timeout: 1200s
 steps:
 - name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
   args:
-  - 'services'
-  - 'enable'
-  - 'cloudbuild.googleapis.com'
-  - 'pubsub.googleapis.com'
-  - 'deploymentmanager.googleapis.com'
-  - 'cloudfunctions.googleapis.com'
+  - '-c'
+  - |
+    ./create_projects.sh
+  dir: 'scripts'
 
 # Decrypt the file containing the key
 - name: 'gcr.io/cloud-builders/gcloud'

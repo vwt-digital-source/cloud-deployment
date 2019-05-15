@@ -13,7 +13,7 @@ def generate_config(context):
                 'projectId': project['projectId'],
                 'parent': {
                     'type': 'folder',
-                    'id': context.properties['parent_folder_id']
+                    'id': '{}'.format(context.properties['parent_folder_id'])
                 }
             }
         })

@@ -20,6 +20,11 @@
                         "branchName": "master"
                     }
                 }
+            ],
+            "services": [
+                "cloudbuild.googleapis.com",
+                "pubsub.googleapis.com",
+                "cloudfunctions.googleapis.com"
             ]
         },
         {
@@ -32,6 +37,9 @@
                     },
                     "filename": "cloudbuild.yaml"
                 }
+            ],
+            "services": [
+                "cloudbuild.googleapis.com"
             ]
         },
         {

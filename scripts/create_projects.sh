@@ -32,6 +32,6 @@ then
     gcloud deployment-manager deployments create ${deployment_name} --template=${gcp_template} --properties="parent_folder_id:${parent_folder_id},billing_account_name:${billing_account_name}" --project=${PROJECT_ID}
 else
     # Update if deployment exists already
-    gcloud deployment-manager deployments update ${deployment_name} --template=${gcp_template} --properties="parent_folder_id:${parent_folder_id},billing_account_name:${billing_account_name}" --project=${PROJECT_ID}
+    gcloud deployment-manager deployments update ${deployment_name} --delete-policy=abandon --template=${gcp_template} --properties="parent_folder_id:${parent_folder_id},billing_account_name:${billing_account_name}" --project=${PROJECT_ID}
 fi
 

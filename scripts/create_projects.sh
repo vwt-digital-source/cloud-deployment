@@ -3,6 +3,7 @@
 deployment_name="${PROJECT_ID}-projects-deploy"
 project_catalog="../config/projects.json"
 billing_account_name=$(cat ../config/billing_account_name.cfg)
+parent_folder_id=$(cat ../config/parent_folder_id.cfg)
 
 if [ -z "${PROJECT_ID}" ]
 then
@@ -10,16 +11,6 @@ then
     exit 1
 fi
 
-if [ "${BRANCH_NAME}" = "develop" ]
-then
-    parent_folder_id="Development"
-elif [ "${BRANCH_NAME}" = "master" ]
-then
-    parent_folder_id="Production"
-else
-    echo "BRANCH_NAME should be set to develop or master to determine project parent folder id"
-    exit 1
-fi
 
 gcp_template=$(mktemp ${deployment_name}-XXXXX.py)
 

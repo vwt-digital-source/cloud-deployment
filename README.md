@@ -44,8 +44,8 @@ As both Cloud Build and Deployment Manager are used to perform the cloud-deploym
 
 Service account|Privilege to grant on projects-parent folder level
 -----|-----
-<project-id>@cloudbuild.gserviceaccount.com      | Cloud Build Editor, Owner
-<project-id>@cloudservices.gserviceaccount.com   | Owner, Project Creator
+xxx@cloudbuild.gserviceaccount.com      | Cloud Build Editor, Owner
+xxx@cloudservices.gserviceaccount.com   | Owner, Project Creator
 
 ### Setup config
 

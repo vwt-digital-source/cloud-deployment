@@ -57,7 +57,7 @@ Config file         | Contents
 [create_build_badge_func.config.sh](config/create_build_badge_func.config.sh) | Specifies region, deployment status bucket and deployment status topic for build status badges
 [data_catalog.json](config/data_catalog.json) | Specifies storage and topic to create for build status badges and github repositories to set branch protection rules for. See [Project Company Data](https://vwt-digital.github.io/project-company-data.github.io/) for more information on the data catalog format.
 [github_access_token.enc](config/github_access_token.enc) | [Encoded](https://cloud.google.com/cloud-build/docs/securing-builds/use-encrypted-secrets-credentials) github access token, keyring to be manually created in the project (keyring=github, key=github-access-token)
-[parent_folder_id.cfg] | The id of the projects-parent folder
+[parent_folder_id.cfg](config/parent_folder_id.cfg) | The id of the projects-parent folder
 [projects.json](config/projects.json)  | Specifies projects to create, services to enable and Cloud Build triggers to create
 [publish_build_result_func.config.sh](config/publish_build_result_func.config.sh) | Specifies region, cloud-deployment project and topic name for build status badges
 

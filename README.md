@@ -11,9 +11,9 @@ This repository contains GCP Cloud Build, Deployment Manager and helper scripts 
 * Cloud Build triggers (the actual Source Repository connection to be manually created)
 
 Next to GCP resources, it will also create a storage bucket containing status badges images for all builds triggered from a source repository, which will contain one of the following images, matching the status of the latest build:
-* [Image of successful build](functions/create_build_badge_func/badge-passing.png | width=150)
-* [Image of failing build](functions/create_build_badge_func/badge-failing.png | width=150)
-* [Image of running build](functions/create_build_badge_func/badge-pending.png | width=150)
+* [Image of successful build](functions/create_build_badge_func/badge-passing.png)
+* [Image of failing build](functions/create_build_badge_func/badge-failing.png)
+* [Image of running build](functions/create_build_badge_func/badge-pending.png)
 The status badges are updated by Cloud Functions, passing the build result Pub/Sub messages of each project on to the project running the cloud-deployment.
 
 The cloud-deployment build will also set branch protection rules on all github repositories that are specified in the [data catalog](config/data_catalog.json). The rules that will be set are specified in [scripts/set_github_restrictions.json](scripts/set_github_restrictions.json). The GitHub API is used to set the branch protection rules.

@@ -3,7 +3,7 @@ steps:
   args:
   - 'functions'
   - 'deploy'
-  - 'report_build_status_github'
+  - 'report_build_status_github_func'
   - '--runtime=python37'
   - '--trigger-topic=${_TOPIC_NAME}'
   - '--region=${_DEPLOYMENT_REGION}'

@@ -69,6 +69,14 @@ steps:
   args:
   - '-c'
   - |
+    gcloud builds submit --substitutions=$(../../config/create_build_badge_func.config.sh),_GITHUB_ACCESS_TOKEN_ENCRYPTED=$(cat ../../config/github_access_token.enc) .
+  dir: 'functions/report_build_status_github_func'
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
     gcp_access_token=$(gcloud config config-helper --format='value(credential.access_token)')
     for project_id in $(python3 scripts/listprojects.py config/projects.json)
     do

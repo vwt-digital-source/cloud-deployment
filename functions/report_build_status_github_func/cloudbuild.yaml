@@ -1,0 +1,10 @@
+steps:
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+  - 'functions'
+  - 'deploy'
+  - 'report_build_status_github'
+  - '--runtime=python37'
+  - '--trigger-topic=${_TOPIC_NAME}'
+  - '--region=${_DEPLOYMENT_REGION}'
+  - '--set-env-vars=STORAGE_BUCKET=${_STORAGE_BUCKET},GITHUB_ACCESS_TOKEN_ENCRYPTED=${_GITHUB_ACCESS_TOKEN_ENCRYPTED},PROJECT_ID=${PROJECT_ID}'

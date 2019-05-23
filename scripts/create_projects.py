@@ -1,5 +1,4 @@
 import sys
-import copy
 
 
 def generate_config(context):

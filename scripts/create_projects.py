@@ -29,6 +29,14 @@ def generate_config(context):
             }
         })
         index = 0
+        iam_policies_depends = [project['projectId']]
+        if 'services' in project:
+            services = project['services']
+            services.append('cloudbuild.googleapis.com') if 'cloudbuild.googleapis.com' not in services else services
+            services.append('pubsub.googleapis.com') if 'pubsub.googleapis.com' not in services else services
+            services.append('cloudfunctions.googleapis.com') if 'cloudfunctions.googleapis.com' not in services else services
+        else:
+            project['services'] = ['cloudbuild.googleapis.com', 'pubsub.googleapis.com', 'cloudfunctions.googleapis.com']
         for service in project.get('services', []):
             depends_on = [project['projectId'], 'billing_{}'.format(project['projectId'])]
             if index != 0:
@@ -45,6 +53,34 @@ def generate_config(context):
                 }
             })
             index += 1
+            iam_policies_depends.append('{}-{}-api'.format(project['projectId'], service))
+        resources.append({
+            'name': 'get-iam-policy-' + project['projectId'],
+            'action': 'gcp-types/cloudresourcemanager-v1:cloudresourcemanager.projects.getIamPolicy',
+            'properties': {
+                'resource': project['projectId'],
+            },
+            'metadata': {
+                'dependsOn': iam_policies_depends,
+                'runtimePolicy': ['UPDATE_ALWAYS']
+            }
+        })
+        resources.append({
+            'name': 'patch-iam-policy-' + project['projectId'],
+            'action': 'gcp-types/cloudresourcemanager-v1:cloudresourcemanager.projects.setIamPolicy',
+            'properties': {
+                'resource': project['projectId'],
+                'policy': '$(ref.get-iam-policy-' + project['projectId'] + ')',
+                'gcpIamPolicyPatch': {
+                    'add': {
+                        'role': 'roles/editor',
+                        'members': [
+                            {'serviceAccount': '$(ref.' + project['projectId'] + '.project_number)@cloudbuild.gserviceaccount.com'}
+                        ]
+                    }
+                }
+            }
+        })
         depends_on = [project['projectId'], 'billing_{}'.format(project['projectId'])]
         for keyring in project.get('keyrings', []):
             resources.append({

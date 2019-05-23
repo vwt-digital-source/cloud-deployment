@@ -69,7 +69,7 @@ steps:
   args:
   - '-c'
   - |
-    gcloud builds submit --substitutions=$(../../config/create_build_badge_func.config.sh),_GITHUB_ACCESS_TOKEN_ENCRYPTED=$(cat ../../config/github_access_token.enc) .
+    gcloud builds submit --substitutions=$(../../config/create_build_badge_func.config.sh),_GITHUB_ACCESS_TOKEN_ENCRYPTED=$(base64 -w0 ../../config/github_access_token.enc) .
   dir: 'functions/report_build_status_github_func'
 
 - name: 'gcr.io/cloud-builders/gcloud'

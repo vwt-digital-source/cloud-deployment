@@ -9,8 +9,9 @@ This repository contains GCP Cloud Build, Deployment Manager and helper scripts 
 * Linked billing account (specified in [config/billing_account_name.cfg](config/billing_account_name.cfg))
 * Enabled services (GCP APIs)
 * Cloud Build triggers (the actual Source Repository connection to be manually created)
+* [Google KMS](https://cloud.google.com/kms/) Keyrings and keys
 
-Next to GCP resources, it will also create a storage bucket containing status badges images for all builds triggered from a source repository, which will contain one of the following images, matching the status of the latest build:
+Next to GCP resources, it will also report build status to GitHub through the [GitHub Statuses API](https://developer.github.com/v3/repos/statuses/), and create a storage bucket containing status badges images for all builds triggered from a source repository, which will contain one of the following images, matching the status of the latest build:
 * [Image of successful build](functions/create_build_badge_func/badge-passing.png)
 * [Image of failing build](functions/create_build_badge_func/badge-failing.png)
 * [Image of running build](functions/create_build_badge_func/badge-pending.png)
@@ -56,7 +57,7 @@ Config file         | Contents
 [billing_account_name.cfg](config/billing_account_name.cfg) | Specifies billing account to link to the created projects
 [create_build_badge_func.config.sh](config/create_build_badge_func.config.sh) | Specifies region, deployment status bucket and deployment status topic for build status badges
 [data_catalog.json](config/data_catalog.json) | Specifies storage and topic to create for build status badges and github repositories to set branch protection rules for. See [Project Company Data](https://vwt-digital.github.io/project-company-data.github.io/) for more information on the data catalog format.
-[github_access_token.enc](config/github_access_token.enc) | [Encoded](https://cloud.google.com/cloud-build/docs/securing-builds/use-encrypted-secrets-credentials) github access token, keyring to be manually created in the project (keyring=github, key=github-access-token)
+[github_access_token.enc](config/github_access_token.enc) | [Encoded](https://cloud.google.com/cloud-build/docs/securing-builds/use-encrypted-secrets-credentials) github access token, keyring to be manually created in the project (keyring=github, key=github-access-token), can also be done from the projects.json, but that makes encryption of the secret before deployment impossible.
 [parent_folder_id.cfg](config/parent_folder_id.cfg) | The id of the projects-parent folder
 [projects.json](config/projects.json)  | Specifies projects to create, services to enable and Cloud Build triggers to create
 [publish_build_result_func.config.sh](config/publish_build_result_func.config.sh) | Specifies region, cloud-deployment project and topic name for build status badges

@@ -25,6 +25,18 @@
                 "cloudbuild.googleapis.com",
                 "pubsub.googleapis.com",
                 "cloudfunctions.googleapis.com"
+            ],
+            "keyrings": [
+                {
+                    "name": "my-keyring",
+                    "region": "europe-west1",
+                    "keys": [
+                        {
+                            "name": "my-key",
+                            "purpose": "ENCRYPT_DECRYPT"
+                        }
+                    ]
+                }
             ]
         },
         {

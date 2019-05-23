@@ -55,7 +55,7 @@ def generate_config(context):
                     'dependsOn': depends_on
                 },
                 'properties': {
-                    'parent': 'projects/' + project['projectId'] + '/locations/' + context.properties['region'],
+                    'parent': 'projects/' + project['projectId'] + '/locations/' + keyring['region'],
                     'keyRingId': keyring['name']
                 }
             })

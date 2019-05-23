@@ -1,4 +1,5 @@
 import sys
+import copy
 
 
 def generate_config(context):
@@ -45,5 +46,33 @@ def generate_config(context):
                 }
             })
             index += 1
+        depends_on = [project['projectId'], 'billing_{}'.format(project['projectId'])]
+        for keyring in project.get('keyrings', []):
+            resources.append({
+                'name': '{}-{}-keyring'.format(project['projectId'], keyring['name']),
+                'type': 'gcp-types/cloudkms-v1:projects.locations.keyRings',
+                'metadata': {
+                    'dependsOn': depends_on
+                },
+                'properties': {
+                    'parent': 'projects/' + project['projectId'] + '/locations/' + context.properties['region'],
+                    'keyRingId': keyring['name']
+                }
+            })
+            depends_on = ['{}-{}-keyring'.format(project['projectId'], keyring['name'])]
+            for key in keyring['keys']:
+                resources.append({
+                    'name': '{}-{}-{}-key'.format(project['projectId'], keyring['name'], key['name']),
+                    'type': 'gcp-types/cloudkms-v1:projects.locations.keyRings.cryptoKeys',
+                    'metadata': {
+                        'dependsOn': depends_on
+                    },
+                    'properties': {
+                        'parent': '$(ref.{}-{}-keyring.name)'.format(project['projectId'], keyring['name']),
+                        'cryptoKeyId': key['name'],
+                        'purpose': key['purpose']
+                    }
+                })
+                depends_on = ['{}-{}-{}-key'.format(project['projectId'], keyring['name'], key['name'])]
 
     return {'resources': resources}

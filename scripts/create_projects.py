@@ -76,7 +76,7 @@ def generate_config(context):
                         {
                             'role': 'roles/editor',
                             'members': [
-                                {'serviceAccount': '$(ref.' + project['projectId'] + '.projectNumber)@cloudbuild.gserviceaccount.com'}
+                                'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudbuild.gserviceaccount.com'
                             ]
                         }
                     ]

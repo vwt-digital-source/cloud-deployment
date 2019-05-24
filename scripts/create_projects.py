@@ -72,12 +72,14 @@ def generate_config(context):
                 'resource': project['projectId'],
                 'policy': '$(ref.get-iam-policy-' + project['projectId'] + ')',
                 'gcpIamPolicyPatch': {
-                    'add': {
-                        'role': 'roles/editor',
-                        'members': [
-                            {'serviceAccount': '$(ref.' + project['projectId'] + '.projectNumber)@cloudbuild.gserviceaccount.com'}
-                        ]
-                    }
+                    'add': [
+                        {
+                            'role': 'roles/editor',
+                            'members': [
+                                {'serviceAccount': '$(ref.' + project['projectId'] + '.projectNumber)@cloudbuild.gserviceaccount.com'}
+                            ]
+                        }
+                    ]
                 }
             }
         })

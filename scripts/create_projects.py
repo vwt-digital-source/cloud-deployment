@@ -83,7 +83,7 @@ def generate_config(context):
                 }
             }
         })
-        depends_on = [project['projectId'], 'billing_{}'.format(project['projectId'])]
+        depends_on = [project['projectId'], 'billing_{}'.format(project['projectId']), '{}-cloudkms.googleapis.com-api'.format(project['projectId'])]
         for keyring in project.get('keyrings', []):
             resources.append({
                 'name': '{}-{}-keyring'.format(project['projectId'], keyring['name']),

@@ -63,6 +63,33 @@
           "description": "My development environment at Google europe-west1 containing cloud build status topic"
         }
       ]
+    },
+    {
+      "identifier": "vwt/dat/repo/cloud-deployment",
+      "title": "Source of cloud deployment",
+      "accessLevel": "public",
+      "rights": "The dataset shows information on the source repositories, it does not contain PII, so no further restrictions required",
+      "contactPoint": {
+        "fn": "Eric van der Velde",
+        "hasEmail": "mailto:e.vandervelde@vwt.digital"
+      },
+      "publisher": {
+        "name": "Digital Ambition Team",
+        "subOrganizationOf": {
+          "name": "VokerWessels Telecom"
+        }
+      },
+      "keyword": [],
+      "issued": "2019-05",
+      "distribution": [
+        {
+          "accessURL": "https://github.com/vwt-digital/cloud-deployment",
+	  "downloadURL": "https://github.com/vwt-digital/cloud-deployment.git",
+          "format": "gitrepo",
+          "title": "vwt-digital/cloud-deployment",
+          "description": "GitHub repository containing cloud-deployment code"
+        }
+      ]
     }
   ]
 }

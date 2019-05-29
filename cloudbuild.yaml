@@ -1,16 +1,14 @@
-timeout: 1200s
+timeout: 1800s
 steps:
 - name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
   args:
-  - 'services'
-  - 'enable'
-  - 'cloudbuild.googleapis.com'
-  - 'pubsub.googleapis.com'
-  - 'deploymentmanager.googleapis.com'
-  - 'cloudfunctions.googleapis.com'
+  - '-c'
+  - |
+    ./create_projects.sh ${PROJECT_ID}
+  dir: 'scripts'
 
 # Decrypt the file containing the key
-steps:
 - name: 'gcr.io/cloud-builders/gcloud'
   args:
   - kms
@@ -65,6 +63,14 @@ steps:
   - |
     gcloud builds submit --substitutions=$(../../config/create_build_badge_func.config.sh) .
   dir: 'functions/create_build_badge_func'
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    gcloud builds submit --substitutions=$(../../config/create_build_badge_func.config.sh),_GITHUB_ACCESS_TOKEN_ENCRYPTED=$(base64 -w0 ../../config/github_access_token.enc) .
+  dir: 'functions/report_build_status_github_func'
 
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'

@@ -35,7 +35,7 @@ steps:
   args:
   - '-c'
   - |
-    curl https://vwt-digital-source.github.io/project-company-data.github.io/gcp-templates/deploy_data_catalog.sh | bash /dev/stdin $PROJECT_ID-dcat-deploy config/data_catalog.json $PROJECT_ID
+    curl https://vwt-digital.github.io/project-company-data.github.io/gcp-templates/deploy_data_catalog.sh | bash /dev/stdin $PROJECT_ID-dcat-deploy config/data_catalog.json $PROJECT_ID
 
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'

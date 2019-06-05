@@ -1,3 +1,5 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/vwt-digital/cloud-deployment/badge)](https://www.codefactor.io/repository/github/vwt-digital/cloud-deployment)
+
 # cloud-deployment
 
 Automated deployment of projects and build status badges to Google Cloud Platform, also managing GitHub branch protection rules, implemented using Google _Cloud Build_ and _Deployment Manager_.

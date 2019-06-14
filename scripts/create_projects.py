@@ -52,18 +52,6 @@ def generate_config(context):
                     'serviceName': service
                 }
             })
-            if service == 'appengine.googleapis.com' and 'appEngineRegion' in project:
-                resources.append({
-                    'name': '{}-appengine'.format(project['projectId']),
-                    'type': 'gcp-types/appengine-v1:apps',
-                    'metadata': {
-                        'dependsOn': ['{}-{}-api'.format(project['projectId'], service)]
-                    },
-                    'properties': {
-                        'id': project['projectId'],
-                        'locationId': project['appEngineRegion']
-                    }
-                })
             index += 1
             iam_policies_depends.append('{}-{}-api'.format(project['projectId'], service))
         resources.append({

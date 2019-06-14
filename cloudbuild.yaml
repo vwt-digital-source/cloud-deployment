@@ -55,6 +55,8 @@ steps:
   - |
     python3 scripts/create_cloudbuilds_topic_iam.py config/projects.json | tee cloudbuildtopiciam.json
     gcloud beta pubsub topics set-iam-policy ${PROJECT_ID}-cloud-builds cloudbuildtopiciam.json -q
+    python3 scripts/create_appengines.py config/projects.json | tee create_appengines.sh
+    source create_appengines.sh
 
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'

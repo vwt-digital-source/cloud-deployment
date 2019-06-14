@@ -10,7 +10,7 @@ This repository contains GCP Cloud Build, Deployment Manager and helper scripts 
 * GCP project
 * Linked billing account (specified in [config/billing_account_name.cfg](config/billing_account_name.cfg))
 * Enabled services (GCP APIs)
-* App Engine (if App Engine API service is enabled, region should be specified in [projects.json](config/projects.json))
+* App Engine (if App Engine API service is enabled and appEngineRegion specified in [projects.json](config/projects.json))
 * Cloud Build triggers (the actual Source Repository connection to be manually created)
 * [Google KMS](https://cloud.google.com/kms/) Keyrings and keys
 
@@ -41,7 +41,8 @@ gcloud services enable deploymentmanager.googleapis.com  \
                 cloudbuild.googleapis.com \
                 pubsub.googleapis.com \
                 cloudfunctions.googleapis.com \
-                sourcerepo.googleapis.com
+                sourcerepo.googleapis.com \
+                appengine.googleapis.com
 ~~~
 
 As both Cloud Build and Deployment Manager are used to perform the cloud-deployment, the respective service accounts require specific privileges. These should be granted on the projects-parent folder as specified in the following table.

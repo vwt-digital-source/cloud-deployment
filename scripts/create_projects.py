@@ -52,7 +52,7 @@ def generate_config(context):
                     'serviceName': service
                 }
             })
-            if service == 'appengine.googleapis.com':
+            if service == 'appengine.googleapis.com' and 'appEngineRegion' in project:
                 resources.append({
                     'name': '{}-appengine'.format(project['projectId']),
                     'type': 'gcp-types/appengine-v1:apps',
@@ -61,7 +61,7 @@ def generate_config(context):
                     },
                     'properties': {
                         'id': project['projectId'],
-                        'locationId': project.get('appEngineRegion', 'PleaseSpecifyAppEngineRegionInProjectsCatalog')
+                        'locationId': project['appEngineRegion']
                     }
                 })
             index += 1

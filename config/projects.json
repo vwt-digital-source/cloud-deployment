@@ -51,8 +51,10 @@
                 }
             ],
             "services": [
-                "cloudbuild.googleapis.com"
-            ]
+                "cloudbuild.googleapis.com",
+                "appengine.googleapis.com"
+            ],
+            "appEngineRegion": "europe-west1"
         },
         {
             "projectId": "my-third-gcp-project",

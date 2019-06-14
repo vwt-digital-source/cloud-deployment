@@ -57,11 +57,11 @@ def generate_config(context):
                     'name': '{}-appengine'.format(project['projectId']),
                     'type': 'gcp-types/appengine-v1:apps',
                     'metadata': {
-                        'dependsOn': '{}-{}-api'.format(project['projectId'], service)
+                        'dependsOn': ['{}-{}-api'.format(project['projectId'], service)]
                     },
                     'properties': {
                         'id': project['projectId'],
-                        'region': project.get('appEngineRegion', 'PleaseSpecifyAppEngineRegionInProjectsCatalog')
+                        'location': project.get('appEngineRegion', 'PleaseSpecifyAppEngineRegionInProjectsCatalog')
                     }
                 })
             index += 1

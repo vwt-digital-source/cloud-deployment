@@ -10,6 +10,7 @@ This repository contains GCP Cloud Build, Deployment Manager and helper scripts 
 * GCP project
 * Linked billing account (specified in [config/billing_account_name.cfg](config/billing_account_name.cfg))
 * Enabled services (GCP APIs)
+* App Engine (if App Engine API service is enabled, region should be specified in [projects.json](config/projects.json))
 * Cloud Build triggers (the actual Source Repository connection to be manually created)
 * [Google KMS](https://cloud.google.com/kms/) Keyrings and keys
 

@@ -37,7 +37,27 @@
                         }
                     ]
                 }
-            ]
+            ],
+            "odrlPolicy": {
+                "uid": "my-first-gcp-project-policy",
+                "permission": [
+                    {
+                        "target": "my-keyring",
+                        "assignee": "user:me@myself.com",
+                        "action": "roles/cloudkms.cryptoKeyEncrypter"
+                    },
+                    {
+                        "target": "my-keyring",
+                        "assignee": "serviceAccount:my-first-gcp-project@appspot.gserviceaccount.com",
+                        "action": "roles/cloudkms.cryptoKeyDecrypter"
+                    },
+                    {
+                        "target": "my-first-gcp-project",
+                        "assignee": "user:me@myself.com",
+                        "action": "roles/owner"
+                    }
+                ]
+            }
         },
         {
             "projectId": "my-second-gcp-project",
@@ -54,7 +74,17 @@
                 "cloudbuild.googleapis.com",
                 "appengine.googleapis.com"
             ],
-            "appEngineRegion": "europe-west1"
+            "appEngineRegion": "europe-west1",
+            "odrlPolicy": {
+                "uid": "my-second-gcp-project-policy",
+                "permission": [
+                    {
+                        "target": "my-second-gcp-project",
+                        "assignee": "user:me@myself.com",
+                        "action": "roles/owner"
+                    }
+                ]
+            }
         },
         {
             "projectId": "my-third-gcp-project",
@@ -66,7 +96,17 @@
                     },
                     "filename": "cloudbuild.yaml"
                 }
-            ]
+            ],
+            "odrlPolicy": {
+                "uid": "my-third-gcp-project-policy",
+                "permission": [
+                    {
+                        "target": "my-third-gcp-project",
+                        "assignee": "user:me@myself.com",
+                        "action": "roles/owner"
+                    }
+                ]
+            }
         }
     ]
 }

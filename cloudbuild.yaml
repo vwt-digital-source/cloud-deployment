@@ -44,8 +44,9 @@ steps:
   - |
     for pr in $(python3 ../../scripts/listprojects.py ../../config/projects.json)
     do
-        gcloud builds submit --project=${pr} --substitutions=$(../../config/publish_build_result_func.config.sh) .
+        gcloud builds submit --project=${pr} --substitutions=$(../../config/publish_build_result_func.config.sh) . &
     done
+    wait
   dir: 'functions/publish_build_result_func'
 
 - name: 'gcr.io/cloud-builders/gcloud'

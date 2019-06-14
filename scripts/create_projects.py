@@ -61,7 +61,7 @@ def generate_config(context):
                     },
                     'properties': {
                         'id': project['projectId'],
-                        'location': project.get('appEngineRegion', 'PleaseSpecifyAppEngineRegionInProjectsCatalog')
+                        'locationId': project.get('appEngineRegion', 'PleaseSpecifyAppEngineRegionInProjectsCatalog')
                     }
                 })
             index += 1

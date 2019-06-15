@@ -52,9 +52,9 @@ steps:
         --runtime=python37 \
         --entry-point=publish_build_result_func \
         --trigger-topic=cloud-builds \
-        --region=${_DEPLOYMENT_REGION} \
-        --project=${pr} \
-        --set-env-vars=PUBLISH_PROJECT_ID=${_PUBLISH_PROJECT_ID},PUBLISH_TOPIC_NAME=${_PUBLISH_TOPIC_NAME} &
+        --region=$${_DEPLOYMENT_REGION} \
+        --project=$${pr} \
+        --set-env-vars=PUBLISH_PROJECT_ID=$${_PUBLISH_PROJECT_ID},PUBLISH_TOPIC_NAME=$${_PUBLISH_TOPIC_NAME} &
     done
     wait
   dir: 'functions/publish_build_result_func'
@@ -87,9 +87,9 @@ steps:
     source ../../config/create_build_badge_func.config.sh
     gcloud functions deploy create_build_badge_func \
     --runtime=python37 \
-    --trigger-topic=${_TOPIC_NAME} \
-    --region=${_DEPLOYMENT_REGION} \
-    --set-env-vars=STORAGE_BUCKET=${_STORAGE_BUCKET}
+    --trigger-topic=$${_TOPIC_NAME} \
+    --region=$${_DEPLOYMENT_REGION} \
+    --set-env-vars=STORAGE_BUCKET=$${_STORAGE_BUCKET}
   dir: 'functions/create_build_badge_func'
 
 # Deploy report_build_status to GitHub function
@@ -102,9 +102,9 @@ steps:
     _GITHUB_ACCESS_TOKEN_ENCRYPTED=$(base64 -w0 ../../config/github_access_token.enc)
     gcloud functions deploy report_build_status_github_func \
     --runtime=python37 \
-    --trigger-topic=${_TOPIC_NAME} \
-    --region=${_DEPLOYMENT_REGION} \
-    --set-env-vars=STORAGE_BUCKET=${_STORAGE_BUCKET},GITHUB_ACCESS_TOKEN_ENCRYPTED=${_GITHUB_ACCESS_TOKEN_ENCRYPTED},PROJECT_ID=${PROJECT_ID}
+    --trigger-topic=$${_TOPIC_NAME} \
+    --region=$${_DEPLOYMENT_REGION} \
+    --set-env-vars=STORAGE_BUCKET=$${_STORAGE_BUCKET},GITHUB_ACCESS_TOKEN_ENCRYPTED=$${_GITHUB_ACCESS_TOKEN_ENCRYPTED},PROJECT_ID=${PROJECT_ID}
   dir: 'functions/report_build_status_github_func'
 
 # Create cloud build triggers on source repo commit

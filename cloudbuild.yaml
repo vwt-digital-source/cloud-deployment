@@ -72,10 +72,12 @@ steps:
 
 # Copy build status badges to storage bucket
 - name: 'gcr.io/cloud-builders/gsutil'
+  entrypoint: 'bash'
   args:
-  - 'cp'
-  - 'badge-*.png'
-  - 'gs://${_STORAGE_BUCKET}'
+  - '-c'
+  - |
+    source ../../config/create_build_badge_func.config.sh
+    gsutil cp badge-*.png gs://$${_STORAGE_BUCKET}
   dir: 'functions/create_build_badge_func'
 
 # Deploy create_build_badges function

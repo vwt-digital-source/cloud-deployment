@@ -74,7 +74,7 @@
                 "cloudbuild.googleapis.com",
                 "appengine.googleapis.com"
             ],
-            "appEngineRegion": "europe-west1",
+            "appEngineRegion": "europe-west",
             "odrlPolicy": {
                 "uid": "my-second-gcp-project-policy",
                 "permission": [

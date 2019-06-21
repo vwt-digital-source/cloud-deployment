@@ -1,6 +1,37 @@
 import sys
 
 
+def gather_permissions(preDefinedBindings, resource_name, odrlPolicy):
+    bindings = preDefinedBindings
+
+    if odrlPolicy is not None:
+        for permission in [p for p in odrlPolicy.get('permission', []) if p.get('target', '') == resource_name]:
+            role_to_add = permission['action']
+            if not bindings:
+                bindings = []
+            binding = next((b for b in bindings if b['role'] == role_to_add), None)
+            if not binding:
+                binding = {
+                    'role': role_to_add,
+                    'members': []
+                }
+                bindings.append(binding)
+            if not permission['assignee'] in binding['members']:
+                binding['members'].append(permission['assignee'])
+
+    return bindings
+
+
+def append_gcp_policy(resource, resource_name, odrlPolicy):
+    permissions = gather_permissions(None, resource_name, odrlPolicy)
+    if permissions is not None:
+        resource['accessControl'] = {
+            'gcpIamPolicy': {
+                'bindings': permissions
+            }
+        }
+
+
 def generate_config(context):
     resources = []
 
@@ -65,6 +96,20 @@ def generate_config(context):
                 'runtimePolicy': ['UPDATE_ALWAYS']
             }
         })
+        projectPreDefinedBindings = [
+            {
+                'role': 'roles/editor',
+                'members': [
+                    'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudbuild.gserviceaccount.com'
+                ]
+            },
+            {
+                'role': 'roles/owner',
+                'members': [
+                    'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudservices.gserviceaccount.com'
+                ]
+            }
+        ]
         resources.append({
             'name': 'patch-iam-policy-' + project['projectId'],
             'action': 'gcp-types/cloudresourcemanager-v1:cloudresourcemanager.projects.setIamPolicy',
@@ -72,20 +117,13 @@ def generate_config(context):
                 'resource': project['projectId'],
                 'policy': '$(ref.get-iam-policy-' + project['projectId'] + ')',
                 'gcpIamPolicyPatch': {
-                    'add': [
-                        {
-                            'role': 'roles/editor',
-                            'members': [
-                                'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudbuild.gserviceaccount.com'
-                            ]
-                        }
-                    ]
+                    'add': gather_permissions(projectPreDefinedBindings, project['projectId'], project.get('odrlPolicy'))
                 }
             }
         })
         depends_on = [project['projectId'], 'billing_{}'.format(project['projectId']), '{}-cloudkms.googleapis.com-api'.format(project['projectId'])]
         for keyring in project.get('keyrings', []):
-            resources.append({
+            keyringResource = {
                 'name': '{}-{}-keyring'.format(project['projectId'], keyring['name']),
                 'type': 'gcp-types/cloudkms-v1:projects.locations.keyRings',
                 'metadata': {
@@ -95,7 +133,9 @@ def generate_config(context):
                     'parent': 'projects/' + project['projectId'] + '/locations/' + keyring['region'],
                     'keyRingId': keyring['name']
                 }
-            })
+            }
+            append_gcp_policy(keyringResource, keyring['name'], project.get('odrlPolicy'))
+            resources.append(keyringResource)
             depends_on = ['{}-{}-keyring'.format(project['projectId'], keyring['name'])]
             for key in keyring['keys']:
                 resources.append({

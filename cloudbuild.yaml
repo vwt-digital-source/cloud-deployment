@@ -1,5 +1,6 @@
 timeout: 1800s
 steps:
+# Create the projects using Deployment Manager
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'
   args:
@@ -8,7 +9,7 @@ steps:
     ./create_projects.sh ${PROJECT_ID}
   dir: 'scripts'
 
-# Decrypt the file containing the key
+# Decrypt the file containing the GitHub key
 - name: 'gcr.io/cloud-builders/gcloud'
   args:
   - kms
@@ -19,7 +20,7 @@ steps:
   - --keyring=github
   - --key=github-access-token
 
-# Update restrictions on GitHub repos
+# Update branch protection rules on GitHub repos
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'
   args:
@@ -30,6 +31,7 @@ steps:
         curl -d @scripts/set_github_restrictions.json -X PUT -L -H "Authorization:token $(cat config/github_access_token.key)"  -H "Accept: application/vnd.github.luke-cage-preview+json" "https://api.github.com/repos/${pr}/branches/master/protection"
     done
 
+# Deploy data catalog of cloud-deployment project
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'
   args:
@@ -37,17 +39,27 @@ steps:
   - |
     curl https://vwt-digital.github.io/project-company-data.github.io/gcp-templates/deploy_data_catalog.sh | bash /dev/stdin $PROJECT_ID-dcat-deploy config/data_catalog.json $PROJECT_ID
 
+# Deploy publish_build_result function to every project
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'
   args:
   - '-c'
   - |
+    source ../../config/publish_build_result_func.config.sh
     for pr in $(python3 ../../scripts/listprojects.py ../../config/projects.json)
     do
-        gcloud builds submit --project=${pr} --substitutions=$(../../config/publish_build_result_func.config.sh) .
+        gcloud functions deploy publish_build_result_func \
+        --runtime=python37 \
+        --entry-point=publish_build_result_func \
+        --trigger-topic=cloud-builds \
+        --region=$${_DEPLOYMENT_REGION} \
+        --project=$${pr} \
+        --set-env-vars=PUBLISH_PROJECT_ID=$${_PUBLISH_PROJECT_ID},PUBLISH_TOPIC_NAME=$${_PUBLISH_TOPIC_NAME} &
     done
+    wait
   dir: 'functions/publish_build_result_func'
 
+# Set IAM permissions on common cloud build result topic to allow all projects to publish their build results
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'
   args:
@@ -55,23 +67,49 @@ steps:
   - |
     python3 scripts/create_cloudbuilds_topic_iam.py config/projects.json | tee cloudbuildtopiciam.json
     gcloud beta pubsub topics set-iam-policy ${PROJECT_ID}-cloud-builds cloudbuildtopiciam.json -q
+    python3 scripts/create_appengines.py config/projects.json | tee create_appengines.sh
+    (source create_appengines.sh || exit 0)
 
-- name: 'gcr.io/cloud-builders/gcloud'
+# Copy build status badges to storage bucket
+- name: 'gcr.io/cloud-builders/gsutil'
   entrypoint: 'bash'
   args:
   - '-c'
   - |
-    gcloud builds submit --substitutions=$(../../config/create_build_badge_func.config.sh) .
+    source ../../config/create_build_badge_func.config.sh
+    gsutil cp badge-*.png gs://$${_STORAGE_BUCKET}
   dir: 'functions/create_build_badge_func'
 
+# Deploy create_build_badges function
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'
   args:
   - '-c'
   - |
-    gcloud builds submit --substitutions=$(../../config/create_build_badge_func.config.sh),_GITHUB_ACCESS_TOKEN_ENCRYPTED=$(base64 -w0 ../../config/github_access_token.enc) .
+    source ../../config/create_build_badge_func.config.sh
+    gcloud functions deploy create_build_badge_func \
+    --runtime=python37 \
+    --trigger-topic=$${_TOPIC_NAME} \
+    --region=$${_DEPLOYMENT_REGION} \
+    --set-env-vars=STORAGE_BUCKET=$${_STORAGE_BUCKET}
+  dir: 'functions/create_build_badge_func'
+
+# Deploy report_build_status to GitHub function
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    source ../../config/create_build_badge_func.config.sh
+    _GITHUB_ACCESS_TOKEN_ENCRYPTED=$(base64 -w0 ../../config/github_access_token.enc)
+    gcloud functions deploy report_build_status_github_func \
+    --runtime=python37 \
+    --trigger-topic=$${_TOPIC_NAME} \
+    --region=$${_DEPLOYMENT_REGION} \
+    --set-env-vars=STORAGE_BUCKET=$${_STORAGE_BUCKET},GITHUB_ACCESS_TOKEN_ENCRYPTED=$${_GITHUB_ACCESS_TOKEN_ENCRYPTED},PROJECT_ID=${PROJECT_ID}
   dir: 'functions/report_build_status_github_func'
 
+# Create cloud build triggers on source repo commit
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'
   args:

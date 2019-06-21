@@ -1,3 +1,5 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/vwt-digital/cloud-deployment/badge)](https://www.codefactor.io/repository/github/vwt-digital/cloud-deployment)
+
 # cloud-deployment
 
 Automated deployment of projects and build status badges to Google Cloud Platform, also managing GitHub branch protection rules, implemented using Google _Cloud Build_ and _Deployment Manager_.
@@ -5,11 +7,12 @@ Automated deployment of projects and build status badges to Google Cloud Platfor
 ## Functionality
 
 This repository contains GCP Cloud Build, Deployment Manager and helper scripts to provision GCP projects from a project catalog specified in JSON (see [config/projects.json](config/projects.json) for an example). The [cloudbuild.yaml](cloudbuild.yaml) generates the following GCP resources from this specification:
-* GCP project
+* GCP project and additional IAM bindings if specified in odrlPolicy
 * Linked billing account (specified in [config/billing_account_name.cfg](config/billing_account_name.cfg))
 * Enabled services (GCP APIs)
+* App Engine (if App Engine API service is enabled and appEngineRegion specified in [projects.json](config/projects.json))
 * Cloud Build triggers (the actual Source Repository connection to be manually created)
-* [Google KMS](https://cloud.google.com/kms/) Keyrings and keys
+* [Google KMS](https://cloud.google.com/kms/) Keyrings, keys and IAM on the keyring
 
 Next to GCP resources, it will also report build status to GitHub through the [GitHub Statuses API](https://developer.github.com/v3/repos/statuses/), and create a storage bucket containing status badges images for all builds triggered from a source repository, which will contain one of the following images, matching the status of the latest build:
 * [Image of successful build](functions/create_build_badge_func/badge-passing.png)
@@ -38,7 +41,8 @@ gcloud services enable deploymentmanager.googleapis.com  \
                 cloudbuild.googleapis.com \
                 pubsub.googleapis.com \
                 cloudfunctions.googleapis.com \
-                sourcerepo.googleapis.com
+                sourcerepo.googleapis.com \
+                appengine.googleapis.com
 ~~~
 
 As both Cloud Build and Deployment Manager are used to perform the cloud-deployment, the respective service accounts require specific privileges. These should be granted on the projects-parent folder as specified in the following table.
@@ -77,3 +81,4 @@ This will deploy all you specified in the configuration files. When re-running w
 
 The GCP project creation and setup is implemented according to techniques described in [Automating project creation with Google Cloud Deployment Manager](
 https://cloud.google.com/blog/products/gcp/automating-project-creation-with-google-cloud-deployment-manager) and implemented in the Deployment Manager [example](https://github.com/GoogleCloudPlatform/deploymentmanager-samples/tree/master/examples/v2/project_creation)
+The odrlPolicy structure, used to specify permissions on projects and keyrings, is based on the [Open Digital Rights Language (ODRL)](https://www.w3.org/TR/odrl/).

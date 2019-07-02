@@ -37,7 +37,8 @@ steps:
   args:
   - '-c'
   - |
-    curl https://vwt-digital.github.io/project-company-data.github.io/gcp-templates/deploy_data_catalog.sh | bash /dev/stdin $PROJECT_ID-dcat-deploy config/data_catalog.json $PROJECT_ID
+    git clone --branch=${_DCAT_DEPLOY_BRANCH_NAME} https://github.com/vwt-digital/dcat-deploy.git
+    dcat-deploy/deploy_dcat_gcp.sh config/data_catalog.json ${PROJECT_ID}
 
 # Deploy publish_build_result function to every project
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -134,3 +135,6 @@ steps:
             curl -X POST -T trigger.json -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers"
         done
     done
+
+substitutions:
+    _DCAT_DEPLOY_BRANCH_NAME: master

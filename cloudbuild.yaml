@@ -37,9 +37,8 @@ steps:
   args:
   - '-c'
   - |
-    . config/backup.config.sh
     git clone --branch=${_DCAT_DEPLOY_BRANCH_NAME} https://github.com/vwt-digital/dcat-deploy.git
-    dcat-deploy/deploy_dcat_gcp.sh config/data_catalog.json ${PROJECT_ID} ${_DCAT_DEPLOY_BRANCH_NAME} $${_BACKUP_BUCKET} $(base64 -w0 config/github_access_token.enc)
+    dcat-deploy/deploy_dcat_gcp.sh config/data_catalog.json ${PROJECT_ID} ${_DCAT_DEPLOY_BRANCH_NAME} $(base64 -w0 config/github_access_token.enc)
 
 # Deploy publish_build_result function to every project
 - name: 'gcr.io/cloud-builders/gcloud'

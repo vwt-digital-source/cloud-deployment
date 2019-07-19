@@ -66,8 +66,10 @@ def generate_config(context):
             services.append('cloudbuild.googleapis.com') if 'cloudbuild.googleapis.com' not in services else services
             services.append('pubsub.googleapis.com') if 'pubsub.googleapis.com' not in services else services
             services.append('cloudfunctions.googleapis.com') if 'cloudfunctions.googleapis.com' not in services else services
+            services.append('cloudresourcemanager.googleapis.com') if 'cloudresourcemanager.googleapis.com' not in services else services
         else:
-            project['services'] = ['cloudbuild.googleapis.com', 'pubsub.googleapis.com', 'cloudfunctions.googleapis.com']
+            project['services'] = ['cloudbuild.googleapis.com', 'pubsub.googleapis.com', 'cloudfunctions.googleapis.com',
+                    'cloudresourcemanager.googleapis.com']
         for service in project.get('services', []):
             depends_on = [project['projectId'], 'billing_{}'.format(project['projectId'])]
             if index != 0:

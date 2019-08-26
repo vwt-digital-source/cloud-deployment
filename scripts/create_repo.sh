@@ -1,8 +1,7 @@
 #!/bin/bash
 
-#DATA_CATALOG=../../../vwt-digital-config/dat-deployment-config/config/vwt-d-gew1-dat-deployment/data_catalog.json
-DATA_CATALOG=data_catalog.json
-GITHUB_ACCESS_TOKEN=../../../vwt-digital-config/dat-deployment-config/config/vwt-d-gew1-dat-deployment/github_access_token.key
+DATA_CATALOG=$1
+GITHUB_ACCESS_TOKEN=$2
 
 OLDIFS="$IFS"
 IFS=$'\n'

@@ -9,4 +9,4 @@ if len(sys.argv) >= 1:
         dist = ds['distribution'][0]
 
         if dist['format'] == "gitrepo":
-            print(dist['title'])
+            print(json.dumps(ds))

@@ -20,16 +20,14 @@ steps:
   - --keyring=github
   - --key=github-access-token
 
-# Update branch protection rules on GitHub repos
+# Create github repos based on data catalog
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'
   args:
   - '-c'
   - |
-    for pr in $(python3 scripts/listrepos.py config/data_catalog.json)
-    do
-        curl -d @scripts/set_github_restrictions.json -X PUT -L -H "Authorization:token $(cat config/github_access_token.key)"  -H "Accept: application/vnd.github.luke-cage-preview+json" "https://api.github.com/repos/${pr}/branches/master/protection"
-    done
+    create_repo.sh data_catalog.json config/github_access_token.key
+  dir: 'scripts'
 
 # Deploy data catalog of cloud-deployment project
 - name: 'gcr.io/cloud-builders/gcloud'

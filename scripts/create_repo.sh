@@ -11,9 +11,8 @@ do
   # (re)Create the repo
   cp template_newRepo.json newRepo.json
 
-  REPO_TITLE=$(echo $pr | python3 -c "import sys, json; print(json.dumps(json.load(sys.stdin)['distribution']))" | \
-	     python3 -c "import sys, json; print(json.dumps(json.load(sys.stdin)[0]))" | \
-	     python3 -c "import sys, json; print(json.load(sys.stdin)['title'])")
+  REPO_TITLE=$(echo $pr | python3 -c "import sys, json; print(json.load(sys.stdin)['distribution'][0]['title'])")
+
   ORGANISATION=$(echo $REPO_TITLE | cut -d / -f1)
 
   REPO_NAME=$(echo $REPO_TITLE | cut -d / -f2)
@@ -41,9 +40,7 @@ do
 
   # Add "develop" branch
   export SHA=$(curl -X GET -H "Authorization:token $(cat ${GITHUB_ACCESS_TOKEN})" "https://api.github.com/repos/$(echo ${ORGANISATION})/$(echo ${REPO_NAME})/git/refs/heads" | \
-	python3 -c "import sys, json; print(json.dumps(json.load(sys.stdin)[0]))" | \
-       	python3 -c "import sys, json; print(json.dumps(json.load(sys.stdin)['object']))" | \
-	python3 -c "import sys, json; print(json.load(sys.stdin)['sha'])")
+	  python3 -c "import sys, json; print(json.load(sys.stdin)[0]['object']['sha'])")
 
   sed "s/SHA/${SHA}/g" template_addBranch.json > addBranch.json
 

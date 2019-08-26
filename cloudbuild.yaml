@@ -26,7 +26,7 @@ steps:
   args:
   - '-c'
   - |
-    ./create_repo.sh data_catalog.json config/github_access_token.key
+    ./create_repo.sh data_catalog.json ../config/github_access_token.key
   dir: 'scripts'
 
 # Deploy data catalog of cloud-deployment project

@@ -9,26 +9,6 @@ steps:
     ./create_projects.sh ${PROJECT_ID}
   dir: 'scripts'
 
-# Decrypt the file containing the GitHub key
-- name: 'gcr.io/cloud-builders/gcloud'
-  args:
-  - kms
-  - decrypt
-  - --ciphertext-file=config/github_access_token.enc
-  - --plaintext-file=config/github_access_token.key
-  - --location=europe-west1
-  - --keyring=github
-  - --key=github-access-token
-
-# Create github repos based on data catalog
-- name: 'gcr.io/cloud-builders/gcloud'
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    ./create_repo.sh ../config/data_catalog.json ../config/github_access_token.key
-  dir: 'scripts'
-
 # Deploy data catalog of cloud-deployment project
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'

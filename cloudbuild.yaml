@@ -9,7 +9,7 @@ steps:
     ./create_projects.sh ${PROJECT_ID}
   dir: 'scripts'
 
-- name: 'gcr.io/distroless/python3'
+- name: 'python:3.7'
   entrypoint: 'bash'
   args:
   - '-c'

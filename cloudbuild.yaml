@@ -9,7 +9,7 @@ steps:
     ./create_projects.sh ${PROJECT_ID}
   dir: 'scripts'
 
-- name: 'python:3.7'
+- name: 'gcr.io/distroless/python3'
   entrypoint: 'bash'
   args:
   - '-c'
@@ -17,7 +17,7 @@ steps:
     git clone --branch=${_DCAT_DEPLOY_BRANCH_NAME} https://github.com/vwt-digital/dcat-deploy.git
     pip3 install requests google-cloud-kms
     export GITHUB_ACCESS_TOKEN_ENCRYPTED=$(base64 -w0 config/github_access_token.enc)
-    export PROJECT_ID=vwt-d-gew1-dat-deployment
+    export PROJECT_ID=$(PROJECT_ID}
     python3 dcat-deploy/catalog/repos/setup_github_team_repos.py config/data_catalog.json 
 
 # Deploy data catalog of cloud-deployment project

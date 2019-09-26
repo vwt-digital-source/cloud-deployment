@@ -58,14 +58,22 @@ steps:
   args:
   - '-c'
   - |
-    source ../../config/create_cloudbuilds_topic_iam.config.sh
-    cp ../../config/adminsdk_credentials.json .
-    cp ../../config/adminsdk_token.pickle .
-    pip3 install google-api-python-client google-auth-httplib2 google-auth-oauthlib
     python3 scripts/create_cloudbuilds_topic_iam.py config/projects.json | tee cloudbuildtopiciam.json
     gcloud beta pubsub topics set-iam-policy ${PROJECT_ID}-cloud-builds cloudbuildtopiciam.json -q
     python3 scripts/create_appengines.py config/projects.json | tee create_appengines.sh
     (source create_appengines.sh || exit 0)
+
+# Add all CloudBuild project ID's to G Suite group
+- name: 'python:3.7'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    source config/create_cloudbuilds_group_iam.config.sh
+    cp config/adminsdk_credentials.json scripts/.
+    cp /config/adminsdk_token.pickle scripts/.
+    pip3 install google-api-python-client google-auth-httplib2 google-auth-oauthlib
+    python3 scripts/create_cloudbuilds_group_iam.py config/projects.json
 
 # Copy build status badges to storage bucket
 - name: 'gcr.io/cloud-builders/gsutil'

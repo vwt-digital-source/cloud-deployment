@@ -37,7 +37,7 @@ if len(sys.argv) >= 1:
     group_object = service.groups().list(
         domain='vwt.digital',
         maxResults=1,
-        query='email:{}*'.format(os.environ['GSUITE_GROUP_KEY']).split('@')[0])
+        query='email:{}*'.format(os.environ['GSUITE_GROUP_KEY']).split('@')[0]
     ).execute()
 
     # Create new group if not existing
@@ -45,16 +45,16 @@ if len(sys.argv) >= 1:
         group_json = {
             "description": "All GCP cloud builder accounts",
             "name": "Cloud Builders",
-            "email": '{}'.format(os.environ['GSUITE_GROUP_KEY']))
+            "email": '{}'.format(os.environ['GSUITE_GROUP_KEY'])
         }
         service.groups().insert(body=group_json).execute()
 
-    print(F'Group "{os.environ['GSUITE_GROUP_KEY'])}" is active')
+    print('Group "{}" is active'.format(os.environ['GSUITE_GROUP_KEY']))
 
 
     # Getting all members of the group
     members_object = service.members().list(
-        groupKey=os.environ['GSUITE_GROUP_KEY']),
+        groupKey=os.environ['GSUITE_GROUP_KEY'],
         roles='MEMBER'
     ).execute()
     group_members = members_object.get('members')
@@ -63,7 +63,7 @@ if len(sys.argv) >= 1:
     if group_members:
         for member in group_members:
             service.members().delete(
-                groupKey=os.environ['GSUITE_GROUP_KEY']),
+                groupKey=os.environ['GSUITE_GROUP_KEY'],
                 memberKey=member['id']
             ).execute()
 
@@ -78,6 +78,6 @@ if len(sys.argv) >= 1:
             "type": "USER",
             "email": '{}@appspot.gserviceaccount.com'.format(project['projectId'])
         }
-        service.members().insert(groupKey=os.environ['GSUITE_GROUP_KEY']), body=new_user).execute()
+        service.members().insert(groupKey=os.environ['GSUITE_GROUP_KEY'], body=new_user).execute()
 
     print('All new group members are added')

@@ -1,14 +1,9 @@
 import json
 import sys
-#! /usr/bin/env python
-
 import os
 
 from google.oauth2 import service_account
 import googleapiclient.discovery
-
-MEMBERS = ['d.vanrhenen@vwt.digital', 'opensource@vwt.digital']
-
 
 def get_service(api_name, api_version, scope, key_file_location, user_impersonation_email):
     """Get a service that communicates to a Google API.

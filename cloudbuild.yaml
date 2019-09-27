@@ -70,9 +70,10 @@ steps:
   - '-c'
   - |
     source config/create_cloudbuilds_group_iam.config.sh
-    cp config/adminsdk_service_account.json scripts/.
-    pip3 install google-api-python-client
-    python3 scripts/create_cloudbuilds_group_iam.py config/projects.json
+    pip3 install google-api-python-client google-cloud-kms
+    export ADMINSDK_CREDENTIALS_ENCRYPTED=$(base64 -w0 config/adminsdk_credentials.enc)
+    export PROJECT_ID=${PROJECT_ID}
+    python scripts/create_cloudbuilds_group_iam.py config/projects.json
     exit 0
 
 # Copy build status badges to storage bucket

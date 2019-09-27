@@ -73,10 +73,6 @@ steps:
     pip3 install google-api-python-client google-cloud-kms
     export ADMINSDK_CREDENTIALS_ENCRYPTED=$(base64 -w0 config/adminsdk_credentials.enc)
     export PROJECT_ID=${PROJECT_ID}
-    export USER_IMPERSONATION_EMAIL=${_USER_IMPERSONATION_EMAIL}
-    export SERVICE_ACCOUNT_SCOPE=${_SERVICE_ACCOUNT_SCOPE}
-    export SERVICE_ACCOUNT_JSON_FILE_PATH=${_SERVICE_ACCOUNT_JSON_FILE_PATH}
-    export GSUITE_GROUP_KEY=${_GSUITE_GROUP_KEY}
     python3 scripts/create_cloudbuilds_group_iam.py config/projects.json
 
 # Copy build status badges to storage bucket

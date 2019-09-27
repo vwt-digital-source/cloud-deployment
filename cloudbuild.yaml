@@ -14,14 +14,11 @@ steps:
   args:
   - '-c'
   - |
-    if [ ${_DCAT_DEPLOY_BRANCH_NAME} == "develop" ]
-    then
-      git clone --branch=${_DCAT_DEPLOY_BRANCH_NAME} https://github.com/vwt-digital/dcat-deploy.git
-      pip3 install requests google-cloud-kms
-      export GITHUB_ACCESS_TOKEN_ENCRYPTED=$(base64 -w0 config/github_access_token.enc)
-      export PROJECT_ID=${PROJECT_ID}
-      python3 dcat-deploy/catalog/repos/setup_github_team_repos.py config/data_catalog.json
-    fi
+    git clone --branch=${_DCAT_DEPLOY_BRANCH_NAME} https://github.com/vwt-digital/dcat-deploy.git
+    pip3 install requests google-cloud-kms
+    export GITHUB_ACCESS_TOKEN_ENCRYPTED=$(base64 -w0 config/github_access_token.enc)
+    export PROJECT_ID=${PROJECT_ID}
+    python3 dcat-deploy/catalog/repos/setup_github_team_repos.py config/data_catalog.json 
 
 # Deploy data catalog of cloud-deployment project
 - name: 'gcr.io/cloud-builders/gcloud'

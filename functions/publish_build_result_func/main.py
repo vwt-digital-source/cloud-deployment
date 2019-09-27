@@ -16,8 +16,17 @@ def publish_build_result_func(data, context):
         buildstatusmessage = base64.b64decode(data['data']).decode('utf-8')
         print('Buildstatus {}'.format(buildstatusmessage))
         publisher = pubsub_v1.PublisherClient()
+
+        # Publish to DAT Deployment topic
         topic_name = 'projects/{project_id}/topics/{topic}'.format(
-            project_id=os.environ['PUBLISH_PROJECT_ID'],
-            topic=os.environ['PUBLISH_TOPIC_NAME'],
+            project_id=os.environ['PUBLISH_DAT_PROJECT_ID'],
+            topic=os.environ['PUBLISH_DAT_TOPIC_NAME'],
+        )
+        publisher.publish(topic_name, bytes(buildstatusmessage.encode('utf-8')))
+
+        # Publish to ODH Hub topic
+        topic_name = 'projects/{project_id}/topics/{topic}'.format(
+            project_id=os.environ['PUBLISH_ODH_PROJECT_ID'],
+            topic=os.environ['PUBLISH_ODH_TOPIC_NAME'],
         )
         publisher.publish(topic_name, bytes(buildstatusmessage.encode('utf-8')))

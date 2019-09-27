@@ -44,7 +44,7 @@ steps:
         --trigger-topic=cloud-builds \
         --region=$${_DEPLOYMENT_REGION} \
         --project=$${pr} \
-        --set-env-vars=PUBLISH_PROJECT_ID=$${_PUBLISH_PROJECT_ID},PUBLISH_TOPIC_NAME=$${_PUBLISH_TOPIC_NAME} &
+        --set-env-vars=PUBLISH_DAT_PROJECT_ID=$${_PUBLISH_DAT_PROJECT_ID},PUBLISH_DAT_TOPIC_NAME=$${_PUBLISH_DAT_TOPIC_NAME},PUBLISH_ODH_PROJECT_ID=$${_PUBLISH_ODH_PROJECT_ID},PUBLISH_ODH_TOPIC_NAME=$${_PUBLISH_ODH_TOPIC_NAME} &
     done
     wait
   dir: 'functions/publish_build_result_func'

@@ -14,14 +14,11 @@ steps:
   args:
   - '-c'
   - |
-    if [ ${_DCAT_DEPLOY_BRANCH_NAME} == "develop" ]
-    then
-      git clone --branch=${_DCAT_DEPLOY_BRANCH_NAME} https://github.com/vwt-digital/dcat-deploy.git
-      pip3 install requests google-cloud-kms
-      export GITHUB_ACCESS_TOKEN_ENCRYPTED=$(base64 -w0 config/github_access_token.enc)
-      export PROJECT_ID=${PROJECT_ID}
-      python3 dcat-deploy/catalog/repos/setup_github_team_repos.py config/data_catalog.json
-    fi
+    git clone --branch=${_DCAT_DEPLOY_BRANCH_NAME} https://github.com/vwt-digital/dcat-deploy.git
+    pip3 install requests google-cloud-kms
+    export GITHUB_ACCESS_TOKEN_ENCRYPTED=$(base64 -w0 config/github_access_token.enc)
+    export PROJECT_ID=${PROJECT_ID}
+    python3 dcat-deploy/catalog/repos/setup_github_team_repos.py config/data_catalog.json
 
 # Deploy data catalog of cloud-deployment project
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -47,7 +44,7 @@ steps:
         --trigger-topic=cloud-builds \
         --region=$${_DEPLOYMENT_REGION} \
         --project=$${pr} \
-        --set-env-vars=PUBLISH_PROJECT_ID=$${_PUBLISH_PROJECT_ID},PUBLISH_TOPIC_NAME=$${_PUBLISH_TOPIC_NAME} &
+        --set-env-vars=PUBLISH_DAT_PROJECT_ID=$${_PUBLISH_DAT_PROJECT_ID},PUBLISH_DAT_TOPIC_NAME=$${_PUBLISH_DAT_TOPIC_NAME},PUBLISH_ODH_PROJECT_ID=$${_PUBLISH_ODH_PROJECT_ID},PUBLISH_ODH_TOPIC_NAME=$${_PUBLISH_ODH_TOPIC_NAME} &
     done
     wait
   dir: 'functions/publish_build_result_func'
@@ -62,6 +59,21 @@ steps:
     gcloud beta pubsub topics set-iam-policy ${PROJECT_ID}-cloud-builds cloudbuildtopiciam.json -q
     python3 scripts/create_appengines.py config/projects.json | tee create_appengines.sh
     (source create_appengines.sh || exit 0)
+
+# Set IAM permissions on G Suite group for ODH Hub
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    pip install virtualenv
+    virtualenv -p python3 venv
+    source venv/bin/activate
+    source config/create_cloudbuilds_group_iam.config.sh
+    pip install --upgrade google-cloud google-cloud-kms google-auth google-api-python-client
+    export ADMINSDK_CREDENTIALS_ENCRYPTED=$(base64 -w0 config/adminsdk_credentials.enc)
+    export PROJECT_ID=${PROJECT_ID}
+    python3 scripts/create_cloudbuilds_group_iam.py config/projects.json $${_USER_IMPERSONATION_EMAIL} $${_SERVICE_ACCOUNT_SCOPE} $${_GSUITE_GROUP_KEY}
 
 # Copy build status badges to storage bucket
 - name: 'gcr.io/cloud-builders/gsutil'

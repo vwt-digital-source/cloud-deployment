@@ -92,7 +92,7 @@ def generate_config(context):
                 'name': account,
                 'type': 'iam.v1.serviceAccount',
                 'properties': {
-                    'accountId': account
+                    'accountId': account,
                     'displayName': account + ' service account',
                     'projectId': project['projectId']
                 }

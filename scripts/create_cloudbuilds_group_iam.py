@@ -46,8 +46,8 @@ if len(sys.argv) >= 1:
     # Create new group if not existing
     if 'groups' not in group_object:
         group_json = {
-            "description": "All GCP cloud builder accounts",
-            "name": "Cloud Builders",
+            "description": "All GCP {} cloud builder accounts".format(os.environ['BRANCH_NAME']),
+            "name": "Cloud Builders {}".format(os.environ['BRANCH_NAME']),
             "email": '{}'.format(sys.argv[4])
         }
         service.groups().insert(body=group_json).execute()

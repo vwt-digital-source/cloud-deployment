@@ -25,7 +25,7 @@ The cloud-deployment build will also set branch protection rules on all github r
 
 ## Setup
 
-It is advisable to run the cloud-deployment from a specific GCP project that is only used for cloud-deployment, as the functions performed require elevated privileges. The next section describes the setup of these elevated privileges, followed by a section about customizing the configuration. 
+It is advisable to run the cloud-deployment from a specific GCP project that is only used for cloud-deployment, as the functions performed require elevated privileges. The next section describes the setup of these elevated privileges, followed by a section about customizing the configuration.
 
 ### Setup credentials
 
@@ -82,3 +82,7 @@ This will deploy all you specified in the configuration files. When re-running w
 The GCP project creation and setup is implemented according to techniques described in [Automating project creation with Google Cloud Deployment Manager](
 https://cloud.google.com/blog/products/gcp/automating-project-creation-with-google-cloud-deployment-manager) and implemented in the Deployment Manager [example](https://github.com/GoogleCloudPlatform/deploymentmanager-samples/tree/master/examples/v2/project_creation)
 The odrlPolicy structure, used to specify permissions on projects and keyrings, is based on the [Open Digital Rights Language (ODRL)](https://www.w3.org/TR/odrl/).
+
+## Next steps
+
+One of the next steps is to make sure the Service Account from the created Error Logging Sink (production and development folder level) has publish rights on the ODH Error Reporting topic.

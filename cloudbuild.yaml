@@ -37,9 +37,7 @@ steps:
   - '-c'
   - |
     source config/setup_logging_sink.config.sh
-    ! gcloud logging sinks describe vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-error --folder=$(cat config/parent_folder_id.cfg) || gcloud logging sinks delete --quiet vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-error --folder=$(cat config/parent_folder_id.cfg)
-
-    gcloud logging sinks create vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-error $${_ERROR_PUBSUB_TOPIC} --log-filter='severity=ERROR' --include-children --folder=$(cat config/parent_folder_id.cfg)
+    ! gcloud logging sinks describe vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-error --folder=$(cat config/parent_folder_id.cfg) || gcloud logging sinks create vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-error $${_ERROR_PUBSUB_TOPIC} --log-filter='severity=ERROR' --include-children --folder=$(cat config/parent_folder_id.cfg)
 
 # Deploy publish_build_result function to every project
 - name: 'gcr.io/cloud-builders/gcloud'

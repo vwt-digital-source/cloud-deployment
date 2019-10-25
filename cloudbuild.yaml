@@ -1,4 +1,4 @@
-timeout: 1800s
+timeout: 3600s
 steps:
 # Create the projects using Deployment Manager
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -51,7 +51,7 @@ steps:
         gcloud functions deploy publish_build_result_func \
         --runtime=python37 \
         --entry-point=publish_build_result_func \
-        --trigger-topic=$${_TOPIC_PROJECT_ID} \
+        --trigger-topic=cloud-builds \
         --region=$${_DEPLOYMENT_REGION} \
         --project=$${pr} \
         --set-env-vars=TOPIC_PROJECT_ID=$${_TOPIC_PROJECT_ID},TOPIC_NAME=$${_TOPIC_NAME}

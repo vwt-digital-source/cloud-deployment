@@ -18,6 +18,9 @@ def parse_status(payload):
 
 
 class DBProcessor(object):
+    def __init__(self):
+        pass
+
     def process(self, payload):
         if 'status' in payload and \
                 'source' in payload and \

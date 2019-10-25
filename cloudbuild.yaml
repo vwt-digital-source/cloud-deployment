@@ -92,6 +92,16 @@ steps:
     --set-env-vars=PUBSUB_VERIFICATION_TOKEN=12345qwer,DOMAIN_VALIDATION_TOKEN=$${_DOMAIN_VALIDATION_TOKEN},GITHUB_ACCESS_TOKEN_ENCRYPTED=$${_GITHUB_ACCESS_TOKEN_ENCRYPTED},PROJECT_ID=${PROJECT_ID}
   dir: 'functions/report_build_status_github_func'
 
+# Protect http report function
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    if [[ "$BRANCH_NAME" == "develop" ]]; then echo '{ "bindings": [ { "members": [ "serviceAccount:vwt-d-gew1-odh-hub@appspot.gserviceaccount.com" ], "role": "roles/cloudfunctions.invoker" } ] }' > consume_func_permissions.json; fi
+    if [[ "$BRANCH_NAME" == "master" ]]; then echo '{ "bindings": [ { "members": [ "serviceAccount:vwt-p-gew1-odh-hub@appspot.gserviceaccount.com" ], "role": "roles/cloudfunctions.invoker" } ] }' > consume_func_permissions.json; fi
+    gcloud beta functions set-iam-policy report-build-status-github-func --region=europe-west1 --project=${PROJECT_ID} consume_func_permissions.json
+
 # Create cloud build triggers on source repo commit
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'

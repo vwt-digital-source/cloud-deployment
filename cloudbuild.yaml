@@ -52,7 +52,7 @@ steps:
         --runtime=python37 \
         --entry-point=publish_build_result_func \
         --trigger-topic=cloud-builds \
-        --region=$${_DEPLOYMENT_REGION} \
+        --region=europe-west1 \
         --project=$${pr} \
         --set-env-vars=TOPIC_PROJECT_ID=$${_TOPIC_PROJECT_ID},TOPIC_NAME=$${_TOPIC_NAME}
     done

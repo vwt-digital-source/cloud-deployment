@@ -82,11 +82,14 @@ steps:
   - |
     source ../../config/cloud_build_result_funcs.config.sh
     _GITHUB_ACCESS_TOKEN_ENCRYPTED=$(base64 -w0 ../../config/github_access_token.enc)
-    gcloud functions deploy report_build_status_github_func \
+    gcloud functions deploy report-build-status-github-func \
+    --entry-point=topic_to_github \
     --runtime=python37 \
-    --trigger-topic=$${_TOPIC_PROJECT_ID} \
-    --region=$${_DEPLOYMENT_REGION} \
-    --set-env-vars=GITHUB_ACCESS_TOKEN_ENCRYPTED=$${_GITHUB_ACCESS_TOKEN_ENCRYPTED},PROJECT_ID=${PROJECT_ID}
+    --trigger-http \
+    --project=${PROJECT_ID} \
+    --region=europe-west1 \
+    --max-instances=10 \
+    --set-env-vars=PUBSUB_VERIFICATION_TOKEN=12345qwer,DOMAIN_VALIDATION_TOKEN=$${_DOMAIN_VALIDATION_TOKEN},GITHUB_ACCESS_TOKEN_ENCRYPTED=$${_GITHUB_ACCESS_TOKEN_ENCRYPTED},PROJECT_ID=${PROJECT_ID}
   dir: 'functions/report_build_status_github_func'
 
 # Create cloud build triggers on source repo commit

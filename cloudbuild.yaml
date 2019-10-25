@@ -98,8 +98,8 @@ steps:
   args:
   - '-c'
   - |
-    if [[ "$BRANCH_NAME" == "develop" ]]; then echo '{ "bindings": [ { "members": [ "serviceAccount:vwt-d-gew1-odh-hub@appspot.gserviceaccount.com" ], "role": "roles/cloudfunctions.invoker" } ] }' > consume_func_permissions.json; fi
-    if [[ "$BRANCH_NAME" == "master" ]]; then echo '{ "bindings": [ { "members": [ "serviceAccount:vwt-p-gew1-odh-hub@appspot.gserviceaccount.com" ], "role": "roles/cloudfunctions.invoker" } ] }' > consume_func_permissions.json; fi
+    if [[ "_DCAT_DEPLOY_BRANCH_NAME" == "develop" ]]; then echo '{ "bindings": [ { "members": [ "serviceAccount:vwt-d-gew1-odh-hub@appspot.gserviceaccount.com" ], "role": "roles/cloudfunctions.invoker" } ] }' > consume_func_permissions.json; fi
+    if [[ "_DCAT_DEPLOY_BRANCH_NAME" == "master" ]]; then echo '{ "bindings": [ { "members": [ "serviceAccount:vwt-p-gew1-odh-hub@appspot.gserviceaccount.com" ], "role": "roles/cloudfunctions.invoker" } ] }' > consume_func_permissions.json; fi
     gcloud beta functions set-iam-policy report-build-status-github-func --region=europe-west1 --project=${PROJECT_ID} consume_func_permissions.json
 
 # Create cloud build triggers on source repo commit

@@ -18,7 +18,7 @@ def publish_build_result_func(data, context):
 
         # Publish to Pub/Sub topic
         topic_name = 'projects/{project_id}/topics/{topic}'.format(
-            project_id=os.environ['PUBLISH_PROJECT_ID'],
-            topic=os.environ['PUBLISH_TOPIC_NAME'],
+            project_id=os.environ['TOPIC_PROJECT_ID'],
+            topic=os.environ['TOPIC_NAME'],
         )
         publisher.publish(topic_name, bytes(buildstatusmessage.encode('utf-8')))

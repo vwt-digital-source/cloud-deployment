@@ -45,16 +45,16 @@ steps:
   args:
   - '-c'
   - |
-    source ../../config/publish_build_result_func.config.sh
+    source ../../config/cloud_build_result_funcs.config.sh
     for pr in $(python3 ../../scripts/listprojects.py ../../config/projects.json)
     do
         gcloud functions deploy publish_build_result_func \
         --runtime=python37 \
         --entry-point=publish_build_result_func \
-        --trigger-topic=$${_PUBLISH_TOPIC_NAME} \
+        --trigger-topic=$${_TOPIC_PROJECT_ID} \
         --region=$${_DEPLOYMENT_REGION} \
         --project=$${pr} \
-        --set-env-vars=PUBLISH_PROJECT_ID=$${_PUBLISH_PROJECT_ID},PUBLISH_TOPIC_NAME=$${_PUBLISH_TOPIC_NAME}
+        --set-env-vars=TOPIC_PROJECT_ID=$${_TOPIC_PROJECT_ID},TOPIC_NAME=$${_TOPIC_NAME}
     done
     wait
   dir: 'functions/publish_build_result_func'
@@ -80,13 +80,13 @@ steps:
   args:
   - '-c'
   - |
-    source ../../config/create_build_badge_func.config.sh
+    source ../../config/cloud_build_result_funcs.config.sh
     _GITHUB_ACCESS_TOKEN_ENCRYPTED=$(base64 -w0 ../../config/github_access_token.enc)
     gcloud functions deploy report_build_status_github_func \
     --runtime=python37 \
-    --trigger-topic=$${_TOPIC_NAME} \
+    --trigger-topic=$${_TOPIC_PROJECT_ID} \
     --region=$${_DEPLOYMENT_REGION} \
-    --set-env-vars=STORAGE_BUCKET=$${_STORAGE_BUCKET},GITHUB_ACCESS_TOKEN_ENCRYPTED=$${_GITHUB_ACCESS_TOKEN_ENCRYPTED},PROJECT_ID=${PROJECT_ID}
+    --set-env-vars=GITHUB_ACCESS_TOKEN_ENCRYPTED=$${_GITHUB_ACCESS_TOKEN_ENCRYPTED},PROJECT_ID=${PROJECT_ID}
   dir: 'functions/report_build_status_github_func'
 
 # Create cloud build triggers on source repo commit

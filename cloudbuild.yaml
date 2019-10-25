@@ -51,24 +51,13 @@ steps:
         gcloud functions deploy publish_build_result_func \
         --runtime=python37 \
         --entry-point=publish_build_result_func \
-        --trigger-topic=cloud-builds \
+        --trigger-topic=$${_PUBLISH_TOPIC_NAME} \
         --region=$${_DEPLOYMENT_REGION} \
         --project=$${pr} \
-        --set-env-vars=PUBLISH_DAT_PROJECT_ID=$${_PUBLISH_DAT_PROJECT_ID},PUBLISH_DAT_TOPIC_NAME=$${_PUBLISH_DAT_TOPIC_NAME},PUBLISH_ODH_PROJECT_ID=$${_PUBLISH_ODH_PROJECT_ID},PUBLISH_ODH_TOPIC_NAME=$${_PUBLISH_ODH_TOPIC_NAME} &
+        --set-env-vars=PUBLISH_PROJECT_ID=$${_PUBLISH_PROJECT_ID},PUBLISH_TOPIC_NAME=$${_PUBLISH_TOPIC_NAME}
     done
     wait
   dir: 'functions/publish_build_result_func'
-
-# Set IAM permissions on common cloud build result topic to allow all projects to publish their build results
-- name: 'gcr.io/cloud-builders/gcloud'
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    python3 scripts/create_cloudbuilds_topic_iam.py config/projects.json | tee cloudbuildtopiciam.json
-    gcloud beta pubsub topics set-iam-policy ${PROJECT_ID}-cloud-builds cloudbuildtopiciam.json -q
-    python3 scripts/create_appengines.py config/projects.json | tee create_appengines.sh
-    (source create_appengines.sh || exit 0)
 
 # Set IAM permissions on G Suite group for ODH Hub
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -84,30 +73,6 @@ steps:
     export ADMINSDK_CREDENTIALS_ENCRYPTED=$(base64 -w0 config/adminsdk_credentials.enc)
     export PROJECT_ID=${PROJECT_ID}
     python3 scripts/create_cloudbuilds_group_iam.py config/projects.json $${_USER_IMPERSONATION_EMAIL} $${_SERVICE_ACCOUNT_SCOPE} $${_GSUITE_GROUP_KEY}
-
-# Copy build status badges to storage bucket
-- name: 'gcr.io/cloud-builders/gsutil'
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    source ../../config/create_build_badge_func.config.sh
-    gsutil cp badge-*.png gs://$${_STORAGE_BUCKET}
-  dir: 'functions/create_build_badge_func'
-
-# Deploy create_build_badges function
-- name: 'gcr.io/cloud-builders/gcloud'
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    source ../../config/create_build_badge_func.config.sh
-    gcloud functions deploy create_build_badge_func \
-    --runtime=python37 \
-    --trigger-topic=$${_TOPIC_NAME} \
-    --region=$${_DEPLOYMENT_REGION} \
-    --set-env-vars=STORAGE_BUCKET=$${_STORAGE_BUCKET}
-  dir: 'functions/create_build_badge_func'
 
 # Deploy report_build_status to GitHub function
 - name: 'gcr.io/cloud-builders/gcloud'

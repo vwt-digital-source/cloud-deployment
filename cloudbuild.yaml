@@ -29,6 +29,33 @@ steps:
     export PROJECT_ID=${PROJECT_ID}
     python3 dcat-deploy/catalog/repos/setup_github_team_repos.py config/data_catalog.json
 
+# Deploy report_build_status to GitHub function
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    source ../../config/cloud_build_result_funcs.config.sh
+    _GITHUB_ACCESS_TOKEN_ENCRYPTED=$(base64 -w0 ../../config/github_access_token.enc)
+    gcloud functions deploy report-build-status-github-func \
+    --entry-point=topic_to_github \
+    --runtime=python37 \
+    --trigger-http \
+    --project=${PROJECT_ID} \
+    --region=europe-west1 \
+    --max-instances=10 \
+    --set-env-vars=PUBSUB_VERIFICATION_TOKEN=12345qwer,DOMAIN_VALIDATION_TOKEN=$${_DOMAIN_VALIDATION_TOKEN},GITHUB_ACCESS_TOKEN_ENCRYPTED=$${_GITHUB_ACCESS_TOKEN_ENCRYPTED},PROJECT_ID=${PROJECT_ID}
+  dir: 'functions/report_build_status_github_func'
+
+# Protect http report function
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    if [[ "${_DCAT_DEPLOY_BRANCH_NAME}" == "develop" ]]; then echo '{ "bindings": [ { "members": [ "serviceAccount:vwt-d-gew1-odh-hub@appspot.gserviceaccount.com" ], "role": "roles/cloudfunctions.invoker" } ] }' > consume_func_permissions.json; fi
+    if [[ "${_DCAT_DEPLOY_BRANCH_NAME}" == "master" ]]; then echo '{ "bindings": [ { "members": [ "serviceAccount:vwt-p-gew1-odh-hub@appspot.gserviceaccount.com" ], "role": "roles/cloudfunctions.invoker" } ] }' > consume_func_permissions.json; fi
+    gcloud beta functions set-iam-policy report-build-status-github-func --region=europe-west1 --project=${PROJECT_ID} consume_func_permissions.json
 
 # Create Error Reporting log sink for parent folder
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -73,34 +100,6 @@ steps:
     export ADMINSDK_CREDENTIALS_ENCRYPTED=$(base64 -w0 config/adminsdk_credentials.enc)
     export PROJECT_ID=${PROJECT_ID}
     python3 scripts/create_cloudbuilds_group_iam.py config/projects.json $${_USER_IMPERSONATION_EMAIL} $${_SERVICE_ACCOUNT_SCOPE} $${_GSUITE_GROUP_KEY}
-
-# Deploy report_build_status to GitHub function
-- name: 'gcr.io/cloud-builders/gcloud'
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    source ../../config/cloud_build_result_funcs.config.sh
-    _GITHUB_ACCESS_TOKEN_ENCRYPTED=$(base64 -w0 ../../config/github_access_token.enc)
-    gcloud functions deploy report-build-status-github-func \
-    --entry-point=topic_to_github \
-    --runtime=python37 \
-    --trigger-http \
-    --project=${PROJECT_ID} \
-    --region=europe-west1 \
-    --max-instances=10 \
-    --set-env-vars=PUBSUB_VERIFICATION_TOKEN=12345qwer,DOMAIN_VALIDATION_TOKEN=$${_DOMAIN_VALIDATION_TOKEN},GITHUB_ACCESS_TOKEN_ENCRYPTED=$${_GITHUB_ACCESS_TOKEN_ENCRYPTED},PROJECT_ID=${PROJECT_ID}
-  dir: 'functions/report_build_status_github_func'
-
-# Protect http report function
-- name: 'gcr.io/cloud-builders/gcloud'
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    if [[ "_DCAT_DEPLOY_BRANCH_NAME" == "develop" ]]; then echo '{ "bindings": [ { "members": [ "serviceAccount:vwt-d-gew1-odh-hub@appspot.gserviceaccount.com" ], "role": "roles/cloudfunctions.invoker" } ] }' > consume_func_permissions.json; fi
-    if [[ "_DCAT_DEPLOY_BRANCH_NAME" == "master" ]]; then echo '{ "bindings": [ { "members": [ "serviceAccount:vwt-p-gew1-odh-hub@appspot.gserviceaccount.com" ], "role": "roles/cloudfunctions.invoker" } ] }' > consume_func_permissions.json; fi
-    gcloud beta functions set-iam-policy report-build-status-github-func --region=europe-west1 --project=${PROJECT_ID} consume_func_permissions.json
 
 # Create cloud build triggers on source repo commit
 - name: 'gcr.io/cloud-builders/gcloud'

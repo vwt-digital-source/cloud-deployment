@@ -12,7 +12,7 @@ def parse_status(payload):
     if payload['status'] in ['FAILURE', 'TIMEOUT', 'CANCELLED']:
         status = 'failure'
     if payload['status'] == 'SUCCESS':
-        status = 'passing'
+        status = 'success'
 
     return status
 

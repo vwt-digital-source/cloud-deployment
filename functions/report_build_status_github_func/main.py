@@ -1,56 +1,46 @@
+import logging
+import json
 import base64
 import os
-import json
-import requests
-from google.cloud import kms_v1
 
-def report_build_status_github_func(data, context):
-    """Background Cloud Function to be triggered by Pub/Sub.
-    Args:
-         data (dict): The dictionary with data specific to this type of event.
-         context (google.cloud.functions.Context): The Cloud Functions event
-         metadata.
-    """
+from dbprocessor import DBProcessor
 
-    if 'data' in data:
-        strdecoded = base64.b64decode(data['data']).decode('utf-8')
-        buildstatusmessage = json.loads(strdecoded)
-        print('RECEIVED {}'.format(json.dumps(buildstatusmessage)))
+parser = DBProcessor()
+verification_token = os.environ['PUBSUB_VERIFICATION_TOKEN']
+domain_token = os.environ['DOMAIN_VALIDATION_TOKEN']
 
-        if 'status' in buildstatusmessage and 'source' in buildstatusmessage and 'repoSource' in buildstatusmessage['source'] \
-                and 'sourceProvenance' in buildstatusmessage and 'resolvedRepoSource' in buildstatusmessage['sourceProvenance']:
 
-            status = 'pending'
-            if buildstatusmessage['status'] == 'QUEUED' or buildstatusmessage['status'] == 'WORKING':
-                status = 'pending'
-            if buildstatusmessage['status'] in ['FAILURE', 'TIMEOUT']:
-                status = 'failure'
-            if buildstatusmessage['status'] == 'SUCCESS':
-                status = 'success'
+def topic_to_github(request):
+    if request.method == 'GET':
+        return '''
+             <html>
+                 <head>
+                     <meta name="google-site-verification" content="{token}" />
+                 </head>
+                 <body>
+                 </body>
+             </html>
+         '''.format(token=domain_token)
 
-            github_status = {
-                'state': status,
-                'description': 'GCP Cloud Build reported: {}'.format(buildstatusmessage['status']),
-                'context': 'gcp/cloudbuild'
-            }
-            if 'logUrl' in buildstatusmessage:
-                github_status['target_url'] = buildstatusmessage['logUrl']
+    if request.args.get('token', '') != verification_token:
+        return 'Invalid request', 400
 
-            repo_id_parts = buildstatusmessage['sourceProvenance']['resolvedRepoSource']['repoName'].split('_')
-            if repo_id_parts[0] == 'github' and len(repo_id_parts) == 3:
-                user = repo_id_parts[1]
-                repo_name = repo_id_parts[2]
-                commitSha = buildstatusmessage['sourceProvenance']['resolvedRepoSource']['commitSha']
+    # Extract data from request
+    envelope = json.loads(request.data.decode('utf-8'))
+    payload = base64.b64decode(envelope['message']['data'])
 
-                github_access_token_encrypted = base64.b64decode(os.environ['GITHUB_ACCESS_TOKEN_ENCRYPTED'])
-                kms_client = kms_v1.KeyManagementServiceClient()
-                crypto_key_name = kms_client.crypto_key_path_path(os.environ['PROJECT_ID'], 'europe-west1', 'github', 'github-access-token')
-                decrypt_response = kms_client.decrypt(crypto_key_name, github_access_token_encrypted)
-                github_access_token = decrypt_response.plaintext.decode("utf-8").replace('\n', '')
+    # Extract subscription from subscription string
+    try:
+        subscription = envelope['subscription'].split('/')[-1]
+        logging.info(f'Message received from {subscription} [{payload}]')
 
-                github_url = 'https://api.github.com/repos/{}/{}/statuses/{}'.format(user, repo_name, commitSha)
-                headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer '+github_access_token}
-                print('POST to {}: {}'.format(github_url, json.dumps(github_status)))
-                post_result = requests.post(github_url, headers=headers, data=json.dumps(github_status))
-                print('POST result code {}, data {}'.format(post_result.status_code, post_result.text))
-                post_result.raise_for_status()
+        parser.process(json.loads(payload))
+
+    except Exception as e:
+        logging.info('Extract of subscription failed')
+        logging.debug(e)
+        raise e
+
+    # Returning any 2xx status indicates successful receipt of the message.
+    # 204: no content, delivery successfull, no further actions needed
+    return 'OK', 204

@@ -81,7 +81,7 @@ steps:
         --trigger-topic=cloud-builds \
         --region=europe-west1 \
         --project=$${pr} \
-        --set-env-vars=TOPIC_PROJECT_ID=$${_TOPIC_PROJECT_ID},TOPIC_NAME=$${_TOPIC_NAME}
+        --set-env-vars=TOPIC_PROJECT_ID=$${_TOPIC_PROJECT_ID},TOPIC_NAME=$${_TOPIC_NAME} &
     done
     wait
   dir: 'functions/publish_build_result_func'

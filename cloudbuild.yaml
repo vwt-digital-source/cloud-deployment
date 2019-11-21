@@ -13,6 +13,7 @@ steps:
 # Deploy data catalog of cloud-deployment project
 - name: 'gcr.io/cloud-builders/gcloud'
   id: 'dcat-deploy'
+  waitFor: ['-']  # The '-' indicates that this step begins immediately.
   entrypoint: 'bash'
   args:
   - '-c'
@@ -35,12 +36,11 @@ steps:
 - name: 'python:3.7'
   id: 'github-teams-repo-permissions'
   waitFor:
-  - create-projects
+  - dcat-deploy
   entrypoint: 'bash'
   args:
   - '-c'
   - |
-    git clone --branch=${_DCAT_DEPLOY_BRANCH_NAME} https://github.com/vwt-digital/dcat-deploy.git
     pip3 install requests google-cloud-kms
     export GITHUB_ACCESS_TOKEN_ENCRYPTED=$(base64 -w0 config/github_access_token.enc)
     export PROJECT_ID=${PROJECT_ID}
@@ -82,6 +82,7 @@ steps:
 # Create Error Reporting and app traffic log sink for parent folder
 - name: 'gcr.io/cloud-builders/gcloud'
   waitFor:
+  - create-projects
   - dcat-deploy
   entrypoint: 'bash'
   args:
@@ -107,6 +108,7 @@ steps:
 # Deploy publish_build_result function to every project
 - name: 'gcr.io/cloud-builders/gcloud'
   waitFor:
+  - create-projects
   - dcat-deploy
   entrypoint: 'bash'
   args:
@@ -129,6 +131,7 @@ steps:
 # Set IAM permissions on G Suite group for ODH Hub
 - name: 'gcr.io/cloud-builders/gcloud'
   waitFor:
+  - create-projects
   - dcat-deploy
   entrypoint: 'bash'
   args:

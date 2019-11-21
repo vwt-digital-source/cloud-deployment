@@ -66,14 +66,28 @@ steps:
     if [[ "${_DCAT_DEPLOY_BRANCH_NAME}" == "master" ]]; then echo '{ "bindings": [ { "members": [ "serviceAccount:vwt-p-gew1-odh-hub@appspot.gserviceaccount.com" ], "role": "roles/cloudfunctions.invoker" } ] }' > consume_func_permissions.json; fi
     gcloud beta functions set-iam-policy report-build-status-github-func --region=europe-west1 --project=${PROJECT_ID} consume_func_permissions.json
 
-# Create Error Reporting log sink for parent folder
+# Create Error Reporting and ALL log sink for parent folder
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'
   args:
   - '-c'
   - |
     source config/setup_logging_sink.config.sh
-    gcloud logging sinks describe vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-error --folder=$(cat config/parent_folder_id.cfg) || gcloud logging sinks create vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-error $${_ERROR_PUBSUB_TOPIC} --log-filter='severity=ERROR' --include-children --folder=$(cat config/parent_folder_id.cfg)
+    if [ -n "$${_ERROR_PUBSUB_TOPIC}" ]
+    then
+       gcloud logging sinks describe vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-error \
+          --folder=$(cat config/parent_folder_id.cfg) || \
+          gcloud logging sinks create vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-error \
+          $${_ERROR_PUBSUB_TOPIC} --log-filter='severity=ERROR' --include-children --folder=$(cat config/parent_folder_id.cfg)
+    fi
+    if [ -n "$${_ALL_LOG_PUBSUB_TOPIC}" ]
+    then
+       gcloud logging sinks describe vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-all \
+          --folder=$(cat config/parent_folder_id.cfg) || \
+          gcloud logging sinks create vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-all \
+          $${_ALL_LOG_PUBSUB_TOPIC} --log-filter='resource.type=(api OR cloud_function OR cloud_run_revision OR consumed_api OR gae_app OR gce_instance OR http_load_balancer OR managed_service)' \
+          --include-children --folder=$(cat config/parent_folder_id.cfg)
+    fi
 
 # Deploy publish_build_result function to every project
 - name: 'gcr.io/cloud-builders/gcloud'

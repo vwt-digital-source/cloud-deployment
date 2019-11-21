@@ -2,6 +2,7 @@ timeout: 3600s
 steps:
 # Create the projects using Deployment Manager
 - name: 'gcr.io/cloud-builders/gcloud'
+  id: 'create-projects'
   entrypoint: 'bash'
   args:
   - '-c'
@@ -11,6 +12,7 @@ steps:
 
 # Deploy data catalog of cloud-deployment project
 - name: 'gcr.io/cloud-builders/gcloud'
+  id: 'dcat-deploy'
   entrypoint: 'bash'
   args:
   - '-c'
@@ -20,6 +22,8 @@ steps:
 
 # Create app engines
 - name: 'gcr.io/cloud-builders/gcloud'
+  waitFor:
+  - create-projects
   entrypoint: 'bash'
   args:
   - '-c'
@@ -27,7 +31,11 @@ steps:
     python3 scripts/create_appengines.py config/projects.json | tee create_appengines.sh
     (source create_appengines.sh || exit 0)
 
+# Setup github teams on repositories
 - name: 'python:3.7'
+  id: 'github-teams-repo-permissions'
+  waitFor:
+  - create-projects
   entrypoint: 'bash'
   args:
   - '-c'
@@ -40,6 +48,9 @@ steps:
 
 # Deploy report_build_status to GitHub function
 - name: 'gcr.io/cloud-builders/gcloud'
+  id: 'report-build-status-to-github-func'
+  waitFor:
+  - dcat-deploy
   entrypoint: 'bash'
   args:
   - '-c'
@@ -56,8 +67,10 @@ steps:
     --set-env-vars=PUBSUB_VERIFICATION_TOKEN=12345qwer,DOMAIN_VALIDATION_TOKEN=$${_DOMAIN_VALIDATION_TOKEN},GITHUB_ACCESS_TOKEN_ENCRYPTED=$${_GITHUB_ACCESS_TOKEN_ENCRYPTED},PROJECT_ID=${PROJECT_ID}
   dir: 'functions/report_build_status_github_func'
 
-# Protect http report function
+# Protect http report_build_status to GitHub function
 - name: 'gcr.io/cloud-builders/gcloud'
+  waitFor:
+  - report-build-status-to-github-func
   entrypoint: 'bash'
   args:
   - '-c'
@@ -66,8 +79,10 @@ steps:
     if [[ "${_DCAT_DEPLOY_BRANCH_NAME}" == "master" ]]; then echo '{ "bindings": [ { "members": [ "serviceAccount:vwt-p-gew1-odh-hub@appspot.gserviceaccount.com" ], "role": "roles/cloudfunctions.invoker" } ] }' > consume_func_permissions.json; fi
     gcloud beta functions set-iam-policy report-build-status-github-func --region=europe-west1 --project=${PROJECT_ID} consume_func_permissions.json
 
-# Create Error Reporting and ALL log sink for parent folder
+# Create Error Reporting and app traffic log sink for parent folder
 - name: 'gcr.io/cloud-builders/gcloud'
+  waitFor:
+  - dcat-deploy
   entrypoint: 'bash'
   args:
   - '-c'
@@ -91,6 +106,8 @@ steps:
 
 # Deploy publish_build_result function to every project
 - name: 'gcr.io/cloud-builders/gcloud'
+  waitFor:
+  - dcat-deploy
   entrypoint: 'bash'
   args:
   - '-c'
@@ -111,6 +128,8 @@ steps:
 
 # Set IAM permissions on G Suite group for ODH Hub
 - name: 'gcr.io/cloud-builders/gcloud'
+  waitFor:
+  - dcat-deploy
   entrypoint: 'bash'
   args:
   - '-c'
@@ -126,6 +145,8 @@ steps:
 
 # Create cloud build triggers on source repo commit
 - name: 'gcr.io/cloud-builders/gcloud'
+  waitFor:
+  - github-teams-repo-permissions
   entrypoint: 'bash'
   args:
   - '-c'

@@ -80,12 +80,12 @@ steps:
           gcloud logging sinks create vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-error \
           $${_ERROR_PUBSUB_TOPIC} --log-filter='severity=ERROR' --include-children --folder=$(cat config/parent_folder_id.cfg)
     fi
-    if [ -n "$${_ALL_LOG_PUBSUB_TOPIC}" ]
+    if [ -n "$${_APPTRAFFICLOG_PUBSUB_TOPIC}" ]
     then
-       gcloud logging sinks describe vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-all \
+       gcloud logging sinks describe vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-apptrafficlog-sink \
           --folder=$(cat config/parent_folder_id.cfg) || \
-          gcloud logging sinks create vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-all \
-          $${_ALL_LOG_PUBSUB_TOPIC} --log-filter='resource.type=(api OR cloud_function OR cloud_run_revision OR consumed_api OR gae_app OR gce_instance OR http_load_balancer OR managed_service)' \
+          gcloud logging sinks create vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-apptrafficlog-sink \
+          $${_APPTRAFFICLOG_PUBSUB_TOPIC} --log-filter='resource.type=(api OR cloud_function OR cloud_run_revision OR consumed_api OR gae_app OR gce_instance OR http_load_balancer OR managed_service)' \
           --include-children --folder=$(cat config/parent_folder_id.cfg)
     fi
 

@@ -122,6 +122,12 @@ def generate_config(context):
                 ]
             },
             {
+                'role': 'roles/run.admin',
+                'members': [
+                    'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudbuild.gserviceaccount.com'
+                ]
+            },
+            {
                 'role': 'roles/owner',
                 'members': [
                     'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudservices.gserviceaccount.com'

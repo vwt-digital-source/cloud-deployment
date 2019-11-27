@@ -1,4 +1,3 @@
-import sys
 
 
 def gather_permissions(preDefinedBindings, resource_name, odrlPolicy):
@@ -38,7 +37,7 @@ def generate_config(context):
     max_projects_parallel = 20
     project_depends = []
 
-    for project in projects['projects']:
+    for project in projects['projects']:  # noqa: F821
         project_def = {
             'name': project['projectId'],
             'type': 'cloudresourcemanager.v1.project',
@@ -83,7 +82,7 @@ def generate_config(context):
             services.append('cloudresourcemanager.googleapis.com') if 'cloudresourcemanager.googleapis.com' not in services else services
         else:
             project['services'] = ['cloudbuild.googleapis.com', 'pubsub.googleapis.com', 'cloudfunctions.googleapis.com',
-                    'cloudresourcemanager.googleapis.com']
+                                   'cloudresourcemanager.googleapis.com']
         for service in project.get('services', []):
             depends_on = [project['projectId'], 'billing_{}'.format(project['projectId'])]
             if index != 0:
@@ -159,7 +158,8 @@ def generate_config(context):
                 }
             }
         })
-        depends_on = [project['projectId'], 'billing_{}'.format(project['projectId']), '{}-cloudkms.googleapis.com-api'.format(project['projectId'])]
+        depends_on = [project['projectId'], 'billing_{}'.format(project['projectId']),
+                      '{}-cloudkms.googleapis.com-api'.format(project['projectId'])]
         for keyring in project.get('keyrings', []):
             keyringResource = {
                 'name': '{}-{}-keyring'.format(project['projectId'], keyring['name']),

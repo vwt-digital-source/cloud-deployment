@@ -34,7 +34,7 @@ def append_gcp_policy(resource, resource_name, odrlPolicy):
 def generate_config(context):
     resources = []
     project_index = 0
-    max_projects_parallel = 20
+    max_projects_parallel = 10
     project_depends = []
 
     for project in projects['projects']:  # noqa: F821

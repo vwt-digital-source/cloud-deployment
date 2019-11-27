@@ -150,6 +150,7 @@ steps:
 - name: 'gcr.io/cloud-builders/gcloud'
   waitFor:
   - github-teams-repo-permissions
+  - create-projects
   entrypoint: 'bash'
   args:
   - '-c'

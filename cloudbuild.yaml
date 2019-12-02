@@ -1,5 +1,5 @@
 timeout: 3600s
-ud 
+
 steps:
 # Create the projects using Deployment Manager
 - name: 'gcr.io/cloud-builders/gcloud'

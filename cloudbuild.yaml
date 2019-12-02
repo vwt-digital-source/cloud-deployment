@@ -13,8 +13,7 @@ steps:
 # Remove service accounts not specified in the projects.json
 - name: 'gcr.io/cloud-builders/gcloud'
   id: 'remove not specified service accounts'
-  waitFor:
-  - create-projects
+  waitFor: ['-']  # The '-' indicates that this step begins immediately.
   entrypoint: 'bash'
   args:
   - '-c'
@@ -22,7 +21,6 @@ steps:
     pip install virtualenv
     virtualenv -p python3 venv
     source venv/bin/activate
-    source config/create_cloudbuilds_group_iam.config.sh
     pip install --upgrade google-cloud google-auth google-api-python-client
     python3 scripts/remove_service_accounts.py config/projects.json 
 

@@ -19,7 +19,7 @@ if len(sys.argv) >= 1:
             for sa in pr['serviceAccounts']:
                 documented_serviceaccounts.append({"projectId": pr['projectId'], "serviceAccount" : sa})
 
-        request = service.projects().serviceAccounts().list(name=f"projects/{pr['projectId']}")
+        request = service.projects().serviceAccounts().list(name="projects/{}".format(pr['projectId']))
         while True:
             response = request.execute()
 
@@ -33,10 +33,10 @@ if len(sys.argv) >= 1:
     for sa in active_serviceaccounts:
         remove = False
         if 'iam.gserviceaccount.com' in sa['name']: 
-            if next((item for item in documented_serviceaccounts if f"projects/{item['projectId']}/serviceAccounts/{item['serviceAccount']}" in sa['name']), False) == False:
+            if next((item for item in documented_serviceaccounts if "projects/{}/serviceAccounts/{}".format(item['projectId'], item['serviceAccount']) in sa['name']), False) == False:
                 remove = True
             else:
-                print(f"FOUND {sa}")
+                print("FOUND {}".format(sa))
 
         if remove == True:
             to_be_removed_service_accounts.append(sa)

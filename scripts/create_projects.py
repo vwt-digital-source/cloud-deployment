@@ -1,4 +1,3 @@
-import sys
 
 
 def gather_permissions(preDefinedBindings, resource_name, odrlPolicy):
@@ -34,9 +33,12 @@ def append_gcp_policy(resource, resource_name, odrlPolicy):
 
 def generate_config(context):
     resources = []
+    project_index = 0
+    max_projects_parallel = 2
+    project_depends = []
 
-    for project in projects['projects']:
-        resources.append({
+    for project in projects['projects']:  # noqa: F821
+        project_def = {
             'name': project['projectId'],
             'type': 'cloudresourcemanager.v1.project',
             'properties': {
@@ -47,7 +49,18 @@ def generate_config(context):
                     'id': '{}'.format(context.properties['parent_folder_id'])
                 }
             }
-        })
+        }
+        if len(project_depends) > project_index % max_projects_parallel:
+            project_def.update({
+                'metadata': {
+                    'dependsOn': [project_depends[project_index % max_projects_parallel]]
+                }
+            })
+            project_depends[project_index % max_projects_parallel] = project['projectId']
+        else:
+            project_depends.append(project['projectId'])
+        project_index += 1
+        resources.append(project_def)
         resources.append({
             'name': 'billing_{}'.format(project['projectId']),
             'type': 'deploymentmanager.v2.virtual.projectBillingInfo',
@@ -69,7 +82,7 @@ def generate_config(context):
             services.append('cloudresourcemanager.googleapis.com') if 'cloudresourcemanager.googleapis.com' not in services else services
         else:
             project['services'] = ['cloudbuild.googleapis.com', 'pubsub.googleapis.com', 'cloudfunctions.googleapis.com',
-                    'cloudresourcemanager.googleapis.com']
+                                   'cloudresourcemanager.googleapis.com']
         for service in project.get('services', []):
             depends_on = [project['projectId'], 'billing_{}'.format(project['projectId'])]
             if index != 0:
@@ -122,6 +135,12 @@ def generate_config(context):
                 ]
             },
             {
+                'role': 'roles/run.admin',
+                'members': [
+                    'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudbuild.gserviceaccount.com'
+                ]
+            },
+            {
                 'role': 'roles/owner',
                 'members': [
                     'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudservices.gserviceaccount.com'
@@ -139,7 +158,8 @@ def generate_config(context):
                 }
             }
         })
-        depends_on = [project['projectId'], 'billing_{}'.format(project['projectId']), '{}-cloudkms.googleapis.com-api'.format(project['projectId'])]
+        depends_on = [project['projectId'], 'billing_{}'.format(project['projectId']),
+                      '{}-cloudkms.googleapis.com-api'.format(project['projectId'])]
         for keyring in project.get('keyrings', []):
             keyringResource = {
                 'name': '{}-{}-keyring'.format(project['projectId'], keyring['name']),

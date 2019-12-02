@@ -1,4 +1,5 @@
 timeout: 3600s
+ud 
 steps:
 # Create the projects using Deployment Manager
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -21,7 +22,7 @@ steps:
     pip install virtualenv
     virtualenv -p python3 venv
     source venv/bin/activate
-    pip install --upgrade google-cloud google-auth google-api-python-client
+    pip install --upgrade google-cloud google-auth google-api-python-client oauth2client
     python3 scripts/remove_service_accounts.py config/projects.json 
 
 # Deploy data catalog of cloud-deployment project

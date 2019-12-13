@@ -102,14 +102,18 @@ def generate_config(context):
             iam_policies_depends.append('{}-{}-api'.format(project['projectId'], service))
         for account in project.get('serviceAccounts', []):
             resources.append({
-                'name': account,
+                'name': '{}-{}-svcaccount'.format(project['projectId'], account),
                 'type': 'iam.v1.serviceAccount',
+                'metadata': {
+                    'dependsOn': [project['projectId']]
+                },
                 'properties': {
                     'accountId': account,
                     'displayName': account + ' service account',
                     'projectId': project['projectId']
                 }
             })
+            iam_policies_depends.append('{}-{}-svcaccount'.format(project['projectId'], account))
         resources.append({
             'name': 'get-iam-policy-' + project['projectId'],
             'action': 'gcp-types/cloudresourcemanager-v1:cloudresourcemanager.projects.getIamPolicy',

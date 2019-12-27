@@ -4,19 +4,13 @@ import json
 from git import Repo
 
 import googleapiclient.discovery
-from google.oauth2 import service_account
-
+from oauth2client.client import GoogleCredentials
 
 def get_policy(project_id):
     """Gets IAM policy for a project."""
-
-    credentials = service_account.Credentials.from_service_account_file(
-        filename=os.environ['GOOGLE_APPLICATION_CREDENTIALS'],
-        scopes=['https://www.googleapis.com/auth/cloud-platform'])
-    service = googleapiclient.discovery.build(
-        'cloudresourcemanager', 'v1', credentials=credentials)
-    policy = service.projects().getIamPolicy(
-        resource=project_id, body={}).execute()
+    credentials = GoogleCredentials.get_application_default()
+    service = googleapiclient.discovery.build('cloudresourcemanager', 'v1', credentials=credentials)
+    policy = service.projects().getIamPolicy(resource=project_id, body={}).execute()
     print(policy)
     return policy
 
@@ -33,16 +27,10 @@ def modify_policy_add_member(policy, role, member):
 def set_policy(project_id, policy):
     """Sets IAM policy for a project."""
 
-    credentials = service_account.Credentials.from_service_account_file(
-        filename=os.environ['GOOGLE_APPLICATION_CREDENTIALS'],
-        scopes=['https://www.googleapis.com/auth/cloud-platform'])
-    service = googleapiclient.discovery.build(
-        'cloudresourcemanager', 'v1', credentials=credentials)
+    credentials = GoogleCredentials.get_application_default()
+    service = googleapiclient.discovery.build('cloudresourcemanager', 'v1', credentials=credentials)
 
-    policy = service.projects().setIamPolicy(
-        resource=project_id, body={
-            'policy': policy
-        }).execute()
+    policy = service.projects().setIamPolicy(resource=project_id, body={'policy': policy}).execute()
     print(policy)
     return policy
 
@@ -55,7 +43,6 @@ project_id = sys.argv[1]
 
 # Get the last commit
 repo = Repo('')
-#repo = Repo('~/Documents/vwt-digital-config/high-privilege-access-config')
 last_commit = list(repo.iter_commits(paths='config/{}'.format(project_id)))[0]
 
 for request_file, v in last_commit.stats.files.items():

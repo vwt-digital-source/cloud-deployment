@@ -7,7 +7,7 @@ from oauth2client.client import GoogleCredentials
 def get_policy(project_id):
     """Gets IAM policy for a project."""
     credentials = GoogleCredentials.get_application_default()
-    service = googleapiclient.discovery.build('cloudresourcemanager', 'v1', credentials=credentials)
+    service = googleapiclient.discovery.build('cloudresourcemanager', 'v1', credentials=credentials, cache_discovery=False)
     policy = service.projects().getIamPolicy(resource=project_id, body={}).execute()
     print(policy)
     return policy
@@ -27,7 +27,7 @@ def set_policy(project_id, policy):
     """Sets IAM policy for a project."""
 
     credentials = GoogleCredentials.get_application_default()
-    service = googleapiclient.discovery.build('cloudresourcemanager', 'v1', credentials=credentials)
+    service = googleapiclient.discovery.build('cloudresourcemanager', 'v1', credentials=credentials, cache_discovery=False)
 
     policy = service.projects().setIamPolicy(resource=project_id, body={'policy': policy}).execute()
     print(policy)

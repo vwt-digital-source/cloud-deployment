@@ -1,4 +1,3 @@
-import sys
 import json
 
 import googleapiclient.discovery
@@ -34,6 +33,7 @@ def set_policy(project_id, policy):
     print(policy)
     return policy
 
+
 def revoke_HPA(request):
     projects = json.load(open('projects.json'))
 
@@ -47,11 +47,10 @@ def revoke_HPA(request):
                     policy = modify_policy_remove_member(policy, binding['role'], member)
                     print("Removed [{}],[{}]".format(member, binding['role']))
 
-        if modified == True:
+        if modified:
             print("New Policy {}".format(policy))
             set_policy(pr['projectId'], policy)
 
     # Returning any 2xx status indicates successful receipt of the message.
     # 204: no content, delivery successful, no further actions needed
     return 'OK', 204
-

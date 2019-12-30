@@ -1,10 +1,10 @@
 import sys
-import os
 import json
 from git import Repo
 
 import googleapiclient.discovery
 from oauth2client.client import GoogleCredentials
+
 
 def get_policy(project_id):
     """Gets IAM policy for a project."""

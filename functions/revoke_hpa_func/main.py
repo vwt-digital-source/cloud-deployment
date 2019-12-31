@@ -49,7 +49,7 @@ def revoke_HPA(request):
 
         if modified:
             print("New Policy {}".format(policy))
-            set_policy(pr['projectId'], policy)
+            # set_policy(pr['projectId'], policy)
 
     # Returning any 2xx status indicates successful receipt of the message.
     # 204: no content, delivery successful, no further actions needed

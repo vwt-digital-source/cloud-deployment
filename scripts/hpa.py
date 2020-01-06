@@ -1,5 +1,6 @@
 import sys
 import json
+import os
 from git import Repo
 
 import googleapiclient.discovery
@@ -39,6 +40,9 @@ if len(sys.argv) < 2:
     sys.exit()
 
 project_id = sys.argv[1]
+
+if not os.path.isdir('config/{}'.format(project_id)):
+    sys.exit()
 
 
 # Get the last commit

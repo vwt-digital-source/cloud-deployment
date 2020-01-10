@@ -5,7 +5,7 @@
             "name": "gcr.io/cloud-builders/git",
             "args": [
                 "clone",
-                "--branch=${_DCAT_DEPLOY_BRANCH_NAME}",
+                "--branch=__BRANCH_NAME",
                 "https://github.com/vwt-digital/cloud-deployment.git"
             ]
         },
@@ -21,8 +21,5 @@
 		"python cloud-deployment/scripts/revoke_hpa.py"
             ]
         }
-    ],
-    "substitutions": {
-        "_DCAT_DEPLOY_BRANCH_NAME": "__DCAT_DEPLOY_BRANCH_NAME__"
-    }
+    ]
 }

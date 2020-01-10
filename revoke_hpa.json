@@ -5,7 +5,7 @@
             "name": "gcr.io/cloud-builders/git",
             "args": [
                 "clone",
-                "--branch=_BRANCH_NAME",
+                "--branch=${_BRANCH_NAME}",
                 "https://github.com/vwt-digital/cloud-deployment.git"
             ]
         },

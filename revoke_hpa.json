@@ -1,0 +1,28 @@
+{
+    "timeout": "3600s",
+    "steps": [
+        {
+            "name": "gcr.io/cloud-builders/git",
+            "args": [
+                "clone",
+                "--branch=${_DCAT_DEPLOY_BRANCH_NAME}",
+                "https://github.com/vwt-digital/cloud-deployment.git"
+            ]
+        },
+        {
+            "name": "gcr.io/cloud-builders/gcloud",
+            "entrypoint": "bash",
+            "args": [
+                "-c",
+		"pip install virtualenv",
+    		"virtualenv -p python3 venv",
+    		"source venv/bin/activate",
+    		"pip install --upgrade google-auth oauth2client google-api-python-client",
+		"python cloud-deployment/scripts/revoke_hpa.py"
+            ]
+        }
+    ],
+    "substitutions": {
+        "_DCAT_DEPLOY_BRANCH_NAME": "__DCAT_DEPLOY_BRANCH_NAME__"
+    }
+}

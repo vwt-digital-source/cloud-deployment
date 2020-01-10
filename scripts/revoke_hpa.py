@@ -34,23 +34,19 @@ def set_policy(project_id, policy):
     return policy
 
 
-def revoke_HPA(request):
-    projects = json.load(open('projects.json'))
+projects = json.load(open('projects.json'))
 
-    for pr in projects['projects']:
-        policy = get_policy(pr['projectId'])
-        modified = False
-        for binding in policy['bindings']:
-            for member in binding['members']:
-                if 'user:' in member:
-                    modified = True
-                    policy = modify_policy_remove_member(policy, binding['role'], member)
-                    print("Removed [{}],[{}]".format(member, binding['role']))
+for pr in projects['projects']:
+    policy = get_policy(pr['projectId'])
+    modified = False
 
-        if modified:
-            print("New Policy {}".format(policy))
-            # set_policy(pr['projectId'], policy)
+    for binding in policy['bindings']:
+        for member in binding['members']:
+            if 'user:' in member:
+                modified = True
+                policy = modify_policy_remove_member(policy, binding['role'], member)
+                print("Removed [{}],[{}]".format(member, binding['role']))
 
-    # Returning any 2xx status indicates successful receipt of the message.
-    # 204: no content, delivery successful, no further actions needed
-    return 'OK', 204
+    if modified:
+        print("New Policy {}".format(policy))
+        # set_policy(pr['projectId'], policy)

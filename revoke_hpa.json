@@ -10,11 +10,19 @@
             ]
         },
         {
+            "name": "gcr.io/cloud-builders/git",
+            "args": [
+                "clone",
+                "--branch=${_BRANCH_NAME}",
+                "https://github.com/vwt-digital-config/high-privilege-access-config.git"
+            ]
+        },
+        {
             "name": "gcr.io/cloud-builders/gcloud",
             "entrypoint": "bash",
             "args": [
                 "-c",
-		"pip install virtualenv && virtualenv -p python3 venv && source venv/bin/activate && pip install --upgrade google-auth oauth2client google-api-python-client && python cloud-deployment/scripts/revoke_hpa.py $(cat config/${PROJECT_ID}/parent_folder_id.cfg)"
+		"pip install virtualenv && virtualenv -p python3 venv && source venv/bin/activate && pip install --upgrade google-auth oauth2client google-api-python-client && python cloud-deployment/scripts/revoke_hpa.py $(cat high-privilege-access-config/config/${PROJECT_ID}/parent_folder_id.cfg)"
             ]
         }
     ],

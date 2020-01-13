@@ -1,5 +1,4 @@
-import json
-
+import sys
 import googleapiclient.discovery
 from oauth2client.client import GoogleCredentials
 
@@ -34,19 +33,32 @@ def set_policy(project_id, policy):
     return policy
 
 
-projects = json.load(open('projects.json'))
+if len(sys.argv) > 1:
+    parent_id = sys.argv[1]
 
-for pr in projects['projects']:
-    policy = get_policy(pr['projectId'])
-    modified = False
+    credentials = GoogleCredentials.get_application_default()
+    service = googleapiclient.discovery.build('cloudresourcemanager', 'v1', credentials=credentials)
 
-    for binding in policy['bindings']:
-        for member in binding['members']:
-            if 'user:' in member:
-                modified = True
-                policy = modify_policy_remove_member(policy, binding['role'], member)
-                print("Removed [{}],[{}]".format(member, binding['role']))
+    request = service.projects().list(filter="parent.id={}".format(parent_id))
 
-    if modified:
-        print("New Policy {}".format(policy))
-        # set_policy(pr['projectId'], policy)
+    while request is not None:
+        response = request.execute()
+
+        for pr in response.get('projects', []):
+            print(pr['projectId'])
+
+            policy = get_policy(pr['projectId'])
+            modified = False
+
+            for binding in policy['bindings']:
+                for member in binding['members']:
+                    if 'user:' in member:
+                        modified = True
+                        policy = modify_policy_remove_member(policy, binding['role'], member)
+                        print("Removed [{}],[{}]".format(member, binding['role']))
+
+            if modified:
+                print("New Policy {}".format(policy))
+                # set_policy(pr['projectId'], policy)
+
+            request = service.projects().list_next(previous_request=request, previous_response=response)

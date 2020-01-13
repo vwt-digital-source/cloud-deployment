@@ -14,7 +14,7 @@
             "entrypoint": "bash",
             "args": [
                 "-c",
-		"pip install virtualenv && virtualenv -p python3 venv && source venv/bin/activate && pip install --upgrade google-auth oauth2client google-api-python-client && PARENT_ID=`cat config/${PROJECT_ID}/parent_folder_id.cfg` && echo ${PARENT_ID} && python cloud-deployment/scripts/revoke_hpa.py ${PARENT_ID}"
+		"pip install virtualenv && virtualenv -p python3 venv && source venv/bin/activate && pip install --upgrade google-auth oauth2client google-api-python-client && python cloud-deployment/scripts/revoke_hpa.py $(cat config/${PROJECT_ID}/parent_folder_id.cfg)"
             ]
         }
     ],

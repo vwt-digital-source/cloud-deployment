@@ -51,7 +51,7 @@ if len(sys.argv) > 1:
             modified = False
 
             for binding in policy['bindings']:
-                for member in binding['members']:
+                for member in reversed(binding['members']):
                     if 'user:' in member:
                         modified = True
                         policy = modify_policy_remove_member(policy, binding['role'], member)

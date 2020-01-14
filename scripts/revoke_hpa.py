@@ -59,6 +59,6 @@ if len(sys.argv) > 1:
 
             if modified:
                 print("New Policy {}".format(policy))
-                # set_policy(pr['projectId'], policy)
+                set_policy(pr['projectId'], policy)
 
             request = service.projects().list_next(previous_request=request, previous_response=response)

@@ -160,5 +160,18 @@ steps:
         done
     done
 
+
+steps:
+# Deploy report_build_status to GitHub function	
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'remove report-build-status-to-github-func'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    ! gcloud functions describe report-build-status-github-func --region=europe-west1 || gcloud functions delete report-build-status-github-func --region=europe-west1 --quiet
+
+
 substitutions:
     _DCAT_DEPLOY_BRANCH_NAME: master
+

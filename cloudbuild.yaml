@@ -21,11 +21,11 @@ steps:
   - '-c'
   - |
     pip install virtualenv
-    virtualenv -p python3 venv
-    source venv/bin/activate
+    virtualenv -p python3 venv-create-projects
+    source venv-create-projects/bin/activate
     pip install --upgrade google-cloud google-auth google-api-python-client oauth2client
-    python3 scripts/remove_service_accounts.py config/projects.json 
-    python3 scripts/remove_user_roles.py config/projects.json 
+    python3 scripts/remove_service_accounts.py config/projects.json
+    python3 scripts/remove_user_roles.py config/projects.json
 
 
 # Deploy data catalog of cloud-deployment project
@@ -123,8 +123,8 @@ steps:
   - '-c'
   - |
     pip install virtualenv
-    virtualenv -p python3 venv
-    source venv/bin/activate
+    virtualenv -p python3 venv-gsuite-iam
+    source venv-gsuite-iam/bin/activate
     source config/create_cloudbuilds_group_iam.config.sh
     pip install --upgrade google-cloud google-cloud-kms google-auth google-api-python-client
     export ADMINSDK_CREDENTIALS_ENCRYPTED=$(base64 -w0 config/adminsdk_credentials.enc)
@@ -160,5 +160,16 @@ steps:
         done
     done
 
+# Deploy report_build_status to GitHub function
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'remove report-build-status-to-github-func'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    ! gcloud functions describe report-build-status-github-func --region=europe-west1 || gcloud functions delete report-build-status-github-func --region=europe-west1 --quiet
+
+
 substitutions:
     _DCAT_DEPLOY_BRANCH_NAME: master
+

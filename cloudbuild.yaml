@@ -122,7 +122,6 @@ steps:
   args:
   - '-c'
   - |
-    pip install setuptools==45.2.0
     pip install virtualenv==16.7.9
     virtualenv -p python3 venv-gsuite-iam
     source venv-gsuite-iam/bin/activate

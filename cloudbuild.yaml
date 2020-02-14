@@ -20,7 +20,7 @@ steps:
   args:
   - '-c'
   - |
-    pip install virtualenv
+    pip install virtualenv==16.7.9
     virtualenv -p python3 venv-create-projects
     source venv-create-projects/bin/activate
     pip install --upgrade google-cloud google-auth google-api-python-client oauth2client
@@ -122,7 +122,8 @@ steps:
   args:
   - '-c'
   - |
-    pip install virtualenv
+    pip install setuptools==45.2.0
+    pip install virtualenv==16.7.9
     virtualenv -p python3 venv-gsuite-iam
     source venv-gsuite-iam/bin/activate
     source config/create_cloudbuilds_group_iam.config.sh

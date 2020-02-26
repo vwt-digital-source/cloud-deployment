@@ -74,6 +74,7 @@ def generate_config(context):
         })
         index = 0
         iam_policies_depends = [project['projectId']]
+        services_list = []
         if 'services' in project:
             services = project['services']
             services.append('cloudbuild.googleapis.com') if 'cloudbuild.googleapis.com' not in services else services
@@ -87,6 +88,12 @@ def generate_config(context):
             depends_on = [project['projectId'], 'billing_{}'.format(project['projectId'])]
             if index != 0:
                 depends_on.append('{}-{}-api'.format(project['projectId'], project['services'][index-1]))
+                service_to_add = '{}-{}-api'.format(project['projectId'], project['services'][index-1])
+                if service_to_add not in services_list:
+                    services_list.append(service_to_add)
+            service_to_add = '{}-{}-api'.format(project['projectId'], service)
+            if service_to_add not in services_list:
+                services_list.append(service_to_add)
             resources.append({
                 'name': '{}-{}-api'.format(project['projectId'], service),
                 'type': 'deploymentmanager.v2.virtual.enableService',
@@ -100,7 +107,9 @@ def generate_config(context):
             })
             index += 1
             iam_policies_depends.append('{}-{}-api'.format(project['projectId'], service))
+        service_accounts_list = []
         for account in project.get('serviceAccounts', []):
+            service_accounts_list.append('{}-{}-svcaccount'.format(project['projectId'], account))
             resources.append({
                 'name': '{}-{}-svcaccount'.format(project['projectId'], account),
                 'type': 'iam.v1.serviceAccount',
@@ -151,6 +160,15 @@ def generate_config(context):
                 ]
             }
         ]
+        odrl_policy = project.get('odrlPolicy')
+        if odrl_policy is not None:
+            for permission in odrl_policy.get('permission'):
+                if 'serviceAccount' in permission['assignee']:
+                    service_account = permission['assignee']
+                    service_account = service_account.replace('serviceAccount:', '')
+                    service_account = service_account + '-svcaccount'
+                    if service_account not in service_accounts_list:
+                        service_accounts_list.append(service_account)
         resources.append({
             'name': 'patch-iam-policy-' + project['projectId'],
             'action': 'gcp-types/cloudresourcemanager-v1:cloudresourcemanager.projects.setIamPolicy',
@@ -164,6 +182,7 @@ def generate_config(context):
         })
         depends_on = [project['projectId'], 'billing_{}'.format(project['projectId']),
                       '{}-cloudkms.googleapis.com-api'.format(project['projectId'])]
+        depends_on = depends_on + services_list + service_accounts_list
         for keyring in project.get('keyrings', []):
             keyringResource = {
                 'name': '{}-{}-keyring'.format(project['projectId'], keyring['name']),

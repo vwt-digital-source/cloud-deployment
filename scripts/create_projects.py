@@ -164,6 +164,7 @@ def generate_config(context):
             for permission in odrl_policy.get('permission'):
                 if 'serviceAccount' in permission['assignee']:
                     service_account = permission['assignee']
+                    service_account = service_account.replace('serviceAccount:', '')
                     service_account = service_account + '-svcaccount'
                     if service_account not in service_accounts_list:
                         service_accounts_list.append(service_account)

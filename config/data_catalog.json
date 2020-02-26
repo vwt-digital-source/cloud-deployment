@@ -1,5 +1,9 @@
 {
   "conformsTo": "https://vwt-digital.github.io/project-company-data.github.io/v1.1/schema",
+  "publishDataCatalog":{
+    "topic": "the-topic",
+    "project": "project-containing-topic"
+  },
   "dataset": [
     {
       "identifier": "my-deployment-status-stg",

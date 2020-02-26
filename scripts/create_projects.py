@@ -74,6 +74,7 @@ def generate_config(context):
         })
         index = 0
         iam_policies_depends = [project['projectId']]
+        services_list = []
         if 'services' in project:
             services = project['services']
             services.append('cloudbuild.googleapis.com') if 'cloudbuild.googleapis.com' not in services else services
@@ -87,6 +88,12 @@ def generate_config(context):
             depends_on = [project['projectId'], 'billing_{}'.format(project['projectId'])]
             if index != 0:
                 depends_on.append('{}-{}-api'.format(project['projectId'], project['services'][index-1]))
+                service_to_add = '{}-{}-api'.format(project['projectId'], project['services'][index-1])
+                if service_to_add not in services_list:
+                    services_list.append(service_to_add)
+            service_to_add = '{}-{}-api'.format(project['projectId'], service)
+            if service_to_add not in services_list:
+                services_list.append(service_to_add)
             resources.append({
                 'name': '{}-{}-api'.format(project['projectId'], service),
                 'type': 'deploymentmanager.v2.virtual.enableService',
@@ -100,7 +107,9 @@ def generate_config(context):
             })
             index += 1
             iam_policies_depends.append('{}-{}-api'.format(project['projectId'], service))
+        service_accounts_list = []
         for account in project.get('serviceAccounts', []):
+            service_accounts_list.append('{}-{}-svcaccount'.format(project['projectId'], account))
             resources.append({
                 'name': '{}-{}-svcaccount'.format(project['projectId'], account),
                 'type': 'iam.v1.serviceAccount',
@@ -163,7 +172,8 @@ def generate_config(context):
             }
         })
         depends_on = [project['projectId'], 'billing_{}'.format(project['projectId']),
-                      '{}-cloudkms.googleapis.com-api'.format(project['projectId'])]
+                      '{}-cloudkms.googleapis.com-api'.format(project['projectId'])] + \
+            services_list + service_accounts_list
         for keyring in project.get('keyrings', []):
             keyringResource = {
                 'name': '{}-{}-keyring'.format(project['projectId'], keyring['name']),

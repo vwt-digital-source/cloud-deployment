@@ -109,7 +109,6 @@ def generate_config(context):
             iam_policies_depends.append('{}-{}-api'.format(project['projectId'], service))
         service_accounts_list = []
         for account in project.get('serviceAccounts', []):
-            service_accounts_list.append('{}-{}-svcaccount'.format(project['projectId'], account))
             resources.append({
                 'name': '{}-{}-svcaccount'.format(project['projectId'], account),
                 'type': 'iam.v1.serviceAccount',

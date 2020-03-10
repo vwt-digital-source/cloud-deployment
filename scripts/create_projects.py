@@ -88,14 +88,10 @@ def generate_config(context):
             depends_on = [project['projectId'], 'billing_{}'.format(project['projectId'])]
             if index != 0:
                 depends_on.append('{}-{}-api'.format(project['projectId'], project['services'][index-1]))
-                service_to_add = '{}-{}-api'.format(project['projectId'], project['services'][index-1])
-                if service_to_add not in services_list:
-                    services_list.append(service_to_add)
             service_to_add = '{}-{}-api'.format(project['projectId'], service)
-            if service_to_add not in services_list:
-                services_list.append(service_to_add)
+            services_list.append(service_to_add)
             resources.append({
-                'name': '{}-{}-api'.format(project['projectId'], service),
+                'name': service_to_add,
                 'type': 'deploymentmanager.v2.virtual.enableService',
                 'metadata': {
                     'dependsOn': depends_on

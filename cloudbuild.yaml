@@ -50,20 +50,6 @@ steps:
     python3 scripts/create_appengines.py config/projects.json | tee create_appengines.sh
     (source create_appengines.sh || exit 0)
 
-# Setup github teams on repositories
-- name: 'python:3.7'
-  id: 'github-teams-repo-permissions'
-  waitFor:
-  - dcat-deploy
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    pip3 install requests google-cloud-kms
-    export GITHUB_ACCESS_TOKEN_ENCRYPTED=$(base64 -w0 config/github_access_token.enc)
-    export PROJECT_ID=${PROJECT_ID}
-    python3 dcat-deploy/catalog/repos/setup_github_team_repos.py config/data_catalog.json
-
 # Create Error Reporting and app traffic log sink for parent folder
 - name: 'gcr.io/cloud-builders/gcloud'
   waitFor:
@@ -135,7 +121,6 @@ steps:
 # Create cloud build triggers on source repo commit
 - name: 'gcr.io/cloud-builders/gcloud'
   waitFor:
-  - github-teams-repo-permissions
   - create-projects
   entrypoint: 'bash'
   args:
@@ -168,7 +153,7 @@ steps:
   args:
   - '-c'
   - |
-    ! gcloud functions describe report-build-status-github-func --region=europe-west1 || gcloud functions delete report-build-status-github-func --region=europe-west1 --quiet
+    ! gcloud functions describe report_build_status_github_func --region=europe-west1 || gcloud functions delete report_build_status_github_func --region=europe-west1 --quiet
 
 
 substitutions:

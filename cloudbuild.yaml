@@ -25,8 +25,6 @@ steps:
     source venv-create-projects/bin/activate
     pip install --upgrade google-cloud google-auth google-api-python-client oauth2client
     python3 scripts/remove_service_accounts.py config/projects.json
-    python3 scripts/remove_user_roles.py config/projects.json
-
 
 # Deploy data catalog of cloud-deployment project
 - name: 'gcr.io/cloud-builders/gcloud'

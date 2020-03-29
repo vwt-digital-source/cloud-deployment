@@ -48,7 +48,7 @@ do
     enabled="/tmp/${project}.enabled"
     specified="/tmp/${project}.specified"
     gcloud services list --enabled --format="value(NAME)" --project "${project}" > "${enabled}"
-    python3 ./list_services.py "${project}" > "${specified}"
+    python3 ./list_services.py "${project}" "${project_catalog}" > "${specified}"
     disable=$(comm -23 <(sort "${enabled}") <(sort "${specified}"))
 
     for service in ${disable}

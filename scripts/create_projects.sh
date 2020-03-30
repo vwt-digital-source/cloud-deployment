@@ -45,9 +45,9 @@ fi
 # Disable services that are not specified in projects.json
 for project in $(gcloud projects list --format="value(PROJECT_ID)" --filter="parent.id=${parent_folder_id}")
 do
-    specified="/tmp/${project}.specified"
+    # specified="/tmp/${project}.specified"
     # gcloud services list --enabled --format="value(NAME)" --project "${project}" > "${enabled}"
-    python3 ./list_services.py "${project}" "${project_catalog}" > "${specified}"
+    specified=$(python3 ./list_services.py "${project}" "${project_catalog}")
     # disable=$(comm -23 <(sort "${enabled}") <(sort "${specified}"))
 
     for service in ${specified}

@@ -10,11 +10,13 @@ default_services = [
     'servicecontrol.googleapis.com',
     'servicemanagement.googleapis.com',
     'cloudresourcemanager.googleapis.com',
-    'source.googleapis.com',
+    'source.googleapis.com'
     'sourcerepo.googleapis.com',
     'storage-api.googleapis.com',
     'storage-component.googleapis.com',
-    'containerregistry.googleapis.com'
+    'cloudbuild.googleapis.com',
+    'pubsub.googleapis.com',
+    'cloudfunctions.googleapis.com'
 ]
 
 with open(sys.argv[2]) as projects_file:

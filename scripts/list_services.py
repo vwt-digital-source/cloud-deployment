@@ -13,7 +13,6 @@ default_services = [
     'servicemanagement.googleapis.com',
     'serviceusage.googleapis.com',
     'cloudresourcemanager.googleapis.com',
-    'source.googleapis.com',
     'sourcerepo.googleapis.com',
     'storage-api.googleapis.com',
     'storage-component.googleapis.com',

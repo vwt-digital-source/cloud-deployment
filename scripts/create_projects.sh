@@ -43,7 +43,7 @@ else
 fi
 
 # Disable services that are not specified in projects.json
-for project in $(gcloud projects list --format="value(PROJECT_ID)")
+for project in $(gcloud projects list --format="value(PROJECT_ID)" --filter="parent.id=${parent_folder_id}")
 do
     enabled="/tmp/${project}.enabled"
     specified="/tmp/${project}.specified"

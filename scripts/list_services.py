@@ -16,7 +16,8 @@ default_services = [
     'storage-component.googleapis.com',
     'cloudbuild.googleapis.com',
     'pubsub.googleapis.com',
-    'cloudfunctions.googleapis.com'
+    'cloudfunctions.googleapis.com',
+    'containerregistry.googleapis.com'
 ]
 
 with open(sys.argv[2]) as projects_file:

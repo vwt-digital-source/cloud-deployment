@@ -4,6 +4,8 @@ import json
 project_id = sys.argv[1]
 
 default_services = [
+    'bigquerystorage.googleapis.com',
+    'bigquery.googleapis.com',
     'cloudtrace.googleapis.com',
     'logging.googleapis.com',
     'monitoring.googleapis.com',

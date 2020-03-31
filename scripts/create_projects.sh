@@ -42,27 +42,28 @@ else
       --delete-policy=abandon
 fi
 
-# Disable unused services in gcp projects
+# Enable/disable gcp services in projects
 for project in $(gcloud projects list --format="value(PROJECT_ID)" --filter="parent.id=${parent_folder_id}")
 do
     echo "Managing services for ${project}..."
 
     enabled="/tmp/${project}.enabled"
     specified="/tmp/${project}.specified"
+    excluded="/tmp/${project}.excluded"
+
+    echo "source.googleapis.com" > "${excluded}"
 
     gcloud services list --enabled --format="value(NAME)" --project "${project}" > "${enabled}"
     python3 ./list_services.py "${project}" "${project_catalog}" > "${specified}"
 
-    disabled=$(python3 ./compare_lists.py "${enabled}" "${specified}")
+    disabled=$(python3 ./compare_lists.py "${enabled}" "${specified}" "${excluded}")
 
-    # Disable services not specified
     for service in ${disabled}
     do
         echo " + disable ${service} in ${project}"
         # gcloud services disable "${service}" --project "${project}" --async
     done
 
-    # Enable services that are specified
     for service in $(cat "$specified")
     do
         echo " + enable ${service} in ${project}"

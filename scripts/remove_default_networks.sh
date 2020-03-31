@@ -12,7 +12,7 @@ do
 
     # Check if default network should be deleted
     default_network=$(python3 "${basedir}"/has_default_network.py "${project}" "${PROJECT_CATALOG}")
-    if [[ "${default_network}" == "False" ]]
+    if [[ "${default_network}" == "false" ]]
     then
 
         # Enable compute.googleapis.com if disabled

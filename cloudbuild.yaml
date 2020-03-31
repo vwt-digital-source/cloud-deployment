@@ -28,7 +28,7 @@ steps:
 
 # Enable/disable services based on projects.json
 - name: 'gcr.io/cloud-builders/gcloud'
-  id: 'Enable/disable services based on projects.json'
+  id: 'Enable/disable services'
   waitFor:
   - create-projects
   entrypoint: 'bash'
@@ -40,7 +40,7 @@ steps:
 
 # Remove default networks based on projects.json
 - name: 'gcr.io/cloud-builders/gcloud'
-  id: 'Remove default networks based on projects.json'
+  id: 'Remove default networks'
   waitFor:
   - create-projects
   entrypoint: 'bash'

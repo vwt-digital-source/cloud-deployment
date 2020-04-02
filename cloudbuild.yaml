@@ -25,8 +25,30 @@ steps:
     source venv-create-projects/bin/activate
     pip install --upgrade google-cloud google-auth google-api-python-client oauth2client
     python3 scripts/remove_service_accounts.py config/projects.json
-    python3 scripts/remove_user_roles.py config/projects.json
 
+# Enable/disable services based on projects.json
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'Enable/disable services'
+  waitFor:
+  - create-projects
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    _parent=$(cat config/parent_folder_id.cfg)
+    ./scripts/manage_services.sh config/projects.json $${_parent}
+
+# Remove default networks based on projects.json
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'Remove default networks'
+  waitFor:
+  - create-projects
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    _parent=$(cat config/parent_folder_id.cfg)
+    ./scripts/remove_default_networks.sh config/projects.json $${_parent}
 
 # Deploy data catalog of cloud-deployment project
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -158,4 +180,3 @@ steps:
 
 substitutions:
     _DCAT_DEPLOY_BRANCH_NAME: master
-

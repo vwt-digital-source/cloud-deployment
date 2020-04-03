@@ -26,7 +26,7 @@ do
     for service in ${disabled}
     do
         echo " + disable ${service} in ${project}"
-        # gcloud services disable "${service}" --project "${project}" --async
+        gcloud services disable "${service}" --project "${project}" --async
     done
 
     for service in $(cat "$specified")

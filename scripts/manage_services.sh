@@ -26,8 +26,8 @@ do
     echo " + disable services in ${project}"
     gcloud services disable ${disabled} --project "${project}" --async
 
-    echo " + enable services in ${project}"
-    gcloud services enable $(cat "$specified") --project "${project}" --async
+    # echo " + enable services in ${project}"
+    # gcloud services enable $(cat "$specified") --project "${project}" --async
 
     if [ $? -ne 0 ]
     then

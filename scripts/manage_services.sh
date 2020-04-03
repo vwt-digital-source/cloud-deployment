@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC2181,SC1091,SC2013
+# shellcheck disable=SC2181,SC1091,SC2013,SC2046,SC2086
 
 PROJECT_CATALOG=${1}
 PARENT_ID=${2}
@@ -23,17 +23,11 @@ do
 
     disabled=$(python3 "${basedir}"/compare_lists.py "${enabled}" "${specified}" "${excluded}")
 
-    for service in ${disabled}
-    do
-        echo " + disable ${service} in ${project}"
-        gcloud services disable "${service}" --project "${project}" --async
-    done
+    echo " + disable services in ${project}"
+    gcloud services disable ${disabled} --project "${project}" --async
 
-    for service in $(cat "$specified")
-    do
-        echo " + enable ${service} in ${project}"
-        gcloud services enable "${service}" --project "${project}" --async
-    done
+    echo " + enable services in ${project}"
+    gcloud services enable $(cat "$specified") --project "${project}" --async
 
     if [ $? -ne 0 ]
     then

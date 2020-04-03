@@ -23,11 +23,17 @@ do
 
     disabled=$(python3 "${basedir}"/compare_lists.py "${enabled}" "${specified}" "${excluded}")
 
-    echo " + disable services in ${project}"
-    gcloud services disable "${disabled}" --project "${project}" --async
+    for service in ${disabled}
+    do
+        echo " + disable ${service} in ${project}"
+        gcloud services disable "${service}" --project "${project}" --async
+    done
 
-    echo " + enable services in ${project}"
-    gcloud services enable "$(cat "$specified")" --project "${project}" --async
+    for service in $(cat "$specified")
+    do
+        echo " + enable ${service} in ${project}"
+        gcloud services enable "${service}" --project "${project}" --async
+    done
 
     if [ $? -ne 0 ]
     then

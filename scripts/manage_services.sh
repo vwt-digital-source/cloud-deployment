@@ -24,7 +24,7 @@ do
     disable=$(python3 "${basedir}"/compare_lists.py "${enabled}" "${specified}" "${excluded}")
 
     echo " + disable services in ${project}"
-    gcloud services disable ${disable} --project "${project}" --async --force
+    gcloud services disable ${disable} --project "${project}" --force
 
     if [ $? -ne 0 ]
     then

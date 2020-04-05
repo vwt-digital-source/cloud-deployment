@@ -21,13 +21,15 @@ do
     gcloud services list --enabled --format="value(NAME)" --project "${project}" > "${enabled}"
     python3 "${basedir}"/list_services.py "${project}" "${PROJECT_CATALOG}" > "${specified}"
 
-    disabled=$(python3 "${basedir}"/compare_lists.py "${enabled}" "${specified}" "${excluded}")
+    disable=$(python3 "${basedir}"/compare_lists.py "${enabled}" "${specified}" "${excluded}")
 
     echo " + disable services in ${project}"
-    gcloud services disable ${disabled} --project "${project}" --async || true
+    gcloud services disable ${disable} --project "${project}" --async
 
-    # echo " + enable services in ${project}"
-    # gcloud services enable $(cat "$specified") --project "${project}" --async
+    if [[ $? =~ "disable_dependent_services" ]]
+    then
+        gcloud services disable ${disable} --project "${project}" --async --force
+    fi
 
     if [ $? -ne 0 ]
     then

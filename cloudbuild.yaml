@@ -108,7 +108,7 @@ steps:
   - '-c'
   - |
     source ../../config/cloud_build_result_funcs.config.sh
-    for pr in $(python3 ../../scripts/listprojects.py ../../config/projects.json)
+    for pr in $(python3 ../../scripts/list_projects.py ../../config/projects.json)
     do
         gcloud functions deploy publish_build_result_func \
         --runtime=python37 \
@@ -149,10 +149,10 @@ steps:
   - '-c'
   - |
     gcp_access_token=$(gcloud config config-helper --format='value(credential.access_token)')
-    for project_id in $(python3 scripts/listprojects.py config/projects.json)
+    for project_id in $(python3 scripts/list_projects.py config/projects.json)
     do
         curl -X GET -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers" > project_triggers.json
-        python3 scripts/listprojecttriggers.py config/projects.json ${project_id} |
+        python3 scripts/list_project_triggers.py config/projects.json ${project_id} |
         while read -r trigger
         do
             echo "Creating trigger in ${project_id}..."

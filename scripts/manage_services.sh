@@ -7,7 +7,7 @@ PARENT_ID=${2}
 basedir=$(dirname "$0")
 result=0
 
-# Enable/disable gcp services in projects
+# Disable gcp services in projects
 for project in $(gcloud projects list --format="value(PROJECT_ID)" --filter="parent.id=${PARENT_ID}")
 do
     echo "Managing services for ${project}..."
@@ -23,7 +23,12 @@ do
 
     disable=$(python3 "${basedir}"/compare_lists.py "${enabled}" "${specified}" "${excluded}")
 
-    echo " + disable services in ${project}"
+
+    for service in $disable
+    do
+        echo " + disable ${service} in ${project}"
+    done
+
     gcloud services disable ${disable} --project "${project}" --force
 
     if [ $? -ne 0 ]

@@ -24,7 +24,7 @@
                     },
                     {
                         "target": "__PROJECT_ID__",
-                        "assignee": "group:__DEVELOPERS__",
+                        "assignee": "group:__USER_GROUP__",
                         "action": "roles/viewer"
                     }
                 ]

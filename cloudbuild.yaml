@@ -38,18 +38,6 @@ steps:
     _parent=$(cat config/parent_folder_id.cfg)
     ./scripts/manage_services.sh config/projects.json $${_parent}
 
-# Remove default networks based on projects.json
-- name: 'gcr.io/cloud-builders/gcloud'
-  id: 'Remove default networks'
-  waitFor:
-  - create-projects
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    _parent=$(cat config/parent_folder_id.cfg)
-    ./scripts/remove_default_networks.sh config/projects.json $${_parent}
-
 # Deploy data catalog of cloud-deployment project
 - name: 'gcr.io/cloud-builders/gcloud'
   id: 'dcat-deploy'

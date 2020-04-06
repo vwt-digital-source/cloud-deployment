@@ -19,7 +19,7 @@
                 "permission": [
                     {
                         "target": "__PROJECT_ID__",
-                        "assignee": "serviceAccount:__RESTORE_PROJECT_NUMBER__@cloudbuild.gserviceaccount.com",
+                        "assignee": "serviceAccount:__PROJECT_NUMBER__@cloudbuild.gserviceaccount.com",
                         "action": "roles/owner"
                     },
                     {

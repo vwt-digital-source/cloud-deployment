@@ -53,10 +53,10 @@ async def add_audit_configs(policy, services):
                     'logType': 'ADMIN_READ'
                 },
                 {
-                    'logType': 'ADMIN_READ'
+                    'logType': 'DATA_READ'
                 },
                 {
-                    'logType': 'ADMIN_READ'
+                    'logType': 'DATA_WRITE'
                 },
             ],
             'service': service

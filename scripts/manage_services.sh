@@ -26,7 +26,10 @@ do
         echo " + disable ${service} in ${project}"
     done
 
-    gcloud services disable ${disable} --project "${project}" --force
+    if [ -n "${disable}" ]
+    then
+        gcloud services disable ${disable} --project "${project}" --force
+    fi
 
     enable=$(python3 "${basedir}"/compare_lists.py "${specified}" "${enabled}" "${excluded}")
 
@@ -35,7 +38,10 @@ do
         echo " + enable ${service} in ${project}"
     done
 
-    gcloud services enable ${enable} --project "${project}"
+    if [ -n "${enable}" ]
+    then
+        gcloud services enable ${enable} --project "${project}"
+    fi
 
     if [ $? -ne 0 ]
     then

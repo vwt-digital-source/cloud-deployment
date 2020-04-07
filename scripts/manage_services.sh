@@ -7,15 +7,18 @@ PARENT_ID=${2}
 basedir=$(dirname "$0")
 result=0
 
-# Disable gcp services in projects
 for project in $(gcloud projects list --format="value(PROJECT_ID)" --filter="parent.id=${PARENT_ID}")
 do
     echo "Managing services for ${project}..."
 
-    excluded="source.googleapis.com"
-    specified=$(python3 "${basedir}"/list_services.py "${project}" "${PROJECT_CATALOG}")
+    enabled="/tmp/${project}.enabled"
+    specified="/tmp/${project}.specified"
+    excluded="/tmp/${project}.excluded"
 
-    enabled=$(gcloud services list --enabled --format="value(NAME)" --project "${project}")
+    echo "source.googleapis.com" > "${excluded}"
+    gcloud services list --enabled --format="value(NAME)" --project "${project}" > "${enabled}"
+    python3 "${basedir}"/list_services.py "${project}" "${PROJECT_CATALOG}" > "${specified}"
+
     disable=$(python3 "${basedir}"/compare_lists.py "${enabled}" "${specified}" "${excluded}")
 
     for service in $disable
@@ -25,7 +28,6 @@ do
 
     gcloud services disable ${disable} --project "${project}" --force
 
-    enabled=$(gcloud services list --enabled --format="value(NAME)" --project "${project}")
     enable=$(python3 "${basedir}"/compare_lists.py "${specified}" "${enabled}" "${excluded}")
 
     for service in $enable

@@ -12,17 +12,11 @@ for project in $(gcloud projects list --format="value(PROJECT_ID)" --filter="par
 do
     echo "Managing services for ${project}..."
 
-    enabled="/tmp/${project}.enabled"
-    specified="/tmp/${project}.specified"
-    excluded="/tmp/${project}.excluded"
+    excluded="source.googleapis.com"
+    specified=$(python3 "${basedir}"/list_services.py "${project}" "${PROJECT_CATALOG}")
 
-    echo "source.googleapis.com" > "${excluded}"
-
-    gcloud services list --enabled --format="value(NAME)" --project "${project}" > "${enabled}"
-    python3 "${basedir}"/list_services.py "${project}" "${PROJECT_CATALOG}" > "${specified}"
-
+    enabled=$(gcloud services list --enabled --format="value(NAME)" --project "${project}")
     disable=$(python3 "${basedir}"/compare_lists.py "${enabled}" "${specified}" "${excluded}")
-
 
     for service in $disable
     do
@@ -30,6 +24,16 @@ do
     done
 
     gcloud services disable ${disable} --project "${project}" --force
+
+    enabled=$(gcloud services list --enabled --format="value(NAME)" --project "${project}")
+    enable=$(python3 "${basedir}"/compare_lists.py "${specified}" "${enabled}" "${excluded}")
+
+    for service in $enable
+    do
+        echo " + enable ${service} in ${project}"
+    done
+
+    gcloud services enable ${enable} --project "${project}"
 
     if [ $? -ne 0 ]
     then

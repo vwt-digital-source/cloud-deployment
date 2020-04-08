@@ -1,7 +1,6 @@
 import json
 import sys
 
-
 cloud_deployment_branch = 'develop'
 
 if len(sys.argv) > 2:

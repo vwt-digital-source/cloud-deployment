@@ -1,4 +1,28 @@
 
+def append_default_services(services):
+    services.extend([
+        'cloudtrace.googleapis.com',
+        'logging.googleapis.com',
+        'monitoring.googleapis.com',
+        'stackdriver.googleapis.com',
+        'clouderrorreporting.googleapis.com',
+        'servicecontrol.googleapis.com',
+        'servicemanagement.googleapis.com',
+        'serviceusage.googleapis.com',
+        'cloudresourcemanager.googleapis.com',
+        'sourcerepo.googleapis.com',
+        'storage-api.googleapis.com',
+        'storage-component.googleapis.com',
+        'cloudbuild.googleapis.com',
+        'pubsub.googleapis.com',
+        'cloudfunctions.googleapis.com',
+        'containerregistry.googleapis.com',
+        'deploymentmanager.googleapis.com',
+        'cloudscheduler.googleapis.com',
+        'cloudkms.googleapis.com'
+    ])
+    return list(set(services))
+
 
 def gather_permissions(preDefinedBindings, resource_name, odrlPolicy):
     bindings = preDefinedBindings
@@ -75,15 +99,8 @@ def generate_config(context):
         index = 0
         iam_policies_depends = [project['projectId']]
         services_list = []
-        if 'services' in project:
-            services = project['services']
-            services.append('cloudbuild.googleapis.com') if 'cloudbuild.googleapis.com' not in services else services
-            services.append('pubsub.googleapis.com') if 'pubsub.googleapis.com' not in services else services
-            services.append('cloudfunctions.googleapis.com') if 'cloudfunctions.googleapis.com' not in services else services
-            services.append('cloudresourcemanager.googleapis.com') if 'cloudresourcemanager.googleapis.com' not in services else services
-        else:
-            project['services'] = ['cloudbuild.googleapis.com', 'pubsub.googleapis.com', 'cloudfunctions.googleapis.com',
-                                   'cloudresourcemanager.googleapis.com']
+        if project.get('services'):
+            project['services'] = append_default_services(project['services'])
         for service in project.get('services', []):
             depends_on = [project['projectId'], 'billing_{}'.format(project['projectId'])]
             if index != 0:

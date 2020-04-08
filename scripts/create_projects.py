@@ -17,7 +17,9 @@ def append_default_services(services):
         'pubsub.googleapis.com',
         'cloudfunctions.googleapis.com',
         'containerregistry.googleapis.com',
-        'deploymentmanager.googleapis.com'
+        'deploymentmanager.googleapis.com',
+        'cloudscheduler.googleapis.com',
+        'cloudkms.googleapis.com'
     ])
     return list(set(services))
 

@@ -1,3 +1,4 @@
+import re
 import asyncio
 import argparse
 import logging
@@ -5,9 +6,9 @@ import logging
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
 from oauth2client.client import GoogleCredentials
+from argparse import RawTextHelpFormatter
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)7s: %(message)s')
-logger = logging.getLogger('')
 
 
 async def main(args):
@@ -18,7 +19,7 @@ async def main(args):
 
 
 async def process(service, project_id, services):
-    logger.info('Updating audit log configuration for project {}...'.format(project_id))
+    logging.info('Updating audit log configuration for project {}...'.format(project_id))
     policy = await get_iam_policy(service, project_id)
     if policy:
         updated_policy = await add_audit_configs(policy, services)
@@ -31,7 +32,7 @@ async def get_iam_policy(service, project_id):
         response = request.execute()
         return response
     except HttpError:
-        logger.error('Request setIamPolicy failed for project {}'.format(project_id))
+        logging.error('Request setIamPolicy failed for project {}'.format(project_id))
 
 
 async def set_iam_policy(service, project_id, policy):
@@ -40,7 +41,7 @@ async def set_iam_policy(service, project_id, policy):
         response = request.execute()
         return response
     except HttpError:
-        logger.error('Request getIamPolicy failed for project {}'.format(project_id))
+        logging.error('Request getIamPolicy failed for project {}'.format(project_id))
 
 
 async def add_audit_configs(policy, services):
@@ -71,15 +72,15 @@ def make_service():
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Add gcp audit log configuration async')
+    parser = argparse.ArgumentParser(description='Add gcp audit log configuration async', formatter_class=RawTextHelpFormatter)
     parser.add_argument('-p', '--projects',
-                        nargs='+',
+                        type=lambda s: re.split(' |\n|, ', s),
                         required=True,
-                        help='a list of projects')
+                        help='a new line, space or comma delimited list of services')
     parser.add_argument('-s', '--services',
-                        nargs='+',
+                        type=lambda s: re.split(' |\n|, ', s),
                         required=True,
-                        help='a list of services')
+                        help='a new line, space or comma delimited list of services')
     return parser.parse_args()
 
 

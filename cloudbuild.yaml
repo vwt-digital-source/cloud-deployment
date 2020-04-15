@@ -1,6 +1,19 @@
 ---
 timeout: 3600s
 steps:
+  # Create virtualenv
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'Create virtualenv'
+    dir: 'scripts'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        pip install virtualenv==16.7.9
+        virtualenv -p python3 venv
+        source /workspace/venv/bin/activate
+        pip install -r scripts/requirements.txt
+
   # Create the projects using Deployment Manager
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'create-projects'
@@ -20,10 +33,7 @@ steps:
     args:
       - '-c'
       - |
-        pip install virtualenv==16.7.9
-        virtualenv -p python3 venv-create-projects
-        source venv-create-projects/bin/activate
-        pip install --upgrade google-cloud google-auth google-api-python-client oauth2client
+        source /workspace/venv/bin/activate
         python3 scripts/remove_service_accounts.py config/projects.json
 
   # Enable/disable services based on projects.json
@@ -49,6 +59,7 @@ steps:
       - |
         _projects=$(python3 ./scripts/list_projects.py ./config/projects.json)
         _audit_logs=$(cat ./config/audit_logs.cfg)
+        source /workspace/venv/bin/activate
         python3 ./scripts/set_iam_policy.py -p "$${_projects}" -s "$${_audit_logs}" -c "auditConfigs"
 
   # Deploy data catalog of cloud-deployment project
@@ -135,13 +146,10 @@ steps:
     args:
       - '-c'
       - |
-        pip install virtualenv==16.7.9
-        virtualenv -p python3 venv-gsuite-iam
-        source venv-gsuite-iam/bin/activate
-        cp config/create_gsuite_group_iam.config.py scripts/config.py
-        pip install google-cloud==0.34.0 google-cloud-kms==1.3.0 google-auth==1.11.1 google-api-python-client==1.7.11
+        source /workspace/venv/bin/activate
         export ADMINSDK_CREDENTIALS_ENCRYPTED=$(base64 -w0 config/adminsdk_credentials.enc)
         export PROJECT_ID=${PROJECT_ID}
+        cp config/create_gsuite_group_iam.config.py scripts/config.py
         python3 scripts/create_gsuite_group_iam.py config/projects.json
         rm scripts/config.py
 

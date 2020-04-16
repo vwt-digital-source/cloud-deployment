@@ -1,9 +1,10 @@
 ---
 timeout: 3600s
 steps:
-  # Create virtualenv
+  # Create python3 virtualenv
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'create-virtualenv'
+    waitFor: ['-']
     entrypoint: 'bash'
     args:
       - '-c'
@@ -13,9 +14,10 @@ steps:
         source /workspace/build-venv/bin/activate
         pip install -r ./scripts/requirements.txt
 
-  # Create the projects using Deployment Manager
+  # Create projects using Deployment Manager
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'create-projects'
+    waitFor: ['-']
     dir: 'scripts'
     entrypoint: 'bash'
     args:
@@ -23,9 +25,22 @@ steps:
       - |
         ./create_projects.sh ${PROJECT_ID}
 
+  # Create logsinks using Deployment Manager
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'create-logsinks'
+    waitFor: ['-']
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        ./scripts/create_logsinks.sh ${PROJECT_ID} \
+          $(cat ./config/parent_folder_id.cfg) \
+          $(cat ./config/billing_account_name.cfg) \
+          ./config/logsinks.json
+
   # Update IAM based on projects.json
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'Update IAM based on projects.json'
+    id: 'update-iam'
     waitFor:
       - create-projects
       - create-virtualenv
@@ -38,7 +53,7 @@ steps:
 
   # Enable/disable services based on projects.json
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'Enable/disable services'
+    id: 'manage-services'
     waitFor:
       - create-projects
     entrypoint: 'bash'
@@ -50,7 +65,7 @@ steps:
 
   # Set cloud audit logs
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'Set cloud audit logs'
+    id: 'set-audit-logs'
     waitFor:
       - create-projects
       - create-virtualenv
@@ -66,7 +81,7 @@ steps:
   # Deploy data catalog of cloud-deployment project
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'dcat-deploy'
-    waitFor: ['-']  # The '-' indicates that this step begins immediately.
+    waitFor: ['-']
     entrypoint: 'bash'
     args:
       - '-c'
@@ -138,7 +153,7 @@ steps:
 
   # Set IAM permissions on G Suite group for ODH Hub
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'Set G Suite iam permissions'
+    id: 'set-gsuite-iam-permssions'
     waitFor:
       - create-projects
       - create-virtualenv
@@ -156,7 +171,7 @@ steps:
 
   # Create cloud build triggers on source repo commit
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'Create cloudbuild triggers'
+    id: 'create-cloudbuild-triggers'
     waitFor:
       - create-projects
     entrypoint: 'bash'

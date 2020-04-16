@@ -29,14 +29,15 @@ steps:
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'create-logsinks'
     waitFor: ['-']
+    dir: 'scripts'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
         ./scripts/create_logsinks.sh ${PROJECT_ID} \
-          $(cat ./config/parent_folder_id.cfg) \
-          $(cat ./config/billing_account_name.cfg) \
-          ./config/logsinks.json
+          $(cat ../config/parent_folder_id.cfg) \
+          $(cat ../config/billing_account_name.cfg) \
+          ../config/logsinks.json
 
   # Update IAM based on projects.json
   - name: 'gcr.io/cloud-builders/gcloud'

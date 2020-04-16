@@ -12,6 +12,7 @@ def generate_config(context):
                 'sink': logsink['logsinkId'],
                 'description': logsink['description'],
                 'parent': '{}/{}'.format(logsink['sourceType'], logsink['sourceId']),
+                'folder': logsink['sourceId'],
                 'filter': logsink.get('filter', ''),
                 'uniqueWriterIdentity': True,
                 'destination': logsink['destination'],

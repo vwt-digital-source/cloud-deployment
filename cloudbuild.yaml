@@ -34,7 +34,7 @@ steps:
     args:
       - '-c'
       - |
-        ./scripts/create_logsinks.sh ${PROJECT_ID} \
+        ./create_logsinks.sh ${PROJECT_ID} \
           $(cat ../config/parent_folder_id.cfg) \
           $(cat ../config/billing_account_name.cfg) \
           ../config/logsinks.json

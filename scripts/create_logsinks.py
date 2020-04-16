@@ -15,6 +15,7 @@ def generate_config(context):
                     'type': logsink['sourceType'],
                     'id': logsink['sourceId']
                 },
+                'filter': logsink.get('filter', ''),
                 'uniqueWriterIdentity': True,
                 'destination': logsink['destination'],
                 'disabled': logsink.get('disabled', "False") == 'True',

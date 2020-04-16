@@ -7,14 +7,11 @@ def generate_config(context):
     for logsink in logsinks.get('logsinks', []):  # noqa: F821
         logsink_def = {
             'name': logsink['logsinkId'],
-            'type': 'logging.v2.sink',
+            'type': 'gcp-types/logging-v2:{}.sinks'.format(logsink['sourceType']),
             'properties': {
                 'sink': logsink['logsinkId'],
                 'description': logsink['description'],
-                'parent': {
-                    'type': logsink['sourceType'],
-                    'id': logsink['sourceId']
-                },
+                'parent': '{}/{}'.format(logsink['sourceType'], logsink['sourceId']),
                 'filter': logsink.get('filter', ''),
                 'uniqueWriterIdentity': True,
                 'destination': logsink['destination'],

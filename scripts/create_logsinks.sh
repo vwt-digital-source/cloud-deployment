@@ -16,7 +16,7 @@ then
 fi
 
 deployment_name="${PROJECT_ID}-logsinks-deploy"
-gcp_template=$(mktemp "${deployment_name}-tmp.py")
+gcp_template=$(mktemp "${deployment_name}-XXXXX.py")
 
 {
     echo "logsinks = \\"

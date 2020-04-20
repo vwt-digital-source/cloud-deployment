@@ -1,170 +1,220 @@
+---
 timeout: 3600s
-
 steps:
-# Create the projects using Deployment Manager
-- name: 'gcr.io/cloud-builders/gcloud'
-  id: 'create-projects'
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    ./create_projects.sh ${PROJECT_ID}
-  dir: 'scripts'
+  # Create python3 virtualenv
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'create-virtualenv'
+    waitFor: ['-']
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        pip install virtualenv==16.7.9
+        virtualenv -p python3 /workspace/build-venv
+        source /workspace/build-venv/bin/activate
+        pip install -r ./scripts/requirements.txt
 
-# Update IAM based on projects.json
-- name: 'gcr.io/cloud-builders/gcloud'
-  id: 'Update IAM based on projects.json'
-  waitFor:
-  - create-projects
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    pip install virtualenv==16.7.9
-    virtualenv -p python3 venv-create-projects
-    source venv-create-projects/bin/activate
-    pip install --upgrade google-cloud google-auth google-api-python-client oauth2client
-    python3 scripts/remove_service_accounts.py config/projects.json
+  # Create projects using Deployment Manager
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'create-projects'
+    waitFor: ['-']
+    dir: 'scripts'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        ./create_projects.sh ${PROJECT_ID}
 
-# Enable/disable services based on projects.json
-- name: 'gcr.io/cloud-builders/gcloud'
-  id: 'Enable/disable services'
-  waitFor:
-  - create-projects
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    _parent=$(cat config/parent_folder_id.cfg)
-    ./scripts/manage_services.sh config/projects.json $${_parent}
+  # Create logsinks using Deployment Manager
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'create-logsinks'
+    waitFor: ['-']
+    dir: 'scripts'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        ./create_logsinks.sh ${PROJECT_ID} \
+          $(cat ../config/parent_folder_id.cfg) \
+          $(cat ../config/billing_account_name.cfg) \
+          ../config/logsinks.json
 
-# Deploy data catalog of cloud-deployment project
-- name: 'gcr.io/cloud-builders/gcloud'
-  id: 'dcat-deploy'
-  waitFor: ['-']  # The '-' indicates that this step begins immediately.
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    git clone --branch=${_DCAT_DEPLOY_BRANCH_NAME} https://github.com/vwt-digital/dcat-deploy.git
-    dcat-deploy/deploy_dcat_gcp.sh config/data_catalog.json ${PROJECT_ID} ${_DCAT_DEPLOY_BRANCH_NAME} $(base64 -w0 config/github_access_token.enc)
+  # Update IAM based on projects.json
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'update-iam'
+    waitFor:
+      - create-projects
+      - create-virtualenv
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        source /workspace/build-venv/bin/activate
+        python3 scripts/remove_service_accounts.py config/projects.json
 
-# Create app engines
-- name: 'gcr.io/cloud-builders/gcloud'
-  waitFor:
-  - create-projects
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    python3 scripts/create_appengines.py config/projects.json | tee create_appengines.sh
-    (source create_appengines.sh || exit 0)
+  # Enable/disable services based on projects.json
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'manage-services'
+    waitFor:
+      - create-projects
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        _parent=$(cat config/parent_folder_id.cfg)
+        ./scripts/manage_services.sh config/projects.json $${_parent}
 
-# Create Error Reporting and app traffic log sink for parent folder
-- name: 'gcr.io/cloud-builders/gcloud'
-  waitFor:
-  - create-projects
-  - dcat-deploy
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    source config/setup_logging_sink.config.sh
-    if [ -n "$${_ERROR_PUBSUB_TOPIC}" ]
-    then
-       gcloud logging sinks describe vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-error \
-          --folder=$(cat config/parent_folder_id.cfg) || \
-          gcloud logging sinks create vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-error \
-          $${_ERROR_PUBSUB_TOPIC} --log-filter='severity=ERROR' --include-children --folder=$(cat config/parent_folder_id.cfg)
-    fi
-    if [ -n "$${_APPTRAFFICLOG_PUBSUB_TOPIC}" ]
-    then
-       gcloud logging sinks describe vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-apptrafficlog-sink \
-          --folder=$(cat config/parent_folder_id.cfg) || \
-          gcloud logging sinks create vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-apptrafficlog-sink \
-          $${_APPTRAFFICLOG_PUBSUB_TOPIC} --log-filter='resource.type=(api OR cloud_function OR cloud_run_revision OR consumed_api OR gae_app OR gce_instance OR http_load_balancer OR managed_service)' \
-          --include-children --folder=$(cat config/parent_folder_id.cfg)
-    fi
+  # Create default cloud build buckets in Europe
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'cloudbuild-buckets'
+    waitFor:
+      - create-projects
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        ./scripts/create_cloudbuild_buckets.sh config/projects.json eu
 
-# Deploy publish_build_result function to every project
-- name: 'gcr.io/cloud-builders/gcloud'
-  waitFor:
-  - create-projects
-  - dcat-deploy
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    source ../../config/cloud_build_result_funcs.config.sh
-    for pr in $(python3 ../../scripts/list_projects.py ../../config/projects.json)
-    do
-        gcloud functions deploy publish_build_result_func \
-        --runtime=python37 \
-        --entry-point=publish_build_result_func \
-        --trigger-topic=cloud-builds \
-        --region=europe-west1 \
-        --project=$${pr} \
-        --set-env-vars=TOPIC_PROJECT_ID=$${_TOPIC_PROJECT_ID},TOPIC_NAME=$${_TOPIC_NAME} &
-    done
-    wait
-  dir: 'functions/publish_build_result_func'
+  # Set cloud audit logs
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'set-audit-logs'
+    waitFor:
+      - create-projects
+      - create-virtualenv
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        _projects=$(python3 ./scripts/list_projects.py ./config/projects.json)
+        _audit_logs=$(cat ./config/audit_logs.cfg)
+        source /workspace/build-venv/bin/activate
+        python3 ./scripts/set_iam_policy.py -p "$${_projects}" -s "$${_audit_logs}" -c "auditConfigs"
 
-# Set IAM permissions on G Suite group for ODH Hub
-- name: 'gcr.io/cloud-builders/gcloud'
-  waitFor:
-  - create-projects
-  - dcat-deploy
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    pip install virtualenv==16.7.9
-    virtualenv -p python3 venv-gsuite-iam
-    source venv-gsuite-iam/bin/activate
-    cp config/create_gsuite_group_iam.config.py scripts/config.py
-    pip install google-cloud==0.34.0 google-cloud-kms==1.3.0 google-auth==1.11.1 google-api-python-client==1.7.11
-    export ADMINSDK_CREDENTIALS_ENCRYPTED=$(base64 -w0 config/adminsdk_credentials.enc)
-    export PROJECT_ID=${PROJECT_ID}
-    python3 scripts/create_gsuite_group_iam.py config/projects.json
-    rm scripts/config.py
+  # Deploy data catalog of cloud-deployment project
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'dcat-deploy'
+    waitFor: ['-']
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        git clone --branch=${_DCAT_DEPLOY_BRANCH_NAME} https://github.com/vwt-digital/dcat-deploy.git
+        dcat-deploy/deploy_dcat_gcp.sh config/data_catalog.json ${PROJECT_ID} ${_DCAT_DEPLOY_BRANCH_NAME} $(base64 -w0 config/github_access_token.enc)
 
-# Create cloud build triggers on source repo commit
-- name: 'gcr.io/cloud-builders/gcloud'
-  waitFor:
-  - create-projects
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    gcp_access_token=$(gcloud config config-helper --format='value(credential.access_token)')
-    for project_id in $(python3 scripts/list_projects.py config/projects.json)
-    do
-        curl -X GET -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers" > project_triggers.json
-        python3 scripts/list_project_triggers.py config/projects.json ${project_id} |
-        while read -r trigger
+  # Create app engines
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'Create default app engines'
+    waitFor:
+      - create-projects
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        python3 scripts/create_appengines.py config/projects.json | tee create_appengines.sh
+        (source create_appengines.sh || exit 0)
+
+  # Create Error Reporting and app traffic log sink for parent folder
+  - name: 'gcr.io/cloud-builders/gcloud'
+    waitFor:
+      - create-projects
+      - dcat-deploy
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        source config/setup_logging_sink.config.sh
+        if [ -n "$${_ERROR_PUBSUB_TOPIC}" ]
+        then
+           gcloud logging sinks describe vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-error \
+              --folder=$(cat config/parent_folder_id.cfg) || \
+              gcloud logging sinks create vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-error \
+              $${_ERROR_PUBSUB_TOPIC} --log-filter='severity=ERROR' --include-children --folder=$(cat config/parent_folder_id.cfg)
+        fi
+        if [ -n "$${_APPTRAFFICLOG_PUBSUB_TOPIC}" ]
+        then
+           gcloud logging sinks describe vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-apptrafficlog-sink \
+              --folder=$(cat config/parent_folder_id.cfg) || \
+              gcloud logging sinks create vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-apptrafficlog-sink \
+              $${_APPTRAFFICLOG_PUBSUB_TOPIC} --log-filter='resource.type=(api OR cloud_function OR cloud_run_revision OR consumed_api OR gae_app OR gce_instance OR http_load_balancer OR managed_service)' \
+              --include-children --folder=$(cat config/parent_folder_id.cfg)
+        fi
+
+  # Deploy publish_build_result function to every project
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'Publish build result function'
+    dir: 'functions/publish_build_result_func'
+    waitFor:
+      - create-projects
+      - dcat-deploy
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        source ../../config/cloud_build_result_funcs.config.sh
+        for pr in $(python3 ../../scripts/list_projects.py ../../config/projects.json)
         do
-            echo "Creating trigger in ${project_id}..."
-            echo ${trigger} | tee trigger.json
-            existing_id=$(python3 scripts/checktriggerexists.py project_triggers.json trigger.json)
-
-            if [ -n "${existing_id}" ]
-            then
-                curl -X DELETE -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers/${existing_id}"
-            fi
-
-            curl -X POST -T trigger.json -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers"
+            gcloud functions deploy publish_build_result_func \
+            --runtime=python37 \
+            --entry-point=publish_build_result_func \
+            --trigger-topic=cloud-builds \
+            --region=europe-west1 \
+            --project=$${pr} \
+            --set-env-vars=TOPIC_PROJECT_ID=$${_TOPIC_PROJECT_ID},TOPIC_NAME=$${_TOPIC_NAME} &
         done
-    done
+        wait
 
-# Deploy report_build_status to GitHub function
-- name: 'gcr.io/cloud-builders/gcloud'
-  id: 'remove report-build-status-to-github-func'
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    ! gcloud functions describe report_build_status_github_func --region=europe-west1 || gcloud functions delete report_build_status_github_func --region=europe-west1 --quiet
+  # Set IAM permissions on G Suite group for ODH Hub
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'set-gsuite-iam-permssions'
+    waitFor:
+      - create-projects
+      - create-virtualenv
+      - dcat-deploy
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        source /workspace/build-venv/bin/activate
+        export ADMINSDK_CREDENTIALS_ENCRYPTED=$(base64 -w0 config/adminsdk_credentials.enc)
+        export PROJECT_ID=${PROJECT_ID}
+        cp config/create_gsuite_group_iam.config.py scripts/config.py
+        python3 scripts/create_gsuite_group_iam.py config/projects.json
+        rm scripts/config.py
 
+  # Create cloud build triggers on source repo commit
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'create-cloudbuild-triggers'
+    waitFor:
+      - create-projects
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcp_access_token=$(gcloud config config-helper --format='value(credential.access_token)')
+        for project_id in $(python3 scripts/list_projects.py config/projects.json)
+        do
+            curl -X GET -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers" > project_triggers.json
+            python3 scripts/list_project_triggers.py config/projects.json ${project_id} |
+            while read -r trigger
+            do
+                echo "Creating trigger in ${project_id}..."
+                echo ${trigger} | tee trigger.json
+                existing_id=$(python3 scripts/checktriggerexists.py project_triggers.json trigger.json)
 
-substitutions:
-    _DCAT_DEPLOY_BRANCH_NAME: master
+                if [ -n "${existing_id}" ]
+                then
+                    curl -X DELETE -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers/${existing_id}"
+                fi
+
+                curl -X POST -T trigger.json -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers"
+            done
+        done
+
+  # Deploy report_build_status to GitHub function
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'remove report-build-status-to-github-func'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        ! gcloud functions describe report_build_status_github_func --region=europe-west1 || gcloud functions delete report_build_status_github_func --region=europe-west1 --quiet

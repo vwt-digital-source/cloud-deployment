@@ -13,10 +13,10 @@ do
     echo "Check if Cloud Build bucket exists for project ${project}..."
 
     gsutil ls -b -p "${project}" "gs://${project}_cloudbuild" >/dev/null 2>&1
-    result=$?
 
-    if [ ${result} -ne 0 ]
+    if [ $? -ne 0 ]
     then
+
         echo " + Creating cloud build bucket"
         gsutil mb -c standard -p "${project}" -l "${REGION}" -b on "gs://${project}_cloudbuild"
 

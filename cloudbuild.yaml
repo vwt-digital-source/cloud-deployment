@@ -64,6 +64,17 @@ steps:
         _parent=$(cat config/parent_folder_id.cfg)
         ./scripts/manage_services.sh config/projects.json $${_parent}
 
+  # Create default cloud build buckets in Europe
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'manage-services'
+    waitFor:
+      - create-projects
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        ./scripts/create_cloudbuild_buckets.sh config/projects.json eu
+
   # Set cloud audit logs
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'set-audit-logs'

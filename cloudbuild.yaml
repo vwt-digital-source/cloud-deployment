@@ -66,7 +66,7 @@ steps:
 
   # Create default cloud build buckets in Europe
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'manage-services'
+    id: 'cloudbuild-buckets'
     waitFor:
       - create-projects
     entrypoint: 'bash'

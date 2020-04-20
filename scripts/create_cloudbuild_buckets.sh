@@ -19,14 +19,15 @@ do
     then
         echo " + Creating cloud build bucket"
         gsutil mb -c standard -p "${project}" -l "${REGION}" -b on "gs://${project}_cloudbuild"
+
+        if [ $? -ne 0 ]
+        then
+            echo "ERROR creating default Cloud Build bucket for ${project}"
+            result=1
+        fi
+
     else
         echo " + Cloud build bucket already exists"
-    fi
-
-    if [ $? -ne 0 ]
-    then
-        echo "ERROR creating default Cloud Build bucket for ${project}"
-        result=1
     fi
 
 done

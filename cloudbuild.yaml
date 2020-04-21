@@ -102,7 +102,7 @@ steps:
       - |
         source ../config/revoke_sa_keys.cfg
         _parent=$(cat ../config/parent_folder_id.cfg)
-        ./schedule_revoke_sa_keys.sh "${PROJECT_ID}" "${BRANCH_NAME}" "$${_parent}" "$${_EXPIRATION_PERIOD_DAYS}"
+        ./schedule_revoke_sa_keys.sh "${PROJECT_ID}" "${_DCAT_DEPLOY_BRANCH_NAME}" "$${_parent}" "$${_EXPIRATION_PERIOD_DAYS}"
 
   # Deploy data catalog of cloud-deployment project
   - name: 'gcr.io/cloud-builders/gcloud'

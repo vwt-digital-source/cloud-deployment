@@ -1,19 +1,21 @@
 #!/bin/bash
+# shellcheck disable=SC2086
 
 PROJECT_ID=${1}
 BRANCH_NAME=${2}
 PARENT_ID=${3}
 EXPIRATION_PERIOD_DAYS=${4}
 
-if [[ -z "${PROJECT_ID}" || -z "${BRANCH_NAME}" || -z "${PARENT_ID}" || -z "${EXPIRATION_PERIOD_DAYS}" ]]
-then
-    echo "PROJECT_ID parameter should be set"
-    echo "BRANCH_NAME parameter should be set"
-    echo "PARENT_ID parameter should be set"
-    echo "EXPIRATION_PERIOD_DAYS parameter should be set"
-    echo "Usage: ${0} <project_id> <branch_name> <parent_id> <EXPIRATION_PERIOD_DAYS>"
-    exit 1
-fi
+function error_exit() {
+  # ${BASH_SOURCE[1]} is the file name of the caller.
+  echo "${BASH_SOURCE[1]}: line ${BASH_LINENO[0]}: ${1:-Unknown Error.} (exit ${2:-1})" 1>&2
+  exit ${2:-1}
+}
+
+[[ -n "${PROJECT_ID}" ]] || error_exit "Missing required PROJECT_ID"
+[[ -n "${BRANCH_NAME}" ]] || error_exit "Missing required BRANCH_NAME"
+[[ -n "${PARENT_ID}" ]] || error_exit "Missing required PARENT_ID"
+[[ -n "${EXPIRATION_PERIOD_DAYS}" ]] || error_exit "Missing required EXPIRATION_PERIOD_DAYS"
 
 basedir=$(dirname "$0")
 

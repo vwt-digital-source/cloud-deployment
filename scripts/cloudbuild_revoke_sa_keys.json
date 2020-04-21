@@ -16,7 +16,7 @@
             "entrypoint": "bash",
             "args": [
                 "-c",
-                "_projects=$(gcloud projects list --format=\"value(PROJECT_ID)\" --filter=\"parent.id=${_PARENT_ID}\") && python3 revoke_sa_keys.py -p \"$${_projects}\" -d ${_EXPIRATION_PERIOD_DAYS}"
+                "pip install dateutil _projects=$(gcloud projects list --format=\"value(PROJECT_ID)\" --filter=\"parent.id=${_PARENT_ID}\") && pip install dateutil && python3 revoke_sa_keys.py -p \"$${_projects}\" -d ${_EXPIRATION_PERIOD_DAYS}"
             ]
         }
     ],

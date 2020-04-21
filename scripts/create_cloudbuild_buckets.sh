@@ -4,6 +4,14 @@
 PROJECT_CATALOG=${1}
 REGION=${2}
 
+if [[ -z "${PROJECT_CATALOG}" || -z "${REGION}" ]]
+then
+    echo "PROJECT_CATALOG parameter should be set"
+    echo "REGION parameter should be set"
+    echo "Usage: ${0} <project_catalog> <region>"
+    exit 1
+fi
+
 basedir=$(dirname "$0")
 result=0
 

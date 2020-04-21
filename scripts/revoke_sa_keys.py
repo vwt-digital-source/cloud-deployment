@@ -68,7 +68,7 @@ def main(args):
 
         for key in expired_keys:
             logging.info('Deleting key {}...'.format(key['name']))
-            delete_service_account_key(key)
+            delete_service_account_key(service, key)
 
 
 def parse_args():

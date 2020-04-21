@@ -17,14 +17,14 @@ def make_service():
 
 
 def list_keys(service, project_id, service_account):
-    name = f"projects/{project_id}/serviceAccounts/{service_account['email']}"
+    name = 'projects/{}/serviceAccounts/{}'.format(project_id, service_account['email'])
     response = service.projects().serviceAccounts().keys().list(
         name=name).execute()
     return response.get('keys')
 
 
 def list_service_accounts(service, project_id):
-    name = f"projects/{project_id}"
+    name = 'projects/{}'.format(project_id)
     response = service.projects().serviceAccounts().list(
         name=name).execute()
     return response.get('accounts')
@@ -62,10 +62,10 @@ def main(args):
             if is_expired(key, args.days):
                 expired_keys.append(key)
 
-        logging.info(f"Found {len(expired_keys)} key(s) older than {args.days} days!")
+        logging.info('Found {} key(s) older than {} days!'.format(len(expired_keys), args.days))
 
         for key in expired_keys:
-            logging.info(f"Deleting key {key['name']}...")
+            logging.info('Deleting key {}...'.format(key['name']))
             delete_service_account_key(key)
 
 

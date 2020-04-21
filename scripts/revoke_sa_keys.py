@@ -8,6 +8,7 @@ from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)7s: %(message)s')
+logging.getLogger('googleapiclient').setLevel(logging.WARNING)
 
 
 def make_service():
@@ -46,6 +47,7 @@ def is_expired(key, valid_days):
 def main(args):
     service = make_service()
     for project_id in args.projects:
+        logging.info('Checking service account keys for project {}...'.format(project_id))
         service_accounts = list_service_accounts(service, project_id)
 
         sa_keys = []
@@ -76,7 +78,7 @@ def parse_args():
                         required=True,
                         help='a new line, space or comma delimited list of projects')
     parser.add_argument('-d', '--days',
-                        type=str,
+                        type=int,
                         required=True,
                         help='number of days')
     return parser.parse_args()

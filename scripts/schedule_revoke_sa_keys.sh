@@ -21,7 +21,7 @@ basedir=$(dirname "$0")
 
 echo "Scheduling job to revoke service account keys..."
 
-sed "${basedir}/cloudbuild_revoke_sa_keys.json" \
+gsed "${basedir}/cloudbuild_revoke_sa_keys.json" \
     -e "s|__BRANCH_NAME__|${BRANCH_NAME}|" \
     -e "s|__EXPIRATION_PERIOD_DAYS__|${EXPIRATION_PERIOD_DAYS}|" \
     -e "s|__PARENT_ID__|${PARENT_ID}|" > cloudbuild_revoke_sa_keys_gen.json

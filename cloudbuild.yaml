@@ -66,7 +66,7 @@ steps:
 
   # Create default cloud build buckets in Europe
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'cloudbuild-buckets'
+    id: 'create-cloudbuild-buckets'
     waitFor:
       - create-projects
     entrypoint: 'bash'
@@ -115,9 +115,9 @@ steps:
         git clone --branch=${_DCAT_DEPLOY_BRANCH_NAME} https://github.com/vwt-digital/dcat-deploy.git
         dcat-deploy/deploy_dcat_gcp.sh config/data_catalog.json ${PROJECT_ID} ${_DCAT_DEPLOY_BRANCH_NAME} $(base64 -w0 config/github_access_token.enc)
 
-  # Create app engines
+  # Create default app engines
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'Create default app engines'
+    id: 'create-app-engines'
     waitFor:
       - create-projects
     entrypoint: 'bash'
@@ -200,29 +200,12 @@ steps:
     id: 'create-cloudbuild-triggers'
     waitFor:
       - create-projects
+    dir: 'scripts'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        gcp_access_token=$(gcloud config config-helper --format='value(credential.access_token)')
-        for project_id in $(python3 scripts/list_projects.py config/projects.json)
-        do
-            curl -X GET -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers" > project_triggers.json
-            python3 scripts/list_project_triggers.py config/projects.json ${project_id} |
-            while read -r trigger
-            do
-                echo "Creating trigger in ${project_id}..."
-                echo ${trigger} | tee trigger.json
-                existing_id=$(python3 scripts/checktriggerexists.py project_triggers.json trigger.json)
-
-                if [ -n "${existing_id}" ]
-                then
-                    curl -X DELETE -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers/${existing_id}"
-                fi
-
-                curl -X POST -T trigger.json -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers"
-            done
-        done
+        ./create_cloudbuild_triggers.sh config/projects.json
 
   # Deploy report_build_status to GitHub function
   - name: 'gcr.io/cloud-builders/gcloud'

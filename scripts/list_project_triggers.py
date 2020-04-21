@@ -17,11 +17,13 @@ if len(sys.argv) > 2:
                     tr['description'] = 'Push to {} {} branch'.format(
                         tr['triggerTemplate']['repoName'],
                         tr['triggerTemplate']['branchName'])
+                    tr['name'] = tr['description'].replace(' ', '-')
 
                 if 'github' in tr:
                     tr['description'] = 'Push to {} {} branch'.format(
                         tr['github']['name'],
                         tr['github']['push']['branch'])
+                    tr['name'] = tr['description'].replace(' ', '-')
 
                 if 'runTrigger' in tr:
                     tr['build'] = {

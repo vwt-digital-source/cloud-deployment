@@ -29,7 +29,7 @@ def main(args):
                 "serviceAccount": service_account
             })
 
-        active_service_accounts.append(get_service_accounts(service, project['projectId']))
+        active_service_accounts.extend(get_service_accounts(service, project['projectId']))
 
     for service_account in active_service_accounts:
         logging.info('FOUND {}'.format(service_account))

@@ -41,7 +41,7 @@ steps:
 
   # Update IAM based on projects.json
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'update-iam'
+    id: 'manage-service-accounts'
     waitFor:
       - create-projects
       - create-virtualenv
@@ -50,7 +50,7 @@ steps:
       - '-c'
       - |
         source /workspace/build-venv/bin/activate
-        python3 scripts/remove_service_accounts.py config/projects.json
+        python3 scripts/remove_service_accounts.py -p config/projects.json -s config/service_accounts.json
 
   # Enable/disable services based on projects.json
   - name: 'gcr.io/cloud-builders/gcloud'

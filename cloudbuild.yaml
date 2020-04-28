@@ -62,7 +62,7 @@ steps:
       - '-c'
       - |
         _parent=$(cat config/parent_folder_id.cfg)
-        ./scripts/manage_services.sh config/projects.json $${_parent}
+        ./scripts/manage_services.sh config/projects.json config/services.json $${_parent}
 
   # Create default cloud build buckets in Europe
   - name: 'gcr.io/cloud-builders/gcloud'

@@ -1,31 +1,4 @@
 
-def append_default_services(services):
-    services.extend([
-        'cloudtrace.googleapis.com',
-        'logging.googleapis.com',
-        'monitoring.googleapis.com',
-        'stackdriver.googleapis.com',
-        'clouderrorreporting.googleapis.com',
-        'servicecontrol.googleapis.com',
-        'servicemanagement.googleapis.com',
-        'serviceusage.googleapis.com',
-        'cloudresourcemanager.googleapis.com',
-        'sourcerepo.googleapis.com',
-        'storage-api.googleapis.com',
-        'storage-component.googleapis.com',
-        'cloudbuild.googleapis.com',
-        'pubsub.googleapis.com',
-        'cloudfunctions.googleapis.com',
-        'containerregistry.googleapis.com',
-        'deploymentmanager.googleapis.com',
-        'cloudscheduler.googleapis.com',
-        'cloudkms.googleapis.com',
-        'iam.googleapis.com',
-        'iamcredentials.googleapis.com'
-    ])
-    return list(set(services))
-
-
 def gather_permissions(preDefinedBindings, resource_name, odrlPolicy):
     bindings = preDefinedBindings
 
@@ -102,8 +75,8 @@ def generate_config(context):
         iam_policies_depends = [project['projectId']]
         services_list = []
         if project.get('services'):
-            project['services'] = append_default_services(project['services'])
-        for service in project.get('services', []):
+            project['services'].extend(services.get('default', []))  # noqa: F821
+        for service in list(set(project.get('services', []))):
             depends_on = [project['projectId'], 'billing_{}'.format(project['projectId'])]
             if index != 0:
                 depends_on.append('{}-{}-api'.format(project['projectId'], project['services'][index-1]))
@@ -123,7 +96,9 @@ def generate_config(context):
             index += 1
             iam_policies_depends.append('{}-{}-api'.format(project['projectId'], service))
         service_accounts_list = []
-        for account in project.get('serviceAccounts', []):
+        default_service_accounts = service_accounts.get('default', [])  # noqa: F821
+        accounts = list(set(project.get('serviceAccounts', []).extend(default_service_accounts)))
+        for account in accounts:
             service_accounts_list.append('{}-{}-svcaccount'.format(project['projectId'], account))
             resources.append({
                 'name': '{}-{}-svcaccount'.format(project['projectId'], account),

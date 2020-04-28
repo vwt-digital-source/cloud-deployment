@@ -2,7 +2,8 @@
 # shellcheck disable=SC2181,SC1091,SC2013,SC2046,SC2086
 
 PROJECT_CATALOG=${1}
-PARENT_ID=${2}
+SERVICE_CATALOG=${2}
+PARENT_ID=${3}
 
 basedir=$(dirname "$0")
 result=0
@@ -17,7 +18,7 @@ do
 
     echo "source.googleapis.com" > "${excluded}"
     gcloud services list --enabled --format="value(NAME)" --project "${project}" > "${enabled}"
-    python3 "${basedir}"/list_services.py "${project}" "${PROJECT_CATALOG}" > "${specified}"
+    python3 "${basedir}"/list_services.py "${project}" "${SERVICE_CATALOG}" "${PROJECT_CATALOG}" > "${specified}"
 
     disable=$(python3 "${basedir}"/compare_lists.py "${enabled}" "${specified}" "${excluded}")
 

@@ -5,6 +5,8 @@ import argparse
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
 
+logging.basicConfig(level=logging.INFO, format='%(levelname)7s: %(message)s')
+
 
 def main(args):
     service = make_service()

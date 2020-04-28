@@ -44,6 +44,7 @@ steps:
     id: 'manage-service-accounts'
     waitFor:
       - create-virtualenv
+      - create-projects
     entrypoint: 'bash'
     args:
       - '-c'
@@ -128,6 +129,7 @@ steps:
 
   # Create Error Reporting and app traffic log sink for parent folder
   - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'create-logsinks-legacy'
     waitFor:
       - create-projects
       - dcat-deploy
@@ -154,7 +156,7 @@ steps:
 
   # Deploy publish_build_result function to every project
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'Publish build result function'
+    id: 'publish-build-result-function'
     dir: 'functions/publish_build_result_func'
     waitFor:
       - create-projects

@@ -43,7 +43,6 @@ steps:
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'manage-service-accounts'
     waitFor:
-      - create-projects
       - create-virtualenv
     entrypoint: 'bash'
     args:

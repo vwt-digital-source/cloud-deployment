@@ -72,7 +72,7 @@ def parse_args():
     parser.add_argument('-p', '--projects-file',
                         required=True,
                         help='path to projects.json file')
-    parser.add_argument('-s', '--service-account-file',
+    parser.add_argument('-s', '--service-accounts-file',
                         required=True,
                         help='path to service_accounts.json file')
     return parser.parse_args()

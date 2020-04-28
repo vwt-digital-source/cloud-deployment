@@ -97,8 +97,8 @@ def generate_config(context):
             iam_policies_depends.append('{}-{}-api'.format(project['projectId'], service))
         service_accounts_list = []
         default_service_accounts = service_accounts.get('default', [])  # noqa: F821
-        accounts = list(set(project.get('serviceAccounts', []).extend(default_service_accounts)))
-        for account in accounts:
+        project.get('serviceAccounts', []).extend(default_service_accounts)
+        for account in list(set(project.get('serviceAccounts', []))):
             service_accounts_list.append('{}-{}-svcaccount'.format(project['projectId'], account))
             resources.append({
                 'name': '{}-{}-svcaccount'.format(project['projectId'], account),

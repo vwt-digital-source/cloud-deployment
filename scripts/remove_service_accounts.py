@@ -36,9 +36,8 @@ def main(args):
     for service_account in active_service_accounts:
         logging.info('FOUND {}'.format(service_account))
         if 'iam.gserviceaccount.com' not in service_account['name']:
-            continue
-        for item in documented_service_accounts:
-            if not "projects/{}/serviceAccounts/{}".format(item['projectId'], item['serviceAccount']) in service_account['name']:
+            if not next((item for item in documented_service_accounts if "projects/{}/serviceAccounts/{}".format(
+                        item['projectId'], item['serviceAccount']) in service_account['name']), False):
                 delete_service_account(service, service_account)
 
 
@@ -65,7 +64,7 @@ def delete_service_account(service, service_account):
 
 def make_service():
     credentials = GoogleCredentials.get_application_default()
-    service = discovery.build('iam', 'v1', credentials=credentials)
+    service = discovery.build('iam', 'v1', credentials=credentials, cache_discovery=False)
     return service
 
 

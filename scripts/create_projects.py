@@ -71,14 +71,13 @@ def generate_config(context):
                 'billingAccountName': context.properties['billing_account_name']
             }
         })
-        index = 0
         iam_policies_depends = [project['projectId']]
         services_list = []
-        all_services = project.get('services', []) + services.get('default', [])  # noqa: F821
-        for service in list(set(all_services)):
+        all_services = list(set(project.get('services', []) + services.get('default', [])))  # noqa: F821
+        for index, service in enumerate(all_services):
             depends_on = [project['projectId'], 'billing_{}'.format(project['projectId'])]
             if index != 0:
-                depends_on.append('{}-{}-api'.format(project['projectId'], project['services'][index-1]))
+                depends_on.append('{}-{}-api'.format(project['projectId'], all_services))
             service_to_add = '{}-{}-api'.format(project['projectId'], service)
             services_list.append(service_to_add)
             resources.append({
@@ -92,7 +91,6 @@ def generate_config(context):
                     'serviceName': service
                 }
             })
-            index += 1
             iam_policies_depends.append('{}-{}-api'.format(project['projectId'], service))
         service_accounts_list = []
         default_service_accounts = service_accounts.get('default', [])  # noqa: F821

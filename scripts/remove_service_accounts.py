@@ -58,7 +58,7 @@ def get_service_accounts(service, project_id):
 
 
 def delete_service_account(service, service_account):
-    # service.projects().serviceAccounts().delete(name=service_account['name']).execute()
+    service.projects().serviceAccounts().delete(name=service_account['name']).execute()
     logging.info("REMOVED {}".format(service_account['name']))
 
 

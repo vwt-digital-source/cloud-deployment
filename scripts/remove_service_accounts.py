@@ -35,7 +35,7 @@ def main(args):
 
     for service_account in active_service_accounts:
         logging.info('FOUND {}'.format(service_account))
-        if 'iam.gserviceaccount.com' not in service_account['name']:
+        if 'iam.gserviceaccount.com' in service_account['name']:
             if not next((item for item in documented_service_accounts if "projects/{}/serviceAccounts/{}".format(
                         item['projectId'], item['serviceAccount']) in service_account['name']), False):
                 delete_service_account(service, service_account)

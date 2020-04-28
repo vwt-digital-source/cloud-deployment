@@ -77,7 +77,7 @@ def generate_config(context):
         for index, service in enumerate(all_services):
             depends_on = [project['projectId'], 'billing_{}'.format(project['projectId'])]
             if index != 0:
-                depends_on.append('{}-{}-api'.format(project['projectId'], all_services))
+                depends_on.append('{}-{}-api'.format(project['projectId'], all_services[index-1]))
             service_to_add = '{}-{}-api'.format(project['projectId'], service)
             services_list.append(service_to_add)
             resources.append({

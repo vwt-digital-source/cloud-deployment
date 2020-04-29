@@ -191,11 +191,14 @@ def generate_config(context):
                 }
             }
         })
-        resources.append({
-            'name': 'patch-sa-policy-' + project['projectId'],
-            'action': 'gcp-types/iam-v1:iam.projects.serviceAccounts.setIamPolicy',
-            'properties': gather_permissions_sa(project['projectId'], project.get('odrlPolicy'))
-        })
+
+        sa_policy_properties = gather_permissions_sa(project['projectId'], project.get('odrlPolicy'))
+        if sa_policy_properties:
+            resources.append({
+                'name': 'patch-sa-policy-' + project['projectId'],
+                'action': 'gcp-types/iam-v1:iam.projects.serviceAccounts.setIamPolicy',
+                'properties': gather_permissions_sa(project['projectId'], project.get('odrlPolicy'))
+            })
 
         depends_on = [project['projectId'], 'billing_{}'.format(project['projectId']),
                       '{}-cloudkms.googleapis.com-api'.format(project['projectId'])] + \

@@ -1,6 +1,8 @@
 #!/bin/bash
 
 projects_catalog=${1}
+services=${2}
+service_accounts=${3}
 
 if [ -z "${projects_catalog}" ]
 then
@@ -10,9 +12,14 @@ fi
 
 tmpscript=$(mktemp /tmp/XXXXXXX.py)
 
+
 {
     echo "projects = \\"
     cat ${projects_catalog}
+    echo "services = \\"
+    cat "${services}"
+    echo "service_accounts = \\"
+    cat "${service_accounts}"
     cat create_projects.py
     cat << EOF
 import json

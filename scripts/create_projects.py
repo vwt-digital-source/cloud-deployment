@@ -1,3 +1,5 @@
+import re
+
 
 def gather_permissions(preDefinedBindings, resource_name, odrlPolicy):
     bindings = preDefinedBindings
@@ -21,36 +23,42 @@ def gather_permissions(preDefinedBindings, resource_name, odrlPolicy):
     return bindings
 
 
-def gather_permissions_sa(resource_name, odrlPolicy):
-    properties = []
-    if odrlPolicy is not None:
-        for permission in [p for p in odrlPolicy.get('permission', []) if 'serviceAccount' in p.get('target', '')]:
-            target_resource = 'projects/{}/serviceAccounts/{}'.format(
-                resource_name, permission['target'].replace('serviceAccount:', ''))
+def gather_permissions_sa(project_id, odrl_policy):
+    resources = []
+    if odrl_policy is not None:
+        for permission in [p for p in odrl_policy.get('permission', []) if 'serviceAccount' in p.get('target', '')]:
+            target_name = permission['target'].replace('serviceAccount:', '')
+            resource_name = 'patch-sa-policy-' + re.sub(r'[^A-Za-z0-9]+', '-', target_name)
+            resource_target = 'projects/{}/serviceAccounts/{}'.format(
+                project_id, target_name)
 
-            property = next((p for p in properties if p['resource'] == target_resource), None)
-            if not property:
-                property = {
-                    'resource': target_resource,
-                    'policy': {
-                        'bindings': []
+            resource = next((p for p in resources if p.get('name', '') == resource_name), None)
+            if not resource:
+                resource = {
+                    'name': resource_name,
+                    'action': 'gcp-types/iam-v1:iam.projects.serviceAccounts.setIamPolicy',
+                    'properties': {
+                        'resource': resource_target,
+                        'policy': {
+                            'bindings': []
+                        }
                     }
                 }
-                properties.append(property)
+                resources.append(resource)
 
-            binding = next((b for b in property['policy']['bindings'] if b.get('role', '') == permission['action']),
-                           None)
+            binding = next((b for b in resource['properties']['policy']['bindings'] if
+                            b.get('role', '') == permission['action']), None)
             if not binding:
                 binding = {
                     'role': permission['action'],
                     'members': []
                 }
-                property['policy']['bindings'].append(binding)
+                resource['properties']['policy']['bindings'].append(binding)
 
             if not permission['assignee'] in binding['members']:
                 binding['members'].append(permission['assignee'])
 
-    return properties
+    return resources
 
 
 def append_gcp_policy(resource, resource_name, odrlPolicy):
@@ -192,9 +200,11 @@ def generate_config(context):
             }
         })
 
+        resources.extend(gather_permissions_sa(project['projectId'], project.get('odrlPolicy')))
+
         depends_on = [project['projectId'], 'billing_{}'.format(project['projectId']),
-                      '{}-cloudkms.googleapis.com-api'.format(project['projectId'])] + \
-            services_list + service_accounts_list
+                      '{}-cloudkms.googleapis.com-api'.format(
+                          project['projectId'])] + services_list + service_accounts_list
         for keyring in project.get('keyrings', []):
             keyringResource = {
                 'name': '{}-{}-keyring'.format(project['projectId'], keyring['name']),

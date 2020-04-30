@@ -4,8 +4,20 @@
 PROJECT_CATALOG=${1}
 REGION=${2}
 
+if [[ -z "${PROJECT_CATALOG}" || -z "${REGION}" ]]
+then
+    echo "PROJECT_CATALOG parameter should be set"
+    echo "REGION parameter should be set"
+    echo "Usage: ${0} <project_catalog> <region>"
+    exit 1
+fi
+
 basedir=$(dirname "$0")
 result=0
+
+cat << EOF > lifecycle.json
+{ "rule": [ { "action": { "type": "Delete" }, "condition": { "age": 30 } } ] }
+EOF
 
 for project in $(python3 "${basedir}"/list_projects.py "${PROJECT_CATALOG}")
 do
@@ -28,6 +40,14 @@ do
 
     else
         echo " + Cloud build bucket already exists"
+    fi
+
+    gsutil lifecycle set lifecycle.json "gs://${project}_cloudbuild"
+
+    if [ $? -ne 0 ]
+    then
+        echo "ERROR setting lifecycle policy for Cloud Build bucket"
+        result=1
     fi
 
 done

@@ -1,36 +1,12 @@
-
-def append_default_services(services):
-    services.extend([
-        'cloudtrace.googleapis.com',
-        'logging.googleapis.com',
-        'monitoring.googleapis.com',
-        'stackdriver.googleapis.com',
-        'clouderrorreporting.googleapis.com',
-        'servicecontrol.googleapis.com',
-        'servicemanagement.googleapis.com',
-        'serviceusage.googleapis.com',
-        'cloudresourcemanager.googleapis.com',
-        'sourcerepo.googleapis.com',
-        'storage-api.googleapis.com',
-        'storage-component.googleapis.com',
-        'cloudbuild.googleapis.com',
-        'pubsub.googleapis.com',
-        'cloudfunctions.googleapis.com',
-        'containerregistry.googleapis.com',
-        'deploymentmanager.googleapis.com',
-        'cloudscheduler.googleapis.com',
-        'cloudkms.googleapis.com',
-        'iam.googleapis.com',
-        'iamcredentials.googleapis.com'
-    ])
-    return list(set(services))
+import re
 
 
 def gather_permissions(preDefinedBindings, resource_name, odrlPolicy):
     bindings = preDefinedBindings
 
     if odrlPolicy is not None:
-        for permission in [p for p in odrlPolicy.get('permission', []) if p.get('target', '') == resource_name]:
+        for permission in [p for p in odrlPolicy.get('permission', [])
+                           if 'serviceAccount:' not in p.get('target', '') and p.get('target', '') == resource_name]:
             role_to_add = permission['action']
             if not bindings:
                 bindings = []
@@ -47,6 +23,44 @@ def gather_permissions(preDefinedBindings, resource_name, odrlPolicy):
     return bindings
 
 
+def gather_permissions_sa(project_id, odrl_policy):
+    resources = []
+    if odrl_policy is not None:
+        for permission in [p for p in odrl_policy.get('permission', []) if 'serviceAccount' in p.get('target', '')]:
+            target_name = permission['target'].replace('serviceAccount:', '')
+            resource_name = 'patch-sa-policy-' + re.sub(r'[^A-Za-z0-9]+', '-', target_name)
+            resource_target = 'projects/{}/serviceAccounts/{}'.format(
+                project_id, target_name)
+
+            resource = next((p for p in resources if p.get('name', '') == resource_name), None)
+            if not resource:
+                resource = {
+                    'name': resource_name,
+                    'action': 'gcp-types/iam-v1:iam.projects.serviceAccounts.setIamPolicy',
+                    'properties': {
+                        'resource': resource_target,
+                        'policy': {
+                            'bindings': []
+                        }
+                    }
+                }
+                resources.append(resource)
+
+            binding = next((b for b in resource['properties']['policy']['bindings'] if
+                            b.get('role', '') == permission['action']), None)
+            if not binding:
+                binding = {
+                    'role': permission['action'],
+                    'members': []
+                }
+                resource['properties']['policy']['bindings'].append(binding)
+
+            if not permission['assignee'] in binding['members']:
+                binding['members'].append(permission['assignee'])
+
+    return resources
+
+
 def append_gcp_policy(resource, resource_name, odrlPolicy):
     permissions = gather_permissions(None, resource_name, odrlPolicy)
     if permissions is not None:
@@ -60,7 +74,7 @@ def append_gcp_policy(resource, resource_name, odrlPolicy):
 def generate_config(context):
     resources = []
     project_index = 0
-    max_projects_parallel = 2
+    max_projects_parallel = 5
     project_depends = []
 
     for project in projects['projects']:  # noqa: F821
@@ -98,15 +112,13 @@ def generate_config(context):
                 'billingAccountName': context.properties['billing_account_name']
             }
         })
-        index = 0
         iam_policies_depends = [project['projectId']]
         services_list = []
-        if project.get('services'):
-            project['services'] = append_default_services(project['services'])
-        for service in project.get('services', []):
+        all_services = list(set(project.get('services', []) + services.get('default', [])))  # noqa: F821
+        for index, service in enumerate(all_services):
             depends_on = [project['projectId'], 'billing_{}'.format(project['projectId'])]
             if index != 0:
-                depends_on.append('{}-{}-api'.format(project['projectId'], project['services'][index-1]))
+                depends_on.append('{}-{}-api'.format(project['projectId'], all_services[index-1]))
             service_to_add = '{}-{}-api'.format(project['projectId'], service)
             services_list.append(service_to_add)
             resources.append({
@@ -120,10 +132,11 @@ def generate_config(context):
                     'serviceName': service
                 }
             })
-            index += 1
             iam_policies_depends.append('{}-{}-api'.format(project['projectId'], service))
         service_accounts_list = []
-        for account in project.get('serviceAccounts', []):
+        default_service_accounts = service_accounts.get('default', [])  # noqa: F821
+        project.get('serviceAccounts', []).extend(default_service_accounts)
+        for account in list(set(project.get('serviceAccounts', []))):
             service_accounts_list.append('{}-{}-svcaccount'.format(project['projectId'], account))
             resources.append({
                 'name': '{}-{}-svcaccount'.format(project['projectId'], account),
@@ -186,9 +199,12 @@ def generate_config(context):
                 }
             }
         })
+
+        resources.extend(gather_permissions_sa(project['projectId'], project.get('odrlPolicy')))
+
         depends_on = [project['projectId'], 'billing_{}'.format(project['projectId']),
-                      '{}-cloudkms.googleapis.com-api'.format(project['projectId'])] + \
-            services_list + service_accounts_list
+                      '{}-cloudkms.googleapis.com-api'.format(
+                          project['projectId'])] + services_list + service_accounts_list
         for keyring in project.get('keyrings', []):
             keyringResource = {
                 'name': '{}-{}-keyring'.format(project['projectId'], keyring['name']),

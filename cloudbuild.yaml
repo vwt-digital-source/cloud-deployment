@@ -41,16 +41,16 @@ steps:
 
   # Update IAM based on projects.json
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'update-iam'
+    id: 'manage-service-accounts'
     waitFor:
-      - create-projects
       - create-virtualenv
+      - create-projects
     entrypoint: 'bash'
     args:
       - '-c'
       - |
         source /workspace/build-venv/bin/activate
-        python3 scripts/remove_service_accounts.py config/projects.json
+        python3 scripts/remove_service_accounts.py -p config/projects.json -s config/service_accounts.json
 
   # Enable/disable services based on projects.json
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -62,11 +62,11 @@ steps:
       - '-c'
       - |
         _parent=$(cat config/parent_folder_id.cfg)
-        ./scripts/manage_services.sh config/projects.json $${_parent}
+        ./scripts/manage_services.sh config/projects.json config/services.json $${_parent}
 
   # Create default cloud build buckets in Europe
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'cloudbuild-buckets'
+    id: 'create-cloudbuild-buckets'
     waitFor:
       - create-projects
     entrypoint: 'bash'
@@ -90,6 +90,20 @@ steps:
         source /workspace/build-venv/bin/activate
         python3 ./scripts/set_iam_policy.py -p "$${_projects}" -s "$${_audit_logs}" -c "auditConfigs"
 
+  # Schedule revoke service account keys
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'schedule-revoke-sa-keys'
+    waitFor:
+      - create-projects
+    dir: 'scripts'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        source ../config/revoke_sa_keys.cfg
+        _parent=$(cat ../config/parent_folder_id.cfg)
+        ./schedule_revoke_sa_keys.sh "${PROJECT_ID}" "${_DCAT_DEPLOY_BRANCH_NAME}" "$${_parent}" "$${_EXPIRATION_PERIOD_DAYS}"
+
   # Deploy data catalog of cloud-deployment project
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'dcat-deploy'
@@ -101,9 +115,9 @@ steps:
         git clone --branch=${_DCAT_DEPLOY_BRANCH_NAME} https://github.com/vwt-digital/dcat-deploy.git
         dcat-deploy/deploy_dcat_gcp.sh config/data_catalog.json ${PROJECT_ID} ${_DCAT_DEPLOY_BRANCH_NAME} $(base64 -w0 config/github_access_token.enc)
 
-  # Create app engines
+  # Create default app engines
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'Create default app engines'
+    id: 'create-app-engines'
     waitFor:
       - create-projects
     entrypoint: 'bash'
@@ -115,6 +129,7 @@ steps:
 
   # Create Error Reporting and app traffic log sink for parent folder
   - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'create-logsinks-legacy'
     waitFor:
       - create-projects
       - dcat-deploy
@@ -141,7 +156,7 @@ steps:
 
   # Deploy publish_build_result function to every project
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'Publish build result function'
+    id: 'publish-build-result-function'
     dir: 'functions/publish_build_result_func'
     waitFor:
       - create-projects
@@ -190,25 +205,7 @@ steps:
     args:
       - '-c'
       - |
-        gcp_access_token=$(gcloud config config-helper --format='value(credential.access_token)')
-        for project_id in $(python3 scripts/list_projects.py config/projects.json)
-        do
-            curl -X GET -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers" > project_triggers.json
-            python3 scripts/list_project_triggers.py config/projects.json ${project_id} |
-            while read -r trigger
-            do
-                echo "Creating trigger in ${project_id}..."
-                echo ${trigger} | tee trigger.json
-                existing_id=$(python3 scripts/checktriggerexists.py project_triggers.json trigger.json)
-
-                if [ -n "${existing_id}" ]
-                then
-                    curl -X DELETE -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers/${existing_id}"
-                fi
-
-                curl -X POST -T trigger.json -H "Authorization: Bearer ${gcp_access_token}" "https://cloudbuild.googleapis.com/v1/projects/${project_id}/triggers"
-            done
-        done
+        ./scripts/create_cloudbuild_triggers.sh ./config/projects.json
 
   # Deploy report_build_status to GitHub function
   - name: 'gcr.io/cloud-builders/gcloud'

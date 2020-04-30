@@ -1,0 +1,36 @@
+{
+    "timeout": "1200s",
+    "steps": [
+        {
+            "name": "gcr.io/cloud-builders/git",
+            "args": [
+                "clone",
+                "--branch=${_BRANCH_NAME}",
+                "https://github.com/vwt-digital/cloud-deployment.git"
+            ]
+        },
+        {
+            "name": "gcr.io/cloud-builders/gcloud",
+            "dir": "cloud-deployment/scripts",
+            "entrypoint": "bash",
+            "args": [
+                "-c",
+                "pip install virtualenv==16.7.9 && virtualenv -p python3 /workspace/venv && source /workspace/venv/bin/activate && pip install -r requirements.txt"
+            ]
+        },
+        {
+            "name": "gcr.io/cloud-builders/gcloud",
+            "dir": "cloud-deployment/scripts",
+            "entrypoint": "bash",
+            "args": [
+                "-c",
+                "_projects=$(gcloud projects list --format=\"value(PROJECT_ID)\" --filter=\"parent.id=${_PARENT_ID}\") && source /workspace/venv/bin/activate && python3 revoke_sa_keys.py -p \"$${_projects}\" -d ${_EXPIRATION_PERIOD_DAYS}"
+            ]
+        }
+    ],
+    "substitutions": {
+        "_PARENT_ID": "__PARENT_ID__",
+        "_BRANCH_NAME": "__BRANCH_NAME__",
+        "_EXPIRATION_PERIOD_DAYS": "__EXPIRATION_PERIOD_DAYS__"
+    }
+}

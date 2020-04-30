@@ -1,0 +1,25 @@
+{
+    "default": [
+        "cloudtrace.googleapis.com",
+        "logging.googleapis.com",
+        "monitoring.googleapis.com",
+        "stackdriver.googleapis.com",
+        "clouderrorreporting.googleapis.com",
+        "servicecontrol.googleapis.com",
+        "servicemanagement.googleapis.com",
+        "serviceusage.googleapis.com",
+        "cloudresourcemanager.googleapis.com",
+        "sourcerepo.googleapis.com",
+        "storage-api.googleapis.com",
+        "storage-component.googleapis.com",
+        "cloudbuild.googleapis.com",
+        "pubsub.googleapis.com",
+        "cloudfunctions.googleapis.com",
+        "containerregistry.googleapis.com",
+        "deploymentmanager.googleapis.com",
+        "cloudscheduler.googleapis.com",
+        "cloudkms.googleapis.com",
+        "iam.googleapis.com",
+        "iamcredentials.googleapis.com"
+    ]
+}

@@ -3,36 +3,35 @@
 import config
 import json
 import sys
-import os
-import base64
 import logging
-
-from google.cloud import kms_v1
-from google.oauth2 import service_account
+import google
 import googleapiclient.discovery
+
+from google.auth import iam
+from google.auth.transport import requests
+from google.oauth2 import service_account
 
 logging.getLogger().setLevel(logging.INFO)
 
+TOKEN_URI = 'https://accounts.google.com/o/oauth2/token'  # nosec
+
 
 def create_adminsdk_service():
-    # Decrypt client_credentials to file
-    adminsdk_credentials_encrypted = base64.b64decode(
-        os.environ['ADMINSDK_CREDENTIALS_ENCRYPTED'])
-    kms_client = kms_v1.KeyManagementServiceClient()
-    crypto_key_name = kms_client.crypto_key_path_path(
-        os.environ['PROJECT_ID'], 'europe-west1', 'admin-sdk',
-        'admin-sdk-credentials')
-    decrypt_response = kms_client.decrypt(crypto_key_name,
-                                          adminsdk_credentials_encrypted)
-    with open('adminsdk_credentials.json', 'w') as outfile:
-        outfile.write(
-            decrypt_response.plaintext.decode("utf-8").replace('\n', ''))
+    credentials, project_id = google.auth.default(scopes=['https://www.googleapis.com/auth/iam'])
 
-    # Set ADMIN SDK credentials
-    delegated_credentials = service_account.Credentials.from_service_account_file(
-        'adminsdk_credentials.json',
-        scopes=config.SERVICE_ACCOUNT_SCOPES,
-        subject=config.USER_IMPERSONATION_EMAIL)
+    try:
+        request = requests.Request()
+        credentials.refresh(request)
+
+        signer = iam.Signer(request, credentials, config.SERVICE_ACCOUNT)
+        delegated_credentials = service_account.Credentials(
+            signer=signer,
+            service_account_email=config.SERVICE_ACCOUNT,
+            token_uri=TOKEN_URI,
+            scopes=config.SERVICE_ACCOUNT_SCOPES,
+            subject=config.USER_IMPERSONATION_EMAIL)
+    except Exception:
+        raise
 
     gs_service = googleapiclient.discovery.build(
         'admin', 'directory_v1', credentials=delegated_credentials,

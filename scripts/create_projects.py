@@ -133,10 +133,11 @@ def generate_config(context):
                 }
             })
             iam_policies_depends.append('{}-{}-api'.format(project['projectId'], service))
+
         service_accounts_list = []
         default_service_accounts = service_accounts.get('default', [])  # noqa: F821
-        project.get('serviceAccounts', []).extend(default_service_accounts)
-        for account in list(set(project.get('serviceAccounts', []))):
+        documented_service_accounts = project.get('serviceAccounts', [])
+        for account in list(set(default_service_accounts.extend(documented_service_accounts))):
             service_accounts_list.append('{}-{}-svcaccount'.format(project['projectId'], account))
             resources.append({
                 'name': '{}-{}-svcaccount'.format(project['projectId'], account),
@@ -151,6 +152,7 @@ def generate_config(context):
                 }
             })
             iam_policies_depends.append('{}-{}-svcaccount'.format(project['projectId'], account))
+
         resources.append({
             'name': 'get-iam-policy-' + project['projectId'],
             'action': 'gcp-types/cloudresourcemanager-v1:cloudresourcemanager.projects.getIamPolicy',

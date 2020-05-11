@@ -23,7 +23,7 @@ def gather_permissions(preDefinedBindings, resource_name, odrlPolicy):
     return bindings
 
 
-def gather_permissions_sa(project_id, odrl_policy):
+def gather_permissions_sa(project_id, odrl_policy, depends_on):
     resources = []
     if odrl_policy is not None:
         for permission in [p for p in odrl_policy.get('permission', []) if 'serviceAccount' in p.get('target', '')]:
@@ -37,6 +37,9 @@ def gather_permissions_sa(project_id, odrl_policy):
                 resource = {
                     'name': resource_name,
                     'action': 'gcp-types/iam-v1:iam.projects.serviceAccounts.setIamPolicy',
+                    'metadata': {
+                        'dependsOn': depends_on
+                    },
                     'properties': {
                         'resource': resource_target,
                         'policy': {
@@ -205,7 +208,7 @@ def generate_config(context):
             }
         })
 
-        resources.extend(gather_permissions_sa(project['projectId'], project.get('odrlPolicy')))
+        resources.extend(gather_permissions_sa(project['projectId'], project.get('odrlPolicy'), iam_policies_depends))
 
         depends_on = [project['projectId'], 'billing_{}'.format(project['projectId']),
                       '{}-cloudkms.googleapis.com-api'.format(

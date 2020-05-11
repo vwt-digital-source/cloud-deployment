@@ -23,7 +23,7 @@ def gather_permissions(preDefinedBindings, resource_name, odrlPolicy):
     return bindings
 
 
-def gather_permissions_sa(project_id, odrl_policy):
+def gather_permissions_sa(project_id, odrl_policy, depends_on):
     resources = []
     if odrl_policy is not None:
         for permission in [p for p in odrl_policy.get('permission', []) if 'serviceAccount' in p.get('target', '')]:
@@ -37,6 +37,9 @@ def gather_permissions_sa(project_id, odrl_policy):
                 resource = {
                     'name': resource_name,
                     'action': 'gcp-types/iam-v1:iam.projects.serviceAccounts.setIamPolicy',
+                    'metadata': {
+                        'dependsOn': depends_on
+                    },
                     'properties': {
                         'resource': resource_target,
                         'policy': {
@@ -133,10 +136,14 @@ def generate_config(context):
                 }
             })
             iam_policies_depends.append('{}-{}-api'.format(project['projectId'], service))
+
         service_accounts_list = []
         default_service_accounts = service_accounts.get('default', [])  # noqa: F821
-        project.get('serviceAccounts', []).extend(default_service_accounts)
-        for account in list(set(project.get('serviceAccounts', []))):
+
+        documented_service_accounts = project.get('serviceAccounts', [])
+        documented_service_accounts.extend(default_service_accounts)
+
+        for account in list(set(documented_service_accounts)):
             service_accounts_list.append('{}-{}-svcaccount'.format(project['projectId'], account))
             resources.append({
                 'name': '{}-{}-svcaccount'.format(project['projectId'], account),
@@ -151,6 +158,7 @@ def generate_config(context):
                 }
             })
             iam_policies_depends.append('{}-{}-svcaccount'.format(project['projectId'], account))
+
         resources.append({
             'name': 'get-iam-policy-' + project['projectId'],
             'action': 'gcp-types/cloudresourcemanager-v1:cloudresourcemanager.projects.getIamPolicy',
@@ -200,7 +208,7 @@ def generate_config(context):
             }
         })
 
-        resources.extend(gather_permissions_sa(project['projectId'], project.get('odrlPolicy')))
+        resources.extend(gather_permissions_sa(project['projectId'], project.get('odrlPolicy'), iam_policies_depends))
 
         depends_on = [project['projectId'], 'billing_{}'.format(project['projectId']),
                       '{}-cloudkms.googleapis.com-api'.format(

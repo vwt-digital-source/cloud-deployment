@@ -12,7 +12,9 @@
                 "sql-component.googleapis.com",
                 "sqladmin.googleapis.com",
                 "datastore.googleapis.com",
-                "firestore.googleapis.com"
+                "firestore.googleapis.com",
+                "bigquery.googleapis.com",
+                "bigquerystorage.googleapis.com"
             ],
             "odrlPolicy": {
                 "uid": "__PROJECT_ID__-policy",

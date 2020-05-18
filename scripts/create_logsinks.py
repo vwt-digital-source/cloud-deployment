@@ -17,12 +17,15 @@ def generate_config(context):
                 'filter': logsink.get('filter', ''),
                 'destination': logsink['destination'],
                 'disabled': logsink.get('disabled', "False") == 'True',
-                'includeChildren': logsink['includeChildren'] == 'True',
-                'bigqueryOptions': {
-                    'usePartitionedTables': logsink['usePartitionedTables'] == 'True'
-                }
+                'includeChildren': logsink['includeChildren'] == 'True'
             }
         }
+
+        if 'bigquery.googleapis.com' in logsink['destination']:
+            logsink_def['properties']['bigqueryOptions'] = {
+                'usePartitionedTables': logsink['usePartitionedTables'] == 'True'
+            }
+
         resources.append(logsink_def)
 
         outputs.append({

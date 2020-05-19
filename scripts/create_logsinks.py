@@ -14,7 +14,7 @@ def generate_config(context):
                 'uniqueWriterIdentity': True,
                 'sink': logsink['logsinkId'],
                 'folder': logsink['sourceId'],
-                'filter': logsink.get('filter', ''),
+                'filter': logsink.get('filter', '').replace("\\", ""),
                 'destination': logsink['destination'],
                 'disabled': logsink.get('disabled', "False") == 'True',
                 'includeChildren': logsink['includeChildren'] == 'True'

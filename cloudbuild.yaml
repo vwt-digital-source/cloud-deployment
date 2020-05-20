@@ -127,33 +127,6 @@ steps:
         python3 scripts/create_appengines.py config/projects.json | tee create_appengines.sh
         (source create_appengines.sh || exit 0)
 
-  # Create Error Reporting and app traffic log sink for parent folder
-  - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'create-logsinks-legacy'
-    waitFor:
-      - create-projects
-      - dcat-deploy
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        source config/setup_logging_sink.config.sh
-        if [ -n "$${_ERROR_PUBSUB_TOPIC}" ]
-        then
-           gcloud logging sinks describe vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-error \
-              --folder=$(cat config/parent_folder_id.cfg) || \
-              gcloud logging sinks create vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-logging-sink-error \
-              $${_ERROR_PUBSUB_TOPIC} --log-filter='severity=ERROR' --include-children --folder=$(cat config/parent_folder_id.cfg)
-        fi
-        if [ -n "$${_APPTRAFFICLOG_PUBSUB_TOPIC}" ]
-        then
-           gcloud logging sinks describe vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-apptrafficlog-sink \
-              --folder=$(cat config/parent_folder_id.cfg) || \
-              gcloud logging sinks create vwt-${_DCAT_DEPLOY_BRANCH_NAME}-$(cat config/parent_folder_id.cfg)-apptrafficlog-sink \
-              $${_APPTRAFFICLOG_PUBSUB_TOPIC} --log-filter='resource.type=(api OR cloud_function OR cloud_run_revision OR consumed_api OR gae_app OR gce_instance OR http_load_balancer OR managed_service)' \
-              --include-children --folder=$(cat config/parent_folder_id.cfg)
-        fi
-
   # Deploy publish_build_result function to every project
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'publish-build-result-function'

@@ -1,4 +1,5 @@
 import re
+from hashlib import sha1
 
 
 def gather_permissions(preDefinedBindings, resource_name, odrlPolicy):
@@ -115,6 +116,7 @@ def generate_config(context):
                 'billingAccountName': context.properties['billing_account_name']
             }
         })
+
         iam_policies_depends = [project['projectId']]
         services_list = []
         all_services = list(set(project.get('services', []) + services.get('default', [])))  # noqa: F821
@@ -137,16 +139,16 @@ def generate_config(context):
             })
             iam_policies_depends.append('{}-{}-api'.format(project['projectId'], service))
 
-        service_accounts_list = []
         default_service_accounts = service_accounts.get('default', [])  # noqa: F821
 
         documented_service_accounts = project.get('serviceAccounts', [])
         documented_service_accounts.extend(default_service_accounts)
 
+        service_accounts_list = []
         for account in list(set(documented_service_accounts)):
-            service_accounts_list.append('{}-{}-svcaccount'.format(project['projectId'], account))
+            resource_name = '{}-{}-svcaccount'.format(project['projectId'], account)
             resources.append({
-                'name': '{}-{}-svcaccount'.format(project['projectId'], account),
+                'name': resource_name,
                 'type': 'iam.v1.serviceAccount',
                 'metadata': {
                     'dependsOn': [project['projectId']]
@@ -157,62 +159,64 @@ def generate_config(context):
                     'projectId': project['projectId']
                 }
             })
-            iam_policies_depends.append('{}-{}-svcaccount'.format(project['projectId'], account))
+            service_accounts_list.append(resource_name)
 
-        resources.append({
-            'name': 'get-iam-policy-' + project['projectId'],
-            'action': 'gcp-types/cloudresourcemanager-v1:cloudresourcemanager.projects.getIamPolicy',
-            'properties': {
-                'resource': project['projectId'],
-            },
-            'metadata': {
-                'dependsOn': iam_policies_depends,
-                'runtimePolicy': ['UPDATE_ALWAYS']
-            }
-        })
+        odrlPolicy = project.get('odrlPolicy')
+        if odrlPolicy and odrlPolicy.get('permission'):
+            for permission in odrlPolicy.get('permission', []):
+                if permission['target'] == project['projectId']:
+                    suffix = sha1('{}-{}-{}'.format(permission['action'], permission['assignee'], permission['target']).encode('utf-8')).hexdigest()[:10]
+                    resources.append({
+                        'name': '{}-iampolicy'.format(suffix),
+                        'type': 'gcp-types/cloudresourcemanager-v1:virtual.projects.iamMemberBinding',
+                        'properties': {
+                            'resource': project['projectId'],
+                            'role': permission['action'],
+                            'member': permission['assignee']
+                        },
+                        'metadata': {
+                            'dependsOn': service_accounts_list
+                        }
+                    })
+
         projectPreDefinedBindings = [
             {
                 'role': 'roles/editor',
-                'members': [
-                    'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudbuild.gserviceaccount.com'
-                ]
+                'member': 'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudbuild.gserviceaccount.com'
             },
             {
                 'role': 'roles/cloudfunctions.admin',
-                'members': [
-                    'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudbuild.gserviceaccount.com'
-                ]
+                'member': 'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudbuild.gserviceaccount.com'
             },
             {
                 'role': 'roles/run.admin',
-                'members': [
-                    'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudbuild.gserviceaccount.com'
-                ]
+                'member': 'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudbuild.gserviceaccount.com'
             },
             {
                 'role': 'roles/owner',
-                'members': [
-                    'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudservices.gserviceaccount.com'
-                ]
+                'member': 'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudservices.gserviceaccount.com'
             }
         ]
-        resources.append({
-            'name': 'patch-iam-policy-' + project['projectId'],
-            'action': 'gcp-types/cloudresourcemanager-v1:cloudresourcemanager.projects.setIamPolicy',
-            'properties': {
-                'resource': project['projectId'],
-                'policy': '$(ref.get-iam-policy-' + project['projectId'] + ')',
-                'gcpIamPolicyPatch': {
-                    'add': gather_permissions(projectPreDefinedBindings, project['projectId'], project.get('odrlPolicy'))
-                }
-            }
-        })
 
-        resources.extend(gather_permissions_sa(project['projectId'], project.get('odrlPolicy'), iam_policies_depends))
+        for binding in projectPreDefinedBindings:
+            suffix = sha1('{}-{}'.format(binding['role'], binding['member']).encode('utf-8')).hexdigest()[:10]
+            resources.append({
+                'name': '{}-iampolicy'.format(suffix),
+                'type': 'gcp-types/cloudresourcemanager-v1:virtual.projects.iamMemberBinding',
+                'properties': {
+                    'resource': project['projectId'],
+                    'role': binding['role'],
+                    'member': binding['member']
+                },
+                'metadata': {
+                    'dependsOn': service_accounts_list
+                }
+            })
 
         depends_on = [project['projectId'], 'billing_{}'.format(project['projectId']),
-                      '{}-cloudkms.googleapis.com-api'.format(
-                          project['projectId'])] + services_list + service_accounts_list
+                      '{}-cloudkms.googleapis.com-api'.format(project['projectId'])] + \
+            services_list + service_accounts_list
+
         for keyring in project.get('keyrings', []):
             keyringResource = {
                 'name': '{}-{}-keyring'.format(project['projectId'], keyring['name']),

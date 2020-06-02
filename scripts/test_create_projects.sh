@@ -3,6 +3,7 @@
 projects_catalog=${1}
 services=${2}
 service_accounts=${3}
+iam_bindings=${4}
 
 if [ -z "${projects_catalog}" ]
 then
@@ -15,11 +16,13 @@ tmpscript=$(mktemp /tmp/XXXXXXX.py)
 
 {
     echo "projects = \\"
-    cat ${projects_catalog}
+    cat "${projects_catalog}"
     echo "services = \\"
     cat "${services}"
     echo "service_accounts = \\"
     cat "${service_accounts}"
+    echo "iam_bindings = \\"
+    cat "${iam_bindings}"
     cat create_projects.py
     cat << EOF
 import json
@@ -33,7 +36,7 @@ class Context:
 
 print(json.dumps(generate_config(Context())))
 EOF
-} > ${tmpscript}
+} > "${tmpscript}"
 
-python3 ${tmpscript}
-rm ${tmpscript}
+python3 "${tmpscript}"
+rm "${tmpscript}"

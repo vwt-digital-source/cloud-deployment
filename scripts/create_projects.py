@@ -179,26 +179,8 @@ def generate_config(context):
                         }
                     })
 
-        projectPreDefinedBindings = [
-            {
-                'role': 'roles/editor',
-                'member': 'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudbuild.gserviceaccount.com'
-            },
-            {
-                'role': 'roles/cloudfunctions.admin',
-                'member': 'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudbuild.gserviceaccount.com'
-            },
-            {
-                'role': 'roles/run.admin',
-                'member': 'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudbuild.gserviceaccount.com'
-            },
-            {
-                'role': 'roles/owner',
-                'member': 'serviceAccount:$(ref.' + project['projectId'] + '.projectNumber)@cloudservices.gserviceaccount.com'
-            }
-        ]
-
-        for binding in projectPreDefinedBindings:
+        for binding in iam_bindings.get('default', []):  # noqa: F821
+            binding['member'] = binding['member'].replace('__PROJECT_ID__', project['projectId'])
             suffix = sha1('{}-{}'.format(binding['role'], binding['member']).encode('utf-8')).hexdigest()[:10]
             resources.append({
                 'name': '{}-iampolicy'.format(suffix),

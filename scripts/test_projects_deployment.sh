@@ -3,8 +3,9 @@
 projects_catalog=${1}
 services=${2}
 service_accounts=${3}
-parent_folder_id=${4}
-billing_account_name=${5}
+iam_bindings=${4}
+parent_folder_id=${5}
+billing_account_name=${6}
 
 if [ -z "${projects_catalog}" ] || [ -z "${services}" ] || [ -z "${service_accounts}" ] || [ -z "${parent_folder_id}" ] || [ -z "${billing_account_name}" ]
 then
@@ -16,11 +17,13 @@ test_template=$(mktemp "/tmp/$(uuidgen).py")
 
 {
     echo "projects = \\"
-    cat ${projects_catalog}
+    cat "${projects_catalog}"
     echo "services = \\"
     cat "${services}"
     echo "service_accounts = \\"
     cat "${service_accounts}"
+    echo "iam_bindings = \\"
+    cat "${iam_bindings}"
     cat create_projects.py
 } > "${test_template}"
 

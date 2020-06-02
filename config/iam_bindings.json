@@ -1,0 +1,28 @@
+{
+    "default": [
+        {
+            "role": "roles/editor",
+            "member": "serviceAccount:$(ref.__PROJECT_ID__.projectNumber)@cloudbuild.gserviceaccount.com"
+        },
+        {
+            "role": "roles/cloudfunctions.admin",
+            "member": "serviceAccount:$(ref.__PROJECT_ID__.projectNumber)@cloudbuild.gserviceaccount.com"
+        },
+        {
+            "role": "roles/run.admin",
+            "member": "serviceAccount:$(ref.__PROJECT_ID__.projectNumber)@cloudbuild.gserviceaccount.com"
+        },
+        {
+            "role": "roles/cloudbuild.builds.builder",
+            "member": "serviceAccount:$(ref.__PROJECT_ID__.projectNumber)@cloudbuild.gserviceaccount.com"
+        },
+        {
+            "role": "roles/owner",
+            "member": "serviceAccount:$(ref.__PROJECT_ID__.projectNumber)@cloudservices.gserviceaccount.com"
+        },
+        {
+            "role": "roles/editor",
+            "member": "serviceAccount:__PROJECT_ID__@appspot.gserviceaccount.com"
+        }
+    ]
+}

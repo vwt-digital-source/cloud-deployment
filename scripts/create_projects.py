@@ -181,7 +181,7 @@ def generate_config(context):
 
         for binding in iam_bindings.get('default', []):  # noqa: F821
             binding['member'] = binding['member'].replace('__PROJECT_ID__', project['projectId'])
-            suffix = sha1('{}-{}'.format(binding['role'], binding['member']).encode('utf-8')).hexdigest()[:10]
+            suffix = sha1('{}-{}-{}'.format(binding['role'], binding['member'], project['projectId']).encode('utf-8')).hexdigest()[:10]
             resources.append({
                 'name': '{}-iampolicy'.format(suffix),
                 'type': 'gcp-types/cloudresourcemanager-v1:virtual.projects.iamMemberBinding',

@@ -161,6 +161,8 @@ def generate_config(context):
             })
             service_accounts_list.append(resource_name)
 
+        resources.extend(gather_permissions_sa(project['projectId'], project.get('odrlPolicy'), iam_policies_depends))
+
         odrlPolicy = project.get('odrlPolicy')
         if odrlPolicy and odrlPolicy.get('permission'):
             for permission in odrlPolicy.get('permission', []):

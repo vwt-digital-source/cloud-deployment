@@ -179,27 +179,26 @@ def main(args):
 
     for project in projects.get('projects', []):
         project_id = project['projectId']
-        if project['projectId'] == 'vwt-d-gew1-dat-monitoring':
-            project_number = get_project_number(service, project_id)
+        project_number = get_project_number(service, project_id)
 
-            default_bindings = list(map(lambda x: transform_binding(x, service, project_id),
-                                        get_default_bindings(args.iam_bindings_file)))
+        default_bindings = list(map(lambda x: transform_binding(x, service, project_id),
+                                    get_default_bindings(args.iam_bindings_file)))
 
-            documented_policies = get_documented_policies(project)
-            documented_bindings = list(map(lambda x: transform_binding(x, service, project_id),
-                                           policies_to_bindings(documented_policies)))
+        documented_policies = get_documented_policies(project)
+        documented_bindings = list(map(lambda x: transform_binding(x, service, project_id),
+                                       policies_to_bindings(documented_policies)))
 
-            iam_bindings = get_iam_bindings(service, project_id)
-            filtered_bindings = filter_bindings(iam_bindings, project_number, project_id)
-            flattened_bindings = flatten_bindings(filtered_bindings)
+        iam_bindings = get_iam_bindings(service, project_id)
+        filtered_bindings = filter_bindings(iam_bindings, project_number, project_id)
+        flattened_bindings = flatten_bindings(filtered_bindings)
 
-            undocumented_bindings = []
-            for binding in flattened_bindings:
-                if binding not in documented_bindings + default_bindings:
-                    undocumented_bindings.append(binding)
+        undocumented_bindings = []
+        for binding in flattened_bindings:
+            if binding not in documented_bindings + default_bindings:
+                undocumented_bindings.append(binding)
 
-            for binding in undocumented_bindings:
-                delete_iam_binding(binding, project_id)
+        for binding in undocumented_bindings:
+            delete_iam_binding(binding, project_id)
 
 
 if __name__ == '__main__':

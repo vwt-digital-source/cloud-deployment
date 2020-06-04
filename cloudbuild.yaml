@@ -39,7 +39,7 @@ steps:
           $(cat ../config/billing_account_name.cfg) \
           ../config/logsinks.json
 
-  # Update IAM based on projects.json
+  # Update IAM roles based on projects.json
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'manage-service-accounts'
     waitFor:
@@ -51,6 +51,19 @@ steps:
       - |
         source /workspace/build-venv/bin/activate
         python3 scripts/remove_service_accounts.py -p config/projects.json -s config/service_accounts.json
+
+  # Update IAM bindings based on projects.json
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'manage-iam-bindings'
+    waitFor:
+      - create-virtualenv
+      - create-projects
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        source /workspace/build-venv/bin/activate
+        python3 scripts/remove_iam_bindings.py -p config/projects.json -i config/iam_bindings.json
 
   # Enable/disable services based on projects.json
   - name: 'gcr.io/cloud-builders/gcloud'

@@ -39,6 +39,17 @@ steps:
           $(cat ../config/billing_account_name.cfg) \
           ../config/logsinks.json
 
+  # Display IAM recommendations
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'iam-recommender'
+    waitFor: ['-']
+    dir: 'scripts'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+         gcloud builds submit --config iam_recommender.yaml --no-source --project ${PROJECT_ID}
+
   # Update IAM roles based on projects.json
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'manage-service-accounts'

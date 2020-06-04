@@ -1,0 +1,23 @@
+---
+timeout: 3600s
+steps:
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        parent_id=$(gcloud projects describe "${PROJECT_ID}" --format="value(parent.id)")
+        projects=$(gcloud projects list --format="value(PROJECT_ID)" --filter="parent.id=$${parent_id}")
+        for project in $${projects}
+        do
+            gcloud recommender recommendations list \
+                --location=global \
+                --recommender=google.iam.policy.Recommender \
+                --project="$${project}" \
+                --format="table[all-box,title='IAM recommender $${project}']\
+                  (ID:sort=1, content.operationGroups.operations.action, \
+                  content.operationGroups.operations.value, \
+                  content.operationGroups.operations.pathFilters.'/iamPolicy/bindings/*/members/*', \
+                  content.operationGroups.operations.pathFilters.'/iamPolicy/bindings/*/role')" \
+                --flatten="content.operationGroups[].operations[]" --quiet
+        done

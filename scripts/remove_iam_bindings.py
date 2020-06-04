@@ -1,6 +1,5 @@
 import re
 import json
-import asyncio
 import logging
 import argparse
 import subprocess

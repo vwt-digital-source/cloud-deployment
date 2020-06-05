@@ -78,7 +78,7 @@ def append_gcp_policy(resource, resource_name, odrlPolicy):
 def generate_config(context):
     resources = []
     project_index = 0
-    max_projects_parallel = 5
+    max_projects_parallel = 10
     project_depends = []
 
     for project in projects['projects']:  # noqa: F821
@@ -167,7 +167,10 @@ def generate_config(context):
         if odrlPolicy and odrlPolicy.get('permission'):
             for permission in odrlPolicy.get('permission', []):
                 if permission['target'] == project['projectId']:
-                    suffix = sha1('{}-{}-{}'.format(permission['action'], permission['assignee'], permission['target']).encode('utf-8')).hexdigest()[:10]
+                    suffix = sha1('{}-{}-{}'.format(
+                        permission['action'],
+                        permission['assignee'],
+                        permission['target']).encode('utf-8')).hexdigest()[:10]
                     resources.append({
                         'name': '{}-iampolicy'.format(suffix),
                         'type': 'gcp-types/cloudresourcemanager-v1:virtual.projects.iamMemberBinding',
@@ -182,15 +185,15 @@ def generate_config(context):
                     })
 
         for binding in iam_bindings.get('default', []):  # noqa: F821
-            binding['member'] = binding['member'].replace('__PROJECT_ID__', project['projectId'])
-            suffix = sha1('{}-{}-{}'.format(binding['role'], binding['member'], project['projectId']).encode('utf-8')).hexdigest()[:10]
+            member = binding['member'].replace('__PROJECT_ID__', project['projectId'])
+            suffix = sha1('{}-{}-{}'.format(binding['role'], member, project['projectId']).encode('utf-8')).hexdigest()[:10]
             resources.append({
                 'name': '{}-default-iampolicy'.format(suffix),
                 'type': 'gcp-types/cloudresourcemanager-v1:virtual.projects.iamMemberBinding',
                 'properties': {
                     'resource': project['projectId'],
                     'role': binding['role'],
-                    'member': binding['member']
+                    'member': member
                 },
                 'metadata': {
                     'dependsOn': service_accounts_list

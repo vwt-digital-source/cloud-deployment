@@ -185,7 +185,7 @@ def generate_config(context):
             binding['member'] = binding['member'].replace('__PROJECT_ID__', project['projectId'])
             suffix = sha1('{}-{}-{}'.format(binding['role'], binding['member'], project['projectId']).encode('utf-8')).hexdigest()[:10]
             resources.append({
-                'name': '{}-iampolicy'.format(suffix),
+                'name': '{}-default-iampolicy'.format(suffix),
                 'type': 'gcp-types/cloudresourcemanager-v1:virtual.projects.iamMemberBinding',
                 'properties': {
                     'resource': project['projectId'],

@@ -12,6 +12,7 @@ fi
 deployment_name="${PROJECT_ID}-projects-deploy"
 project_catalog="../config/projects.json"
 services="../config/services.json"
+iam_bindings="../config/iam_bindings.json"
 service_accounts="../config/service_accounts.json"
 billing_account_name=$(cat ../config/billing_account_name.cfg)
 parent_folder_id=$(cat ../config/parent_folder_id.cfg)
@@ -25,6 +26,8 @@ gcp_template=$(mktemp "${deployment_name}-XXXXX.py")
     cat "${services}"
     echo "service_accounts = \\"
     cat "${service_accounts}"
+    echo "iam_bindings = \\"
+    cat "${iam_bindings}"
     cat create_projects.py
 } > "${gcp_template}"
 

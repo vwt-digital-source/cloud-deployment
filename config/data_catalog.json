@@ -30,7 +30,7 @@
         {
           "accessURL": "https://console.cloud.google.com/storage/browser/my-deployment-status-stg",
           "mediaType": "application/json",
-	  "deploymentZone": "europe-west1",
+	        "deploymentZone": "europe-west1",
           "format": "blob-storage",
           "title": "my-deployment-status-stg",
           "description": "My environment at Google europe-west1 containing deployment status blob storage"
@@ -88,7 +88,7 @@
       "distribution": [
         {
           "accessURL": "https://github.com/vwt-digital/cloud-deployment",
-	  "downloadURL": "https://github.com/vwt-digital/cloud-deployment.git",
+	        "downloadURL": "https://github.com/vwt-digital/cloud-deployment.git",
           "format": "gitrepo",
           "title": "vwt-digital/cloud-deployment",
           "description": "GitHub repository containing cloud-deployment code"
@@ -97,4 +97,3 @@
     }
   ]
 }
-

@@ -25,7 +25,7 @@
             "member": "serviceAccount:__PROJECT_ID__@appspot.gserviceaccount.com"
         },
         {
-            "role": "roles/storage.objectAdmin",
+            "role": "roles/storage.admin",
             "member": "serviceAccount:__PROJECT_ID__@appspot.gserviceaccount.com"
         },
         {

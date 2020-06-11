@@ -76,13 +76,12 @@ def append_gcp_policy(resource, resource_name, odrlPolicy):
 
 
 def generate_config(context):
+
     resources = []
-    project_index = 0
-    max_projects_parallel = 10
-    project_depends = []
 
     for project in projects['projects']:  # noqa: F821
-        project_def = {
+
+        resources.append({
             'name': project['projectId'],
             'type': 'cloudresourcemanager.v1.project',
             'properties': {
@@ -93,18 +92,8 @@ def generate_config(context):
                     'id': '{}'.format(context.properties['parent_folder_id'])
                 }
             }
-        }
-        if len(project_depends) > project_index % max_projects_parallel:
-            project_def.update({
-                'metadata': {
-                    'dependsOn': [project_depends[project_index % max_projects_parallel]]
-                }
-            })
-            project_depends[project_index % max_projects_parallel] = project['projectId']
-        else:
-            project_depends.append(project['projectId'])
-        project_index += 1
-        resources.append(project_def)
+        })
+
         resources.append({
             'name': 'billing_{}'.format(project['projectId']),
             'type': 'deploymentmanager.v2.virtual.projectBillingInfo',
@@ -119,6 +108,7 @@ def generate_config(context):
 
         iam_policies_depends = [project['projectId']]
         services_list = []
+
         all_services = list(set(project.get('services', []) + services.get('default', [])))  # noqa: F821
         for index, service in enumerate(all_services):
             depends_on = [project['projectId'], 'billing_{}'.format(project['projectId'])]

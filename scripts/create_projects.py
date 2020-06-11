@@ -21,7 +21,7 @@ def gather_permissions(resource_name, odrlPolicy, bindings=[]):
     return bindings
 
 
-def gather_permissions_sa(project_id, odrl_policy, depends_on):
+def gather_permissions_sa(project_id, odrl_policy):
     resources = []
     if odrl_policy is not None:
         for permission in [p for p in odrl_policy.get('permission', []) if 'serviceAccount' in p.get('target', '')]:

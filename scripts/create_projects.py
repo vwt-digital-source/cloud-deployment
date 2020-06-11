@@ -189,7 +189,7 @@ def generate_config(context):
                     'name': '{}-{}-{}-key'.format(project['projectId'], keyring['name'], key['name']),
                     'type': 'gcp-types/cloudkms-v1:projects.locations.keyRings.cryptoKeys',
                     'metadata': {
-                        'dependsOn': '{}-{}-keyring'.format(project['projectId'], keyring['name'])
+                        'dependsOn': ['{}-{}-keyring'.format(project['projectId'], keyring['name'])]
                     },
                     'properties': {
                         'parent': '$(ref.{}-{}-keyring.name)'.format(project['projectId'], keyring['name']),

@@ -5,9 +5,9 @@ services=${2}
 service_accounts=${3}
 iam_bindings=${4}
 
-if [ -z "${projects_catalog}" ]
+if [ -z "${iam_bindings}" ]
 then
-    echo "Usage: $0 <projects_catalog>"
+    echo "Usage: $0 <projects_catalog> <default-services> <default-service-accounts> <default-iam-bindings>"
     exit 1
 fi
 

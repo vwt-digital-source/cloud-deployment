@@ -93,7 +93,7 @@ def generate_config(context):
             }
         })
 
-        services = []
+        all_services = []
         for service in list(project.get('services', []) + services.get('default', [])):  # noqa: F821
             resource_name = '{}-{}-api'.format(project['projectId'], service)
             resources.append({
@@ -107,9 +107,9 @@ def generate_config(context):
                     'serviceName': service
                 }
             })
-            services.append(resource_name)
+            all_services.append(resource_name)
 
-        service_accounts = []
+        all_service_accounts = []
         for account in list(project.get('serviceAccounts', []) + service_accounts.get('default', [])):  # noqa: F821
             resource_name = '{}-{}-svcaccount'.format(project['projectId'], account)
             resources.append({
@@ -124,7 +124,7 @@ def generate_config(context):
                     'projectId': project['projectId']
                 }
             })
-            service_accounts.append(resource_name)
+            all_service_accounts.append(resource_name)
 
         resources.extend(gather_permissions_sa(project['projectId'], project.get('odrlPolicy')))
 
@@ -145,7 +145,7 @@ def generate_config(context):
                             'member': permission['assignee']
                         },
                         'metadata': {
-                            'dependsOn': service_accounts
+                            'dependsOn': all_service_accounts
                         }
                     })
 
@@ -161,7 +161,7 @@ def generate_config(context):
                     'member': member
                 },
                 'metadata': {
-                    'dependsOn': service_accounts
+                    'dependsOn': all_service_accounts
                 }
             })
 
@@ -170,7 +170,7 @@ def generate_config(context):
                 'name': '{}-{}-keyring'.format(project['projectId'], keyring['name']),
                 'type': 'gcp-types/cloudkms-v1:projects.locations.keyRings',
                 'metadata': {
-                    'dependsOn': ['{}-cloudkms.googleapis.com-api'.format(project['projectId'])] + service_accounts
+                    'dependsOn': ['{}-cloudkms.googleapis.com-api'.format(project['projectId'])] + all_service_accounts
                 },
                 'properties': {
                     'parent': 'projects/{}/locations/{}'.format(project['projectId'], keyring['region']),

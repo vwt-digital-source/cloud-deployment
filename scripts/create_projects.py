@@ -93,11 +93,11 @@ def generate_config(context):
             }
         })
 
-        services_list = []
-        all_services = list(set(project.get('services', []) + services.get('default', [])))  # noqa: F821
-        for index, service in enumerate(all_services):
+        services = []
+        for service in project.get('services', []) + services.get('default', []):  # noqa: F821
+            resource_name = '{}-{}-api'.format(project['projectId'], service)
             resources.append({
-                'name': '{}-{}-api'.format(project['projectId'], service),
+                'name': resource_name,
                 'type': 'deploymentmanager.v2.virtual.enableService',
                 'metadata': {
                     'dependsOn': ['billing_{}'.format(project['projectId'])]
@@ -107,11 +107,10 @@ def generate_config(context):
                     'serviceName': service
                 }
             })
-            services_list.append('{}-{}-api'.format(project['projectId'], service))
+            services.append(resource_name)
 
-        service_accounts_list = []
-        all_service_accounts = list(set(project.get('serviceAccounts', []) + service_accounts.get('default', [])))  # noqa: F821
-        for account in all_service_accounts:
+        service_accounts = []
+        for account in project.get('serviceAccounts', []) + service_accounts.get('default', []):  # noqa: F821
             resource_name = '{}-{}-svcaccount'.format(project['projectId'], account)
             resources.append({
                 'name': resource_name,
@@ -125,7 +124,7 @@ def generate_config(context):
                     'projectId': project['projectId']
                 }
             })
-            service_accounts_list.append(resource_name)
+            service_accounts.append(resource_name)
 
         resources.extend(gather_permissions_sa(project['projectId'], project.get('odrlPolicy')))
 
@@ -146,7 +145,7 @@ def generate_config(context):
                             'member': permission['assignee']
                         },
                         'metadata': {
-                            'dependsOn': service_accounts_list.append(project['projectId'])
+                            'dependsOn': service_accounts
                         }
                     })
 
@@ -162,7 +161,7 @@ def generate_config(context):
                     'member': member
                 },
                 'metadata': {
-                    'dependsOn': service_accounts_list.append(project['projectId'])
+                    'dependsOn': service_accounts
                 }
             })
 
@@ -171,7 +170,7 @@ def generate_config(context):
                 'name': '{}-{}-keyring'.format(project['projectId'], keyring['name']),
                 'type': 'gcp-types/cloudkms-v1:projects.locations.keyRings',
                 'metadata': {
-                    'dependsOn': ['{}-cloudkms.googleapis.com-api'.format(project['projectId'])] + service_accounts_list
+                    'dependsOn': ['{}-cloudkms.googleapis.com-api'.format(project['projectId'])] + service_accounts
                 },
                 'properties': {
                     'parent': 'projects/{}/locations/{}'.format(project['projectId'], keyring['region']),

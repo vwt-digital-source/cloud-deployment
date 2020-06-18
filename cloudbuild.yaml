@@ -105,6 +105,7 @@ steps:
     waitFor:
       - create-projects
       - create-virtualenv
+      - manage-iam-bindings
     entrypoint: 'bash'
     args:
       - '-c'

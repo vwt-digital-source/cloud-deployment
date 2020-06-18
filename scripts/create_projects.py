@@ -146,7 +146,7 @@ def generate_config(context):
                             'member': permission['assignee']
                         },
                         'metadata': {
-                            'dependsOn': service_accounts_list
+                            'dependsOn': service_accounts_list.append(project['projectId'])
                         }
                     })
 
@@ -162,7 +162,7 @@ def generate_config(context):
                     'member': member
                 },
                 'metadata': {
-                    'dependsOn': service_accounts_list
+                    'dependsOn': service_accounts_list.append(project['projectId'])
                 }
             })
 

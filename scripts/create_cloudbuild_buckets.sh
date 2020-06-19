@@ -5,11 +5,12 @@ PROJECT_CATALOG=${1}
 REGION=${2}
 GROUP=${3}
 
-if [[ -z "${PROJECT_CATALOG}" || -z "${REGION}" ]]
+if [[ -z "${PROJECT_CATALOG}" || -z "${REGION}" || -z "${GROUP}" ]]
 then
     echo "PROJECT_CATALOG parameter should be set"
     echo "REGION parameter should be set"
-    echo "Usage: ${0} <project_catalog> <region>"
+    echo "GROUP parameter should be set"
+    echo "Usage: ${0} <project_catalog> <region> <group>"
     exit 1
 fi
 

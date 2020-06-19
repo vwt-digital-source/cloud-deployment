@@ -3,6 +3,7 @@
 
 PROJECT_CATALOG=${1}
 REGION=${2}
+GROUP=${3}
 
 if [[ -z "${PROJECT_CATALOG}" || -z "${REGION}" ]]
 then
@@ -42,7 +43,14 @@ do
         echo " + Cloud build bucket already exists"
     fi
 
+    echo "Set lifecycle on bucket..."
+
     gsutil lifecycle set lifecycle.json "gs://${project}_cloudbuild"
+
+    echo "Set permissions on bucket..."
+
+    gsutil iam ch "group:${GROUP}:roles/storage.legacyObjectReader" "gs://${project}_cloudbuild"
+    gsutil iam ch "group:${GROUP}:roles/storage.legacyBucketReader" "gs://${project}_cloudbuild"
 
     if [ $? -ne 0 ]
     then

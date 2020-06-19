@@ -203,7 +203,7 @@ steps:
     args:
       - '-c'
       - |
-        ./scripts/create_cloudbuild_triggers.sh ./config/projects.json $(cat ../config/group.cfg)
+        ./scripts/create_cloudbuild_triggers.sh ./config/projects.json $(cat ./config/group.cfg)
 
   # Deploy report_build_status to GitHub function
   - name: 'gcr.io/cloud-builders/gcloud'

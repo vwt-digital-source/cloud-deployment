@@ -116,7 +116,7 @@ def generate_config(context):
                 'name': resource_name,
                 'type': 'iam.v1.serviceAccount',
                 'metadata': {
-                    'dependsOn': all_services
+                    'dependsOn': [project['projectId']]
                 },
                 'properties': {
                     'accountId': account,

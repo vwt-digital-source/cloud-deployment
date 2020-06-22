@@ -97,7 +97,7 @@ steps:
     args:
       - '-c'
       - |
-        ./scripts/create_cloudbuild_buckets.sh config/projects.json eu
+        ./scripts/create_cloudbuild_buckets.sh config/projects.json eu $(cat ./config/group.cfg)
 
   # Set cloud audit logs
   - name: 'gcr.io/cloud-builders/gcloud'

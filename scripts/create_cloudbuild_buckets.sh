@@ -3,12 +3,14 @@
 
 PROJECT_CATALOG=${1}
 REGION=${2}
+GROUP=${3}
 
-if [[ -z "${PROJECT_CATALOG}" || -z "${REGION}" ]]
+if [[ -z "${PROJECT_CATALOG}" || -z "${REGION}" || -z "${GROUP}" ]]
 then
     echo "PROJECT_CATALOG parameter should be set"
     echo "REGION parameter should be set"
-    echo "Usage: ${0} <project_catalog> <region>"
+    echo "GROUP parameter should be set"
+    echo "Usage: ${0} <project_catalog> <region> <group>"
     exit 1
 fi
 
@@ -42,7 +44,14 @@ do
         echo " + Cloud build bucket already exists"
     fi
 
+    echo "Set lifecycle on bucket..."
+
     gsutil lifecycle set lifecycle.json "gs://${project}_cloudbuild"
+
+    echo "Set permissions on bucket..."
+
+    gsutil iam ch "group:${GROUP}:roles/storage.legacyObjectReader" "gs://${project}_cloudbuild"
+    gsutil iam ch "group:${GROUP}:roles/storage.legacyBucketReader" "gs://${project}_cloudbuild"
 
     if [ $? -ne 0 ]
     then

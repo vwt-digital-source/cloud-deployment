@@ -20,10 +20,19 @@ if len(sys.argv) > 2:
                     tr['name'] = tr['description'].replace(' ', '-')
 
                 if 'github' in tr:
-                    tr['description'] = 'Push to {} {} branch'.format(
-                        tr['github']['name'],
-                        tr['github']['push']['branch'])
-                    tr['name'] = tr['description'].replace(' ', '-')
+
+                    if 'tag' in tr['github']['push']:
+                        tr['description'] = 'Push to {} tag'.format(
+                            tr['github']['name'])
+                        tr['name'] = tr['description'].replace(' ', '-')
+                        regex = tr['github']['push']['tag'].replace('\\\\', '\\')
+                        tr['github']['push']['tag'] = regex
+
+                    if 'branch' in tr['github']['push']:
+                        tr['description'] = 'Push to {} {} branch'.format(
+                            tr['github']['name'],
+                            tr['github']['push']['branch'])
+                        tr['name'] = tr['description'].replace(' ', '-')
 
                 if 'runTrigger' in tr:
                     tr['build'] = {

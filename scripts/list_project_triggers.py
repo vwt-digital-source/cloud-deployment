@@ -22,9 +22,8 @@ if len(sys.argv) > 2:
                 if 'github' in tr:
 
                     if 'tag' in tr['github']['push']:
-                        tr['description'] = 'Push to {} {} tag'.format(
-                            tr['github']['name'],
-                            tr['github']['push']['tag'])
+                        tr['description'] = 'Push to {} tag'.format(
+                            tr['github']['name'])
                         tr['name'] = tr['description'].replace(' ', '-')
                         regex = tr['github']['push']['tag'].replace('\\\\', '\\')
                         tr['github']['push']['tag'] = regex

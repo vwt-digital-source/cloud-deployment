@@ -170,7 +170,7 @@ def generate_config(context):
                 'name': '{}-{}-keyring'.format(project['projectId'], keyring['name']),
                 'type': 'gcp-types/cloudkms-v1:projects.locations.keyRings',
                 'metadata': {
-                    'dependsOn': ['{}-cloudkms.googleapis.com-api'.format(project['projectId'])] + all_service_accounts
+                    'dependsOn': ['{}-cloudkms.googleapis.com-api'.format(project['projectId'])]
                 },
                 'properties': {
                     'parent': 'projects/{}/locations/{}'.format(project['projectId'], keyring['region']),

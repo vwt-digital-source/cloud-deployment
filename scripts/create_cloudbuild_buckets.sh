@@ -18,7 +18,7 @@ basedir=$(dirname "$0")
 result=0
 
 cat << EOF > lifecycle.json
-{ "rule": [ { "action": { "type": "Delete" }, "condition": { "age": 30 } } ] }
+{ "rule": [ { "action": { "type": "Delete" }, "condition": { "age": 180 } } ] }
 EOF
 
 for project in $(python3 "${basedir}"/list_projects.py "${PROJECT_CATALOG}")

@@ -56,7 +56,7 @@ do
       --project="${PROJECT_ID}" \
       --branch-pattern="${BRANCH_NAME}" \
       --build-config="project_cloudbuild.yaml" \
-      --substitutions=DEST_PROJECT="$project"
+      --substitutions=_DEST_PROJECT="$project"
     gcloud beta builds triggers run "Create-project-${project}-trigger" \
       --branch="${BRANCH_NAME}" \
       --project="${PROJECT_ID}"

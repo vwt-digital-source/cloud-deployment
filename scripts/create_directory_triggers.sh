@@ -21,6 +21,10 @@ function error_exit() {
 
 basedir=$(dirname "$0")
 
+echo "Installing Ruby"
+sudo apt update
+sudo apt install ruby-full
+
 echo "Getting directories..."
 touch "$basedir/directories.txt"
 projects=$(ls "${DIRECTORY}")

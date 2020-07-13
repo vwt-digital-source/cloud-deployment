@@ -21,9 +21,9 @@ function error_exit() {
 
 basedir=$(dirname "$0")
 
-echo "Installing Ruby"
-sudo apt update
-sudo apt install ruby-full
+echo "Installing ruby..."
+apt-get update
+apt-get install ruby-full -y
 
 echo "Getting directories..."
 touch "$basedir/directories.txt"

@@ -22,7 +22,7 @@ trigger_id=$(gcloud beta builds triggers list \
                           AND github.push.branch=${BRANCH_NAME} \
                           AND filename=cloudbuild.yaml")
 
-if [[ -z "${trigger_id}" ]]
+if [[ -n "${trigger_id}" ]]
 then
     gcloud beta builds triggers run "$trigger_id" \
       --branch="${BRANCH_NAME}" \

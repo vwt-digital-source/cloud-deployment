@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 PROJECT_ID=${1}
 DEST_PROJECT=${2}

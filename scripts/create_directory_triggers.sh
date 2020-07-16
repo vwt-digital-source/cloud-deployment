@@ -52,7 +52,7 @@ do
       --repo-name="${REPO_NAME}" \
       --repo-owner="${REPO_OWNER}" \
       --description="Create project ${project} trigger" \
-      --included-files="config/${PROJECT_ID}/projects" \
+      --included-files="config/${PROJECT_ID}/projects,config/${PROJECT_ID}" \
       --project="${PROJECT_ID}" \
       --branch-pattern="${BRANCH_NAME}" \
       --build-config="project_cloudbuild.yaml" \

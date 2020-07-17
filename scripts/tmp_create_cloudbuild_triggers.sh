@@ -1,7 +1,8 @@
 #!/bin/bash
 # shellcheck disable=SC2181,SC2030,SC2031,SC2086
 
-PROJECT_CATALOG=${1}
+PROJECT_ID=${1}
+PROJECT_CATALOG=${2}
 
 function error_exit() {
   # ${BASH_SOURCE[1]} is the file name of the caller.
@@ -9,6 +10,7 @@ function error_exit() {
   exit "${2:-1}"
 }
 
+[[ -n "${PROJECT_ID}" ]] || error_exit "Missing required PROJECT_ID"
 [[ -n "${PROJECT_CATALOG}" ]] || error_exit "Missing required PROJECT_CATALOG"
 
 basedir=$(dirname "$0")

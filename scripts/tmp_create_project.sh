@@ -46,13 +46,13 @@ then
     # Create if deployment does not yet exist
     gcloud deployment-manager deployments create "${deployment_name}" \
       --template="${gcp_template}" \
-      --properties="PARENT_ID:${PARENT_ID},BILLING_ACCOUNT:${BILLING_ACCOUNT}" \
+      --properties="parent_folder_id:${PARENT_ID},billing_account_name:${BILLING_ACCOUNT}" \
       --project="${PROJECT_ID}"
 else
     # Update if deployment exists already
     gcloud deployment-manager deployments update "${deployment_name}" \
       --template="${gcp_template}" \
-      --properties="PARENT_ID:${PARENT_ID},BILLING_ACCOUNT:${BILLING_ACCOUNT}" \
+      --properties="parent_folder_id:${PARENT_ID},billing_account_name:${BILLING_ACCOUNT}" \
       --project="${PROJECT_ID}" \
       --delete-policy=abandon
 fi

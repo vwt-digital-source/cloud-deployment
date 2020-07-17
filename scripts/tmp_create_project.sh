@@ -34,7 +34,7 @@ gcp_template=$(mktemp "${deployment_name}-XXXXX.py")
     cat "${service_accounts}"
     echo "iam_bindings = \\"
     cat "${iam_bindings}"
-    cat create_projects.py
+    cat tmp_create_projects.py
 } > "${gcp_template}"
 
 # Check if deployment exists

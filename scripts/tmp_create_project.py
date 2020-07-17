@@ -1,5 +1,5 @@
 import re
-from haslib import sha256
+from hashlib import sha256
 
 
 def gather_permissions(resource_name, odrlPolicy, bindings=[]):

@@ -79,11 +79,11 @@ def make_service():
 def parse_args():
     parser = argparse.ArgumentParser(description='Add gcp audit log configuration async')
     parser.add_argument('-p', '--projects',
-                        type=lambda s: re.split(' |\n|, ', s),
+                        type=lambda s: re.split(' |\n|, |,', s),
                         required=True,
                         help='a new line, space or comma delimited list of services')
     parser.add_argument('-s', '--services',
-                        type=lambda s: re.split(' |\n|, ', s),
+                        type=lambda s: re.split(' |\n|, |,', s),
                         required=True,
                         help='a new line, space or comma delimited list of services')
     parser.add_argument('-c', '--config',

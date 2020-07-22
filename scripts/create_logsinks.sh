@@ -15,13 +15,15 @@ then
     exit 1
 fi
 
+basedir=$(dirname "$0")
+
 deployment_name="${PROJECT_ID}-logsinks-deploy"
 gcp_template=$(mktemp "${deployment_name}-XXXXX.py")
 
 {
     echo "logsinks = \\"
-    cat ${LOGSINK_CATALOG}
-    cat create_logsinks.py
+    cat "${LOGSINK_CATALOG}"
+    cat "$basedir/create_logsinks.py"
 } > "${gcp_template}"
 
 # Check if deployment exists

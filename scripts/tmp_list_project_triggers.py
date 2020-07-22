@@ -4,7 +4,7 @@ import sys
 
 cloud_deployment_branch = 'develop'
 
-projectfile = open(sys.argv[2])
+projectfile = open(sys.argv[1])
 project = json.load(projectfile)
 for trigger in project['triggers']:
     if 'triggerTemplate' in trigger:

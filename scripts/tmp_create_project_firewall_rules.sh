@@ -32,12 +32,12 @@ python3 "${basedir}"/tmp_firewall_rules_setup.py "${PROJECT_CATALOG}" |
 
     echo "+ Create firewall rule ${rule[0]} for project ${PROJECT_ID}..."
 
-    gcloud compute --project="${PROJECT_ID}" firewall-rules create ${rule[0]} \
-      --direction=${rule[1]} \
-      --${rule[2]} ${rule[3]} \
-      --description=${rule[4]} \
-      --network=${rule[5]} \
-      --priority=${rule[6]} \
+    gcloud compute --project="${PROJECT_ID}" firewall-rules create ${rule[3]} \
+      --direction=${rule[2]} \
+      --${rule[0]} ${rule[6]} \
+      --description=${rule[1]} \
+      --network=${rule[4]} \
+      --priority=${rule[5]} \
       --source-ranges=${rule[7]}
     result=$?
 

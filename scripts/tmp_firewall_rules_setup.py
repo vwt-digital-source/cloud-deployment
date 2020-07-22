@@ -12,4 +12,4 @@ if 'firewallRules' in project and len(project['firewallRules']) > 0:
 
         print(' '.join('"{}"'.format(value)
                        if any(map(str(value).__contains__, [' ', '\n'])) or value == ''
-                       else str(value) for value in rule.values()))
+                       else str(value) for _, value in rule.items()))

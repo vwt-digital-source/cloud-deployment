@@ -1,5 +1,5 @@
 import re
-from hashlib import sha1
+from hashlib import sha256
 
 
 def gather_permissions(resource_name, odrlPolicy, bindings=[]):
@@ -66,7 +66,7 @@ def generate_config(context):
 
     resources = []
 
-    for project in projects['projects']:  # noqa: F821
+    for project in [projects]:  # noqa: F821
 
         resources.append({
             'name': project['projectId'],
@@ -132,7 +132,7 @@ def generate_config(context):
         if odrlPolicy and odrlPolicy.get('permission'):
             for permission in odrlPolicy.get('permission', []):
                 if permission['target'] == project['projectId']:
-                    suffix = sha1('{}-{}-{}'.format(
+                    suffix = sha256('{}-{}-{}'.format(
                         permission['action'],
                         permission['assignee'],
                         permission['target']).encode('utf-8')).hexdigest()[:10]
@@ -151,7 +151,7 @@ def generate_config(context):
 
         for binding in iam_bindings.get('default', []):  # noqa: F821
             member = binding['member'].replace('__PROJECT_ID__', project['projectId'])
-            suffix = sha1('{}-{}-{}'.format(binding['role'], member, project['projectId']).encode('utf-8')).hexdigest()[:10]
+            suffix = sha256('{}-{}-{}'.format(binding['role'], member, project['projectId']).encode('utf-8')).hexdigest()[:10]
             resources.append({
                 'name': '{}-default-iampolicy'.format(suffix),
                 'type': 'gcp-types/cloudresourcemanager-v1:virtual.projects.iamMemberBinding',

@@ -1,4 +1,5 @@
 import json
+import uuid
 import sys
 
 cloud_deployment_branch = 'develop'
@@ -59,4 +60,8 @@ if len(sys.argv) > 2:
                         ]
                     }
                     del tr['runTrigger']
+
+                if 'includedFiles' in tr or 'excludedFiles' in tr:
+                    tr['name'] = tr['name'] + '-' + str(uuid.uuid4())[:4]
+
                 print(json.dumps(tr))

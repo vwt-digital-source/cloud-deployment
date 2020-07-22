@@ -1,10 +1,7 @@
-#!/usr/bin/env python3
-
 import config
-import json
-import sys
 import logging
 import google
+import argparse
 import googleapiclient.discovery
 
 from google.auth import iam
@@ -40,17 +37,6 @@ def create_adminsdk_service():
         'cloudresourcemanager', 'v1beta1', credentials=delegated_credentials,
         cache_discovery=False)
     return gs_service, rm_service
-
-
-def get_project_numbers(project_ids, rm_service):
-    project_list = {}
-    response = rm_service.projects().list().execute()
-
-    for project in response.get('projects', []):
-        if project['projectId'] in project_ids:
-            project_list[str(project['projectId'])] = int(project['projectNumber'])
-
-    return project_list
 
 
 def create_gsuite_groups(gs_service, group_list):
@@ -121,39 +107,52 @@ def process_gsuite_groups(gs_service, group_info, new_group_members):
             len(new_group_members), group_info['email']))
 
 
-def create_gsuite_group_iam():
-    if len(sys.argv) >= 2 and \
-            all(hasattr(config, attr) for attr in ["USER_IMPERSONATION_EMAIL",
-                                                   "SERVICE_ACCOUNT_SCOPES",
-                                                   "GSUITE_GROUPS"]):
-        # Create list with project ids
-        projects = json.load(open(sys.argv[1]))
-        project_ids = {str(project['projectId']) for project in
-                       projects['projects']}
+def list_projects(service, parent_id, field):
+    """Get a filtered list of projects corresponding a parent id"""
 
-        gs_service, rm_service = create_adminsdk_service()
-        project_ids = get_project_numbers(project_ids, rm_service)
+    filter = "parent.id:{}".format(parent_id)
 
-        # Create G Suite Groups
-        create_gsuite_groups(gs_service, config.GSUITE_GROUPS)
+    request = service.projects().list(filter=filter)
+    response = request.execute()
 
-        # Create object will all project e-mails
-        project_list = {
-            'appspot': [],
-            'cloudbuild': []
-        }
-        for project in project_ids:
-            project_list['appspot'].append(
-                '{}@appspot.gserviceaccount.com'.format(project))
-            project_list['cloudbuild'].append(
-                '{}@cloudbuild.gserviceaccount.com'.format(project_ids[project]))
+    projects = [project.get(field) for project in response.get('projects')]
 
-        # Process groups
-        for group in config.GSUITE_GROUPS:
-            if group['members'] in project_list and \
-                    len(project_list[group['members']]) > 0:
-                process_gsuite_groups(gs_service, group,
-                                      project_list[group['members']])
+    return projects
 
 
-create_gsuite_group_iam()
+def parse_args():
+    """A simple function to parse command line arguments"""
+
+    parser = argparse.ArgumentParser(description='Create gsuite groups')
+    parser.add_argument('-p', '--parent-id',
+                        required=True,
+                        help='parent project/directory/organization id')
+    return parser.parse_args()
+
+
+def main(args):
+
+    gs_service, rm_service = create_adminsdk_service()
+
+    project_ids = list_projects(rm_service, args.parent_id, 'projectId')
+    project_numbers = list_projects(rm_service, args.parent_id, 'projectNumber')
+
+    # Create G Suite Groups
+    create_gsuite_groups(gs_service, config.GSUITE_GROUPS)
+
+    # Create object will all project e-mails
+    project_list = {
+        'appspot': ['{}@appspot.gserviceaccount.com'.format(project) for project in project_ids],
+        'cloudbuild': ['{}@cloudbuild.gserviceaccount.com'.format(project) for project in project_numbers]
+    }
+
+    # Process groups
+    for group in config.GSUITE_GROUPS:
+        if group['members'] in project_list and \
+                len(project_list[group['members']]) > 0:
+            process_gsuite_groups(gs_service, group,
+                                  project_list[group['members']])
+
+
+if __name__ == '__main__':
+    main(parse_args())

@@ -20,12 +20,10 @@ echo "Creating firewall rules for ${PROJECT_ID}..."
 
 python3 "${basedir}"/tmp_firewall_rules_setup.py "${PROJECT_CATALOG}" |
   while read -r -a rule; do
-    printf '%s\n' "${rule[@]}"
     rule_name=$(gcloud compute firewall-rules list \
       --filter="name=${rule[0]}" \
       --project="${PROJECT_ID}" \
       --format="value(NAME)")
-    echo $rule_name
 
     if [ -n "${rule_name}" ]; then
       echo " - Delete firewall rule ${rule_name}"

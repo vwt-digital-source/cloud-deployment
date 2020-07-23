@@ -4,64 +4,60 @@ import sys
 
 cloud_deployment_branch = 'develop'
 
-if len(sys.argv) > 2:
-    project_id = sys.argv[2]
-    projectsfile = open(sys.argv[1])
-    projects = json.load(projectsfile)
-    for pr in projects['projects']:
-        if pr['projectId'] == project_id and 'triggers' in pr and len(pr['triggers']) > 0:
-            for tr in pr['triggers']:
-                if 'triggerTemplate' in tr:
-                    if not 'projectId':
-                        tr['triggerTemplate']['projectId'] = pr['projectId']
+projectfile = open(sys.argv[1])
+project = json.load(projectfile)
+for trigger in project['triggers']:
+    if 'triggerTemplate' in trigger:
+        if not 'projectId':
+            trigger['triggerTemplate']['projectId'] = project['projectId']
 
-                    tr['description'] = 'Push to {} {} branch'.format(
-                        tr['triggerTemplate']['repoName'],
-                        tr['triggerTemplate']['branchName'])
-                    tr['name'] = tr['description'].replace(' ', '-')
+        trigger['description'] = 'Push to {} {} branch'.format(
+            trigger['triggerTemplate']['repoName'],
+            trigger['triggerTemplate']['branchName'])
+        trigger['name'] = trigger['description'].replace(' ', '-')
 
-                if 'github' in tr:
+    if 'github' in trigger:
 
-                    if 'tag' in tr['github']['push']:
-                        tr['description'] = 'Push to {} tag'.format(
-                            tr['github']['name'])
-                        tr['name'] = tr['description'].replace(' ', '-')
-                        regex = tr['github']['push']['tag'].replace('\\\\', '\\')
-                        tr['github']['push']['tag'] = regex
+        if 'tag' in trigger['github']['push']:
+            trigger['description'] = 'Push to {} tag'.format(
+                trigger['github']['name'])
+            trigger['name'] = trigger['description'].replace(' ', '-')
+            regex = trigger['github']['push']['tag'].replace('\\\\', '\\')
+            trigger['github']['push']['tag'] = regex
 
-                    if 'branch' in tr['github']['push']:
-                        tr['description'] = 'Push to {} {} branch'.format(
-                            tr['github']['name'],
-                            tr['github']['push']['branch'])
-                        tr['name'] = tr['description'].replace(' ', '-')
+        if 'branch' in trigger['github']['push']:
+            trigger['description'] = 'Push to {} {} branch'.format(
+                trigger['github']['name'],
+                trigger['github']['push']['branch'])
+            trigger['name'] = trigger['description'].replace(' ', '-')
 
-                if 'runTrigger' in tr:
-                    tr['build'] = {
-                        'steps': [
-                            {
-                                'name': 'gcr.io/cloud-builders/git',
-                                'args': [
-                                    'clone',
-                                    '--branch={}'.format(cloud_deployment_branch),
-                                    'https://github.com/vwt-digital/cloud-deployment.git'
-                                ]
-                            },
-                            {
-                                'name': 'gcr.io/cloud-builders/gcloud',
-                                'entrypoint': 'bash',
-                                'args': [
-                                    '-c',
-                                    './runcloudbuildtrigger.sh ${{PROJECT_ID}} {} {}'.format(
-                                        tr['runTrigger']['repoName'],
-                                        tr['runTrigger']['branchName'])
-                                ],
-                                'dir': 'cloud-deployment/scripts'
-                            }
-                        ]
-                    }
-                    del tr['runTrigger']
+    if 'runTrigger' in trigger:
+        trigger['build'] = {
+            'steps': [
+                {
+                    'name': 'gcr.io/cloud-builders/git',
+                    'args': [
+                        'clone',
+                        '--branch={}'.format(cloud_deployment_branch),
+                        'https://github.com/vwt-digital/cloud-deployment.git'
+                    ]
+                },
+                {
+                    'name': 'gcr.io/cloud-builders/gcloud',
+                    'entrypoint': 'bash',
+                    'args': [
+                        '-c',
+                        './runcloudbuildtrigger.sh ${{PROJECT_ID}} {} {}'.format(
+                            trigger['runTrigger']['repoName'],
+                            trigger['runTrigger']['branchName'])
+                    ],
+                    'dir': 'cloud-deployment/scripts'
+                }
+            ]
+        }
+        del trigger['runTrigger']
 
-                if 'includedFiles' in tr or 'excludedFiles' in tr:
-                    tr['name'] = tr['name'] + '-' + str(uuid.uuid4())[:4]
+    if 'includedFiles' in trigger or 'excludedFiles' in trigger:
+        trigger['name'] = trigger['name'] + '-' + str(uuid.uuid4())[:4]
 
-                print(json.dumps(tr))
+    print(json.dumps(trigger))

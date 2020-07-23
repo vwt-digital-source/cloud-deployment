@@ -18,7 +18,7 @@ result=0
 
 echo "Creating firewall rules for ${PROJECT_ID}..."
 
-python3 "${basedir}"/tmp_firewall_rules_setup.py "${PROJECT_CATALOG}" |
+python3 "${basedir}"/firewall_rules_setup.py "${PROJECT_CATALOG}" |
   while read -r -a rule; do
     rule_name=$(gcloud compute firewall-rules list \
       --filter="name=${rule[0]}" \

@@ -11,7 +11,7 @@
         },
         {
             "name": "gcr.io/cloud-builders/gcloud",
-            "dir": "cloud-deployment/scripts",
+            "dir": "cloud-deployment/jobs",
             "entrypoint": "bash",
             "args": [
                 "-c",
@@ -20,7 +20,7 @@
         },
         {
             "name": "gcr.io/cloud-builders/gcloud",
-            "dir": "cloud-deployment/scripts",
+            "dir": "cloud-deployment/jobs",
             "entrypoint": "bash",
             "args": [
                 "-c",

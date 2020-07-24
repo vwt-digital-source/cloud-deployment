@@ -8,7 +8,7 @@ steps:
     args:
       - '-c'
       - |
-        source config/${PROJECT_ID}/env.sh
+        source config/env.sh
         ./logsinks/create_logsinks.sh \
           ${PROJECT_ID} \
           $${_PARENT_ID} \

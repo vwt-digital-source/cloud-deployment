@@ -1,6 +1,6 @@
 import json
-import uuid
 import sys
+import hashlib
 
 cloud_deployment_branch = 'develop'
 
@@ -57,7 +57,8 @@ for trigger in project['triggers']:
         }
         del trigger['runTrigger']
 
-    if 'includedFiles' in trigger or 'excludedFiles' in trigger:
-        trigger['name'] = trigger['name'] + '-' + str(uuid.uuid4())[:4]
+    if 'includedFiles' in trigger:
+        suffix = hashlib.sha256(''.join(trigger['includedFiles']))
+        trigger['name'] = trigger['name'] + '-' + suffix[:4]
 
     print(json.dumps(trigger))

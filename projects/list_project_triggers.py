@@ -47,7 +47,7 @@ for trigger in project['triggers']:
                     'entrypoint': 'bash',
                     'args': [
                         '-c',
-                        './runcloudbuildtrigger.sh ${{PROJECT_ID}} {} {}'.format(
+                        './projects/run_cloudbuild_trigger.sh ${{PROJECT_ID}} {} {}'.format(
                             trigger['runTrigger']['repoName'],
                             trigger['runTrigger']['branchName'])
                     ],

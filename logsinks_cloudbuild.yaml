@@ -13,4 +13,4 @@ steps:
           ${PROJECT_ID} \
           $${_PARENT_ID} \
           $${_BILLING_ACCOUNT_NAME} \
-          config/${PROJECT_ID}/logsinks/logsinks.json
+          config/logsinks/logsinks.json

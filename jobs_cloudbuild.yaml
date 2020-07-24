@@ -12,6 +12,6 @@ steps:
         source config/env.sh
         ./jobs/schedule_revoke_sa_keys.sh \
           "${PROJECT_ID}" \
-          "${BRANCH_NAME}" \
+          "${_BRANCH_NAME}" \
           "$${_PARENT_ID}" \
           "$${_EXPIRATION_PERIOD_DAYS}"

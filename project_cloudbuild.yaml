@@ -144,7 +144,7 @@ steps:
   # Deploy publish_build_result function to every project
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'publish-build-result-function'
-    dir: 'cloud-deployment/functions/publish_build_result_func'
+    dir: 'functions/publish_build_result_func'
     waitFor:
       - create-project
     entrypoint: 'bash'

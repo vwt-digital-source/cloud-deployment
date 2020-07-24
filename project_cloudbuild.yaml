@@ -85,18 +85,6 @@ steps:
       - |
         ./create_cloudbuild_triggers.sh ${_DEST_PROJECT} ${_CONFIG}/projects/${_DEST_PROJECT}/project.json
 
-  # Create firewall rules on source repo commit
-  - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'create-cloudbuild-firewall-rules'
-    dir: 'projects'
-    waitFor:
-      - create-project
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        ./create_project_firewall_rules.sh ${_DEST_PROJECT} ${_CONFIG}/projects/${_DEST_PROJECT}/project.json
-
   # Update IAM roles based on projects.json
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'manage-service-accounts'

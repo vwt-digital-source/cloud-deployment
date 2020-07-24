@@ -19,22 +19,6 @@
             }
         }
     ],
-    "firewallRules": [
-        {
-            "name": "my-firewall-rule",
-            "direction": "INGRESS/EGRESS",
-            "action": "allow/deny",
-            "protocolRules": [
-                "protocol:port"
-            ],
-            "description": "my-description",
-            "network": "my-network",
-            "priority": 1000,
-            "sourceRanges": [
-                "0.0.0.0/0"
-            ]
-        }
-    ],
     "services": [
         "cloudbuild.googleapis.com",
         "pubsub.googleapis.com",

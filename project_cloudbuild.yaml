@@ -46,7 +46,7 @@ steps:
     args:
       - '-c'
       - |
-        python3 create_gae.py ${_CONFIG}
+        python3 create_gae.py ${_CONFIG}/projects/${_DEST_PROJECT}/project.json
 
   # Create default cloud build buckets in Europe
   - name: 'gcr.io/cloud-builders/gcloud'

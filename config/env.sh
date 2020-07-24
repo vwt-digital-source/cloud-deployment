@@ -7,7 +7,6 @@ _AUDIT_LOGS=datastore.googleapis.com,pubsub.googleapis.com,storage.googleapis.co
 _BILLING_ACCOUNT_NAME=billingAccounts/XXXXXX-XXXXXX-XXXXXX
 _PARENT_ID=000123456789
 
-
 # Cloudbuild result function
 _TOPIC_PROJECT_ID=my-project-with-topics
 _TOPIC_NAME=topic-name

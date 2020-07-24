@@ -1,9 +1,9 @@
 ---
 timeout: 1800s
 substitutions:
-  _CONFIG: '/workspace/config/${PROJECT_ID}/projects/${_DEST_PROJECT}/project.json'
-  _COMMON_CONFIG: '/workspace/config/${PROJECT_ID}'
-  _ENV: '/workspace/config/${PROJECT_ID}/env.sh'
+  _CONFIG: '/workspace/config/projects/${_DEST_PROJECT}/project.json'
+  _COMMON_CONFIG: '/workspace/config'
+  _ENV: '/workspace/config/env.sh'
   _VENV: '/workspace/build-venv'
 options:
   substitution_option: 'ALLOW_LOOSE'

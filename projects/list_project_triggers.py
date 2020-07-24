@@ -58,7 +58,7 @@ for trigger in project['triggers']:
         del trigger['runTrigger']
 
     if 'includedFiles' in trigger:
-        suffix = hashlib.sha256(''.join(trigger['includedFiles']))
+        suffix = hashlib.sha256(''.join(trigger['includedFiles']).encode('utf-8'))
         trigger['name'] = trigger['name'] + '-' + suffix[:4]
 
     print(json.dumps(trigger))

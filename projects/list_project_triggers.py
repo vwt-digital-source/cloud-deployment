@@ -6,7 +6,7 @@ cloud_deployment_branch = 'develop'
 
 projectfile = open(sys.argv[1])
 project = json.load(projectfile)
-for trigger in project['triggers']:
+for trigger in project.get('triggers', []):
     if 'triggerTemplate' in trigger:
         if not 'projectId':
             trigger['triggerTemplate']['projectId'] = project['projectId']
@@ -58,7 +58,7 @@ for trigger in project['triggers']:
         del trigger['runTrigger']
 
     if 'includedFiles' in trigger:
-        suffix = hashlib.sha256(''.join(trigger['includedFiles']).encode('utf-8'))
+        suffix = hashlib.sha256(''.join(trigger['includedFiles']).encode('utf-8')).hexdigest()
         trigger['name'] = trigger['name'] + '-' + suffix[:4]
 
     print(json.dumps(trigger))

@@ -1,0 +1,59 @@
+{
+    "projectId": "company-d-gew1-project-a",
+    "triggers": [
+        {
+            "triggerTemplate": {
+                "repoName": "github_my-github_company-d-gew1-project-a-repo",
+                "branchName": "master"
+            },
+            "filename": "cloudbuild.yaml"
+        },
+        {
+            "triggerTemplate": {
+                "repoName": "github_otherguy_some-3rd-party-repo",
+                "branchName": "master"
+            },
+            "runTrigger": {
+                "repoName": "github_my-github_company-d-gew1-project-a-repo",
+                "branchName": "master"
+            }
+        }
+    ],
+    "services": [
+        "cloudbuild.googleapis.com",
+        "pubsub.googleapis.com",
+        "cloudfunctions.googleapis.com"
+    ],
+    "keyrings": [
+        {
+            "name": "my-keyring",
+            "region": "europe-west1",
+            "keys": [
+                {
+                    "name": "my-key",
+                    "purpose": "ENCRYPT_DECRYPT"
+                }
+            ]
+        }
+    ],
+    "odrlPolicy": {
+        "uid": "my-first-gcp-project-policy",
+        "permission": [
+            {
+                "target": "my-keyring",
+                "assignee": "user:me@myself.com",
+                "action": "roles/cloudkms.cryptoKeyEncrypter"
+            },
+            {
+                "target": "my-keyring",
+                "assignee": "serviceAccount:company-d-gew1-project-a@appspot.gserviceaccount.com",
+                "action": "roles/cloudkms.cryptoKeyDecrypter"
+            },
+            {
+                "target": "company-d-gew1-project-a",
+                "assignee": "user:me@myself.com",
+                "action": "roles/owner"
+            }
+        ]
+    }
+}

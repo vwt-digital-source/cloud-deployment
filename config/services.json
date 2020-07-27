@@ -21,6 +21,7 @@
         "cloudkms.googleapis.com",
         "iam.googleapis.com",
         "iamcredentials.googleapis.com",
-        "recommender.googleapis.com"
+        "recommender.googleapis.com",
+        "secretmanager.googleapis.com"
     ]
 }

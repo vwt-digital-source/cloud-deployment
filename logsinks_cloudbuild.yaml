@@ -1,0 +1,16 @@
+---
+timeout: 1800s
+substitutions:
+steps:
+  # Create logsinks
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        source config/env.sh
+        ./logsinks/create_logsinks.sh \
+          ${PROJECT_ID} \
+          $${_PARENT_ID} \
+          $${_BILLING_ACCOUNT_NAME} \
+          config/logsinks/logsinks.json

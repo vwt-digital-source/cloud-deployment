@@ -1,6 +1,6 @@
 import json
-import uuid
 import sys
+import hashlib
 
 cloud_deployment_branch = 'develop'
 
@@ -47,17 +47,18 @@ for trigger in project['triggers']:
                     'entrypoint': 'bash',
                     'args': [
                         '-c',
-                        './runcloudbuildtrigger.sh ${{PROJECT_ID}} {} {}'.format(
+                        './run_cloudbuild_trigger.sh ${{PROJECT_ID}} {} {}'.format(
                             trigger['runTrigger']['repoName'],
                             trigger['runTrigger']['branchName'])
                     ],
-                    'dir': 'cloud-deployment/scripts'
+                    'dir': 'cloud-deployment/projects'
                 }
             ]
         }
         del trigger['runTrigger']
 
-    if 'includedFiles' in trigger or 'excludedFiles' in trigger:
-        trigger['name'] = trigger['name'] + '-' + str(uuid.uuid4())[:4]
+    if 'includedFiles' in trigger:
+        suffix = hashlib.sha256(''.join(trigger['includedFiles']).encode('utf-8'))
+        trigger['name'] = trigger['name'] + '-' + suffix[:4]
 
     print(json.dumps(trigger))

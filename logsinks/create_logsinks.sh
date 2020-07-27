@@ -1,19 +1,21 @@
 #!/bin/bash
 
+
 PROJECT_ID=${1}
 PARENT_ID=${2}
 BILLING_ACCOUNT=${3}
 LOGSINK_CATALOG=${4}
 
-if [[ -z "${PROJECT_ID}" || -z "${PARENT_ID}" || -z "${BILLING_ACCOUNT}" || -z "${LOGSINK_CATALOG}" ]]
-then
-    echo "PROJECT_ID parameter should be set to deployment manager project"
-    echo "PARENT_ID parameter should be set to the parent folder/organization id"
-    echo "BILLING ACCOUNT parameter should be set to: billingAccounts/xxxxxx-xxxxxx-xxxxx"
-    echo "LOGSINK_CATALOG parameter should be set to the file containing the logsinks"
-    echo "Usage: ${0} <project_id> <parent_id> <billing_account> <logsink_catalog>"
-    exit 1
-fi
+function error_exit() {
+  # ${BASH_SOURCE[1]} is the file name of the caller.
+  echo "${BASH_SOURCE[1]}: line ${BASH_LINENO[0]}: ${1:-Unknown Error.} (exit ${2:-1})" 1>&2
+  exit "${2:-1}"
+}
+
+[[ -n "${PROJECT_ID}" ]] || error_exit "Missing required PROJECT_ID"
+[[ -n "${PARENT_ID}" ]] || error_exit "Missing required PARENT_ID"
+[[ -n "${BILLING_ACCOUNT}" ]] || error_exit "Missing required BILLING_ACCOUNT"
+[[ -n "${LOGSINK_CATALOG}" ]] || error_exit "Missing required LOGSINK_CATALOG"
 
 basedir=$(dirname "$0")
 

@@ -1,0 +1,149 @@
+---
+timeout: 1800s
+substitutions:
+  _CONFIG: '/workspace/config'
+  _ENV: '/workspace/config/env.sh'
+  _VENV: '/workspace/build-venv'
+options:
+  substitution_option: 'ALLOW_LOOSE'
+steps:
+  # Create python3 virtualenv
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'create-virtualenv'
+    dir: 'projects'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        pip install virtualenv==16.7.9
+        virtualenv -p python3 ${_VENV}
+        source ${_VENV}/bin/activate
+        pip install -r requirements.txt
+
+  # Create project using deployment manager
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'create-project'
+    dir: 'projects'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        source ${_ENV}
+        ./create_project.sh \
+          ${PROJECT_ID} \
+          ${_DEST_PROJECT} \
+          ${_CONFIG} \
+          $${_BILLING_ACCOUNT_NAME} \
+          $${_PARENT_ID}
+
+  # Create default app engine
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'create-gae'
+    dir: 'projects'
+    waitFor:
+      - create-project
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        python3 create_gae.py ${_CONFIG}/projects/${_DEST_PROJECT}/project.json
+
+  # Create default cloud build buckets in Europe
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'create-cloudbuild-buckets'
+    dir: 'projects'
+    waitFor:
+      - create-project
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        source ${_ENV}
+        ./create_cloudbuild_buckets.sh ${_DEST_PROJECT} $${_REGION} $${_GROUP}
+
+  # Enable/disable services based on projects.json
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'manage-services'
+    dir: 'projects'
+    waitFor:
+      - create-project
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        ./manage_services.sh ${_DEST_PROJECT} ${_CONFIG}/projects/${_DEST_PROJECT}/project.json ${_CONFIG}/services.json
+
+  # Create cloud build triggers on source repo commit
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'create-cloudbuild-triggers'
+    dir: 'projects'
+    waitFor:
+      - create-project
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        ./create_cloudbuild_triggers.sh ${_DEST_PROJECT} ${_CONFIG}/projects/${_DEST_PROJECT}/project.json
+
+  # Update IAM roles based on projects.json
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'manage-service-accounts'
+    dir: 'projects'
+    waitFor:
+      - create-virtualenv
+      - create-project
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        source ${_VENV}/bin/activate
+        python3 remove_service_accounts.py -p ${_CONFIG}/projects/${_DEST_PROJECT}/project.json -s ${_CONFIG}/service_accounts.json
+
+  # Update IAM bindings based on projects.json
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'manage-iam-bindings'
+    dir: 'projects'
+    waitFor:
+      - create-virtualenv
+      - create-project
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        source ${_VENV}/bin/activate
+        python3 remove_iam_bindings.py -p ${_CONFIG}/projects/${_DEST_PROJECT}/project.json -i ${_CONFIG}/iam_bindings.json
+
+  # Set cloud audit logs
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'set-audit-logs'
+    dir: 'projects'
+    waitFor:
+      - create-project
+      - create-virtualenv
+      - manage-iam-bindings
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        source ${_VENV}/bin/activate
+        source ${_ENV}
+        python3 set_iam_policy.py -p ${_DEST_PROJECT} -s "$${_AUDIT_LOGS}" -c auditConfigs
+
+  # Deploy publish_build_result function to every project
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'publish-build-result-function'
+    dir: 'functions/publish_build_result_func'
+    waitFor:
+      - create-project
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        source ${_ENV}
+        gcloud functions deploy publish_build_result_func \
+          --runtime=python37 \
+          --entry-point=publish_build_result_func \
+          --trigger-topic=cloud-builds \
+          --region=europe-west1 \
+          --project=${_DEST_PROJECT} \
+          --set-env-vars=TOPIC_PROJECT_ID=$${_TOPIC_PROJECT_ID},TOPIC_NAME=$${_TOPIC_NAME}

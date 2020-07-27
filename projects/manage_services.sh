@@ -25,7 +25,7 @@ excluded="/tmp/${PROJECT_ID}.excluded"
 
 echo "source.googleapis.com" > "${excluded}"
 gcloud services list --enabled --format="value(NAME)" --project "${PROJECT_ID}" > "${enabled}"
-python3 "${basedir}"/tmp_list_services.py "${PROJECT_ID}" "${SERVICE_CATALOG}" "${PROJECT_CATALOG}" > "${specified}"
+python3 "${basedir}"/list_services.py "${PROJECT_ID}" "${SERVICE_CATALOG}" "${PROJECT_CATALOG}" > "${specified}"
 
 disable=$(python3 "${basedir}"/compare_lists.py "${enabled}" "${specified}" "${excluded}")
 

@@ -18,7 +18,7 @@ result=0
 
 echo "Creating build triggers in ${PROJECT_ID}..."
 
-python3 "${basedir}"/tmp_list_project_triggers.py "${PROJECT_CATALOG}"|
+python3 "${basedir}"/list_project_triggers.py "${PROJECT_CATALOG}"|
 while read -r trigger
 do
 

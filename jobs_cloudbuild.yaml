@@ -1,0 +1,17 @@
+---
+timeout: 1800s
+substitutions:
+steps:
+  # Schedule revoke service account keys
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        source config/jobs/env.sh
+        source config/env.sh
+        ./jobs/schedule_revoke_sa_keys.sh \
+          "${PROJECT_ID}" \
+          "${_BRANCH_NAME}" \
+          "$${_PARENT_ID}" \
+          "$${_EXPIRATION_PERIOD_DAYS}"

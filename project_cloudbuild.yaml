@@ -46,7 +46,8 @@ steps:
     args:
       - '-c'
       - |
-        python3 create_gae.py ${_CONFIG}/projects/${_DEST_PROJECT}/project.json
+        _REGION=$(python3 get_region.py ${_CONFIG}/projects/${_DEST_PROJECT}/project.json)
+        gcloud app describe --project=${_DEST_PROJECT} || gcloud app create --project=${_DEST_PROJECT} --region=$${_REGION}
 
   # Create default cloud build buckets in Europe
   - name: 'gcr.io/cloud-builders/gcloud'

@@ -32,7 +32,7 @@ disable=$(python3 "${basedir}"/compare_lists.py "${enabled}" "${specified}" "${e
 for service in $disable
 do
     echo " + disable ${service} in ${PROJECT_ID}"
-    gcloud services disable "${disable}" --project "${PROJECT_ID}" --force
+    gcloud services disable "${service}" --project "${PROJECT_ID}" --force
 done
 
 enable=$(python3 "${basedir}"/compare_lists.py "${specified}" "${enabled}" "${excluded}")
@@ -40,7 +40,7 @@ enable=$(python3 "${basedir}"/compare_lists.py "${specified}" "${enabled}" "${ex
 for service in $enable
 do
     echo " + enable ${service} in ${PROJECT_ID}"
-    gcloud services enable "${enable}" --project "${PROJECT_ID}"
+    gcloud services enable "${service}" --project "${PROJECT_ID}"
 done
 
 result=$?

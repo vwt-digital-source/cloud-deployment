@@ -26,7 +26,7 @@ def gather_permissions_sa(project_id, odrl_policy, all_service_accounts):
     depends_on = []
     depends_on.extend(project_id)
     for asa in all_service_accounts:
-        if asa is not None:
+        if asa is not None or asa != "":
             depends_on.append(asa)
     if odrl_policy is not None:
         for permission in [p for p in odrl_policy.get('permission', []) if 'serviceAccount' in p.get('target', '')]:

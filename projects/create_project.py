@@ -126,6 +126,8 @@ def generate_config(context):
             })
             all_service_accounts.append(resource_name)
 
+        print("All s: {}".format(all_services))
+        print("All SAs: {}".format(all_service_accounts))
         resources.extend(gather_permissions_sa(project['projectId'], project.get('odrlPolicy'), all_service_accounts))
 
         odrlPolicy = project.get('odrlPolicy')

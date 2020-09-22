@@ -39,7 +39,7 @@ def gather_permissions_sa(project_id, odrl_policy):
                     'name': resource_name,
                     'action': 'gcp-types/iam-v1:iam.projects.serviceAccounts.setIamPolicy',
                     'metadata': {
-                        'dependsOn': [service_account_name]
+                        'dependsOn': [project_id]
                     },
                     'properties': {
                         'resource': resource_target,

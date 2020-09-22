@@ -28,7 +28,7 @@ def gather_permissions_sa(project_id, odrl_policy):
             target_name_list = target_name.split("@")
             service_account_name = target_name_list[0]
             service_account_domain = target_name_list[1]
-            resource_name = 'patch-sa-policy-' + service_account_name + '-' + service_account_domain
+            resource_name = '"patch-sa-policy-' + service_account_name + '-' + service_account_domain + '"'
             resource_name = resource_name.replace('.', '-')
             resource_target = 'projects/{}/serviceAccounts/{}'.format(
                 project_id, target_name)

@@ -23,6 +23,9 @@ def gather_permissions(resource_name, odrlPolicy, bindings=[]):
 
 def gather_permissions_sa(project_id, odrl_policy, all_service_accounts):
     resources = []
+    depends_on = []
+    depends_on.extend(project_id)
+    depends_on.extend(all_service_accounts)
     if odrl_policy is not None:
         for permission in [p for p in odrl_policy.get('permission', []) if 'serviceAccount' in p.get('target', '')]:
             target_name = permission['target'].replace('serviceAccount:', '')
@@ -36,7 +39,7 @@ def gather_permissions_sa(project_id, odrl_policy, all_service_accounts):
                     'name': resource_name,
                     'action': 'gcp-types/iam-v1:iam.projects.serviceAccounts.setIamPolicy',
                     'metadata': {
-                        'dependsOn': [project_id, all_service_accounts]
+                        'dependsOn': depends_on
                     },
                     'properties': {
                         'resource': resource_target,
@@ -126,8 +129,6 @@ def generate_config(context):
             })
             all_service_accounts.append(resource_name)
 
-        print("All s: {}".format(all_services))
-        print("All SAs: {}".format(all_service_accounts))
         resources.extend(gather_permissions_sa(project['projectId'], project.get('odrlPolicy'), all_service_accounts))
 
         odrlPolicy = project.get('odrlPolicy')

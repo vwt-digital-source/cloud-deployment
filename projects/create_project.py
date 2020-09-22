@@ -1,4 +1,3 @@
-import re
 from hashlib import sha256
 
 
@@ -21,17 +20,14 @@ def gather_permissions(resource_name, odrlPolicy, bindings=[]):
     return bindings
 
 
-def gather_permissions_sa(project_id, odrl_policy, all_service_accounts):
+def gather_permissions_sa(project_id, odrl_policy):
     resources = []
-    depends_on = []
-    depends_on.extend(project_id)
-    for asa in all_service_accounts:
-        if asa is not None or asa != "":
-            depends_on.append(asa)
     if odrl_policy is not None:
         for permission in [p for p in odrl_policy.get('permission', []) if 'serviceAccount' in p.get('target', '')]:
             target_name = permission['target'].replace('serviceAccount:', '')
-            resource_name = 'patch-sa-policy-' + re.sub(r'[^A-Za-z0-9]+', '-', target_name)
+            target_name_list = target_name.split("@")
+            service_account_name = target_name_list[0]
+            resource_name = 'patch-sa-policy-' + service_account_name
             resource_target = 'projects/{}/serviceAccounts/{}'.format(
                 project_id, target_name)
 
@@ -41,7 +37,7 @@ def gather_permissions_sa(project_id, odrl_policy, all_service_accounts):
                     'name': resource_name,
                     'action': 'gcp-types/iam-v1:iam.projects.serviceAccounts.setIamPolicy',
                     'metadata': {
-                        'dependsOn': depends_on
+                        'dependsOn': [service_account_name]
                     },
                     'properties': {
                         'resource': resource_target,
@@ -131,7 +127,7 @@ def generate_config(context):
             })
             all_service_accounts.append(resource_name)
 
-        resources.extend(gather_permissions_sa(project['projectId'], project.get('odrlPolicy'), all_service_accounts))
+        resources.extend(gather_permissions_sa(project['projectId'], project.get('odrlPolicy')))
 
         odrlPolicy = project.get('odrlPolicy')
         if odrlPolicy and odrlPolicy.get('permission'):

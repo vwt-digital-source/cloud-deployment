@@ -1,4 +1,3 @@
-import re
 from hashlib import sha256
 
 
@@ -26,9 +25,14 @@ def gather_permissions_sa(project_id, odrl_policy):
     if odrl_policy is not None:
         for permission in [p for p in odrl_policy.get('permission', []) if 'serviceAccount' in p.get('target', '')]:
             target_name = permission['target'].replace('serviceAccount:', '')
-            resource_name = 'patch-sa-policy-' + re.sub(r'[^A-Za-z0-9]+', '-', target_name)
+            target_name_list = target_name.split("@")
+            service_account_name = target_name_list[0]
+            service_account_domain = target_name_list[1]
+            resource_name = '"patch-sa-policy-' + service_account_name + '-' + service_account_domain + '"'
+            resource_name = resource_name.replace('.', '-')
             resource_target = 'projects/{}/serviceAccounts/{}'.format(
                 project_id, target_name)
+            service_account_name_dependency = '{}-{}-svcaccount'.format(project_id, service_account_name)
 
             resource = next((p for p in resources if p.get('name', '') == resource_name), None)
             if not resource:
@@ -36,7 +40,7 @@ def gather_permissions_sa(project_id, odrl_policy):
                     'name': resource_name,
                     'action': 'gcp-types/iam-v1:iam.projects.serviceAccounts.setIamPolicy',
                     'metadata': {
-                        'dependsOn': [project_id]
+                        'dependsOn': [service_account_name_dependency]
                     },
                     'properties': {
                         'resource': resource_target,

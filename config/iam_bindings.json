@@ -19,14 +19,6 @@
         {
             "role": "roles/owner",
             "member": "serviceAccount:$(ref.__PROJECT_ID__.projectNumber)@cloudservices.gserviceaccount.com"
-        },
-        {
-            "role": "roles/cloudbuild.builds.editor",
-            "member": "serviceAccount:__PROJECT_ID__@appspot.gserviceaccount.com"
-        },
-        {
-            "role": "roles/storage.admin",
-            "member": "serviceAccount:__PROJECT_ID__@appspot.gserviceaccount.com"
         }
     ]
 }

@@ -114,7 +114,10 @@ def generate_config(context):
             all_services.append(resource_name)
 
         all_service_accounts = []
-        for account in list(set(project.get('serviceAccounts', []) + service_accounts.get('default', []))):  # noqa: F821
+        s = set(project.get('serviceAccounts', []) + service_accounts.get('default', []))  # noqa: F821
+        s.add(project['projectId'])
+
+        for account in list(s):
             resource_name = '{}-{}-svcaccount'.format(project['projectId'], account)
             resources.append({
                 'name': resource_name,

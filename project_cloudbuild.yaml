@@ -47,7 +47,12 @@ steps:
       - '-c'
       - |
         _REGION=$(python3 get_region.py ${_CONFIG}/projects/${_DEST_PROJECT}/project.json)
-        gcloud app describe --project=${_DEST_PROJECT} || gcloud app create --project=${_DEST_PROJECT} --region=$${_REGION}
+        gcloud app describe \
+            --project=${_DEST_PROJECT} || gcloud app create --project=${_DEST_PROJECT} --region=$${_REGION}
+        gcloud projects add-iam-policy-binding \
+            ${_DEST_PROJECT} --member=${_DEST_PROJECT}@appspot.gserviceaccount.com --role=roles/cloudbuild.builds.editor
+        gcloud projects add-iam-policy-binding \
+            ${_DEST_PROJECT} --member=${_DEST_PROJECT}@appspot.gserviceaccount.com --role=roles/storage.admin
 
   # Create default cloud build buckets in Europe
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -98,7 +103,8 @@ steps:
       - '-c'
       - |
         source ${_VENV}/bin/activate
-        python3 remove_service_accounts.py -p ${_CONFIG}/projects/${_DEST_PROJECT}/project.json -s ${_CONFIG}/service_accounts.json
+        python3 remove_service_accounts.py  -p ${_CONFIG}/projects/${_DEST_PROJECT}/project.json \
+                                            -s ${_CONFIG}/service_accounts.json
 
   # Update IAM bindings based on projects.json
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -112,7 +118,8 @@ steps:
       - '-c'
       - |
         source ${_VENV}/bin/activate
-        python3 remove_iam_bindings.py -p ${_CONFIG}/projects/${_DEST_PROJECT}/project.json -i ${_CONFIG}/iam_bindings.json
+        python3 remove_iam_bindings.py  -p ${_CONFIG}/projects/${_DEST_PROJECT}/project.json \
+                                        -i ${_CONFIG}/iam_bindings.json
 
   # Set cloud audit logs
   - name: 'gcr.io/cloud-builders/gcloud'

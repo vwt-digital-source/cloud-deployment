@@ -36,11 +36,15 @@ def gather_permissions_sa(project_id, odrl_policy):
 
             resource = next((p for p in resources if p.get('name', '') == resource_name), None)
             if not resource:
+                depends_on = [project_id]
+                if service_account_domain == "{}.iam.gserviceaccount.com".format(project_id):
+                    depends_on.append(service_account_name_dependency)
+
                 resource = {
                     'name': resource_name,
                     'action': 'gcp-types/iam-v1:iam.projects.serviceAccounts.setIamPolicy',
                     'metadata': {
-                        'dependsOn': [service_account_name_dependency]
+                        'dependsOn': depends_on
                     },
                     'properties': {
                         'resource': resource_target,

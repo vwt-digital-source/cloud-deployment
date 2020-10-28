@@ -50,10 +50,10 @@ steps:
         gcloud app describe \
             --project=${_DEST_PROJECT} || gcloud app create --project=${_DEST_PROJECT} --region=$${_REGION}
         gcloud projects add-iam-policy-binding ${_DEST_PROJECT} \
-            --member="${_DEST_PROJECT}@appspot.gserviceaccount.com" \
+            --member="serviceAccount:${_DEST_PROJECT}@appspot.gserviceaccount.com" \
             --role="roles/cloudbuild.builds.editor"
         gcloud projects add-iam-policy-binding ${_DEST_PROJECT} \
-            --member="${_DEST_PROJECT}@appspot.gserviceaccount.com" \
+            --member="serviceAccount:${_DEST_PROJECT}@appspot.gserviceaccount.com" \
             --role="roles/storage.admin"
 
   # Create default cloud build buckets in Europe

@@ -55,6 +55,9 @@ steps:
         gcloud projects add-iam-policy-binding ${_DEST_PROJECT} \
             --member=serviceAccount:${_DEST_PROJECT}@appspot.gserviceaccount.com \
             --role=roles/storage.admin
+        gcloud projects remove-iam-policy-binding ${_DEST_PROJECT} \
+            --member=serviceAccount:${_DEST_PROJECT}@appspot.gserviceaccount.com \
+            --role=roles/editor
 
   # Create default cloud build buckets in Europe
   - name: 'gcr.io/cloud-builders/gcloud'

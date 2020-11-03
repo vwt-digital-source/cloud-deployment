@@ -110,7 +110,7 @@ def generate_config(context):
                     target_name = permission['target'].replace('serviceAccount:', '')
                     resource_target = 'projects/{}/serviceAccounts/{}'.format(project['projectId'], target_name)
                     assignee_name = re.search(":(.*?)@", permission['assignee']).group(1).replace('.', '-')
-                    resource_name = target_name.replace('@')[0] + assignee_name + '-sa-iampolicy'
+                    resource_name = target_name.split('@')[0] + assignee_name + '-sa-iampolicy'
                     resources.append({
                         'name': resource_name,
                         'action': 'gcp-types/iam-v1:iam.projects.serviceAccounts.setIamPolicy',

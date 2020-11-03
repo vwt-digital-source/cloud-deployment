@@ -109,7 +109,7 @@ def generate_config(context):
                 if 'serviceAccount' in permission['target']:
                     target_name = permission['target'].replace('serviceAccount:', '')
                     resource_target = 'projects/{}/serviceAccounts/{}'.format(project['projectId'], target_name)
-                    assignee_name = re.search(permission['assignee'], ":(.*?)@").group(1).replace('.', '-')
+                    assignee_name = re.search(":(.*?)@", permission['assignee']).group(1).replace('.', '-')
                     resource_name = target_name.replace('@')[0] + assignee_name + '-sa-iampolicy'
                     resources.append({
                         'name': resource_name,

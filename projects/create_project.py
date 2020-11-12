@@ -1,3 +1,4 @@
+import re
 from hashlib import sha256
 
 
@@ -18,56 +19,6 @@ def gather_permissions(resource_name, odrlPolicy, bindings=[]):
                 binding['members'].append(permission['assignee'])
 
     return bindings
-
-
-def gather_permissions_sa(project_id, odrl_policy):
-    resources = []
-    if odrl_policy is not None:
-        for permission in [p for p in odrl_policy.get('permission', []) if 'serviceAccount' in p.get('target', '')]:
-            target_name = permission['target'].replace('serviceAccount:', '')
-            target_name_list = target_name.split("@")
-            service_account_name = target_name_list[0]
-            service_account_domain = target_name_list[1]
-            resource_name = '"patch-sa-policy-' + service_account_name + '-' + service_account_domain + '"'
-            resource_name = resource_name.replace('.', '-')
-            resource_target = 'projects/{}/serviceAccounts/{}'.format(
-                project_id, target_name)
-            service_account_name_dependency = '{}-{}-svcaccount'.format(project_id, service_account_name)
-
-            resource = next((p for p in resources if p.get('name', '') == resource_name), None)
-            if not resource:
-                depends_on = [project_id]
-                if service_account_domain == "{}.iam.gserviceaccount.com".format(project_id):
-                    depends_on.append(service_account_name_dependency)
-
-                resource = {
-                    'name': resource_name,
-                    'action': 'gcp-types/iam-v1:iam.projects.serviceAccounts.setIamPolicy',
-                    'metadata': {
-                        'dependsOn': depends_on
-                    },
-                    'properties': {
-                        'resource': resource_target,
-                        'policy': {
-                            'bindings': []
-                        }
-                    }
-                }
-                resources.append(resource)
-
-            binding = next((b for b in resource['properties']['policy']['bindings'] if
-                            b.get('role', '') == permission['action']), None)
-            if not binding:
-                binding = {
-                    'role': permission['action'],
-                    'members': []
-                }
-                resource['properties']['policy']['bindings'].append(binding)
-
-            if not permission['assignee'] in binding['members']:
-                binding['members'].append(permission['assignee'])
-
-    return resources
 
 
 def generate_config(context):
@@ -134,8 +85,6 @@ def generate_config(context):
             })
             all_service_accounts.append(resource_name)
 
-        resources.extend(gather_permissions_sa(project['projectId'], project.get('odrlPolicy')))
-
         odrlPolicy = project.get('odrlPolicy')
         if odrlPolicy and odrlPolicy.get('permission'):
             for permission in odrlPolicy.get('permission', []):
@@ -157,9 +106,36 @@ def generate_config(context):
                         }
                     })
 
+                if 'serviceAccount' in permission['target']:
+                    target_name = permission['target'].replace('serviceAccount:', '')
+                    resource_target = 'projects/{}/serviceAccounts/{}'.format(project['projectId'], target_name)
+                    assignee_name = re.search(":(.*?)@", permission['assignee']).group(1).replace('.', '-')
+                    resource_name = target_name.split('@')[0] + assignee_name + '-sa-iampolicy'
+                    resources.append({
+                        'name': resource_name,
+                        'action': 'gcp-types/iam-v1:iam.projects.serviceAccounts.setIamPolicy',
+                        'metadata': {
+                            'dependsOn': all_service_accounts
+                        },
+                        'properties': {
+                            'resource': resource_target,
+                            'policy': {
+                                'bindings': [
+                                    {
+                                        "role": permission['action'],
+                                        "members": [permission['assignee']]
+                                    }
+                                ]
+                            }
+                        }
+                    })
+
         for binding in iam_bindings.get('default', []):  # noqa: F821
             member = binding['member'].replace('__PROJECT_ID__', project['projectId'])
-            suffix = sha256('{}-{}-{}'.format(binding['role'], member, project['projectId']).encode('utf-8')).hexdigest()[:10]
+            suffix = sha256('{}-{}-{}'.format(
+                binding['role'],
+                member,
+                project['projectId']).encode('utf-8')).hexdigest()[:10]
             resources.append({
                 'name': '{}-default-iampolicy'.format(suffix),
                 'type': 'gcp-types/cloudresourcemanager-v1:virtual.projects.iamMemberBinding',

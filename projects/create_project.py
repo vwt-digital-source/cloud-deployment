@@ -185,8 +185,8 @@ def generate_config(context):
     for action in actions:
         for binding in bindings:
             if binding["name"] == action["name"]:
-                binding["properties"]["policies"]["bindings"].extend(
-                    action["properties"]["policies"]["bindings"]
+                binding["properties"]["policy"]["bindings"].extend(
+                    action["properties"]["policy"]["bindings"]
                 )
             else:
                 bindings.append(action)

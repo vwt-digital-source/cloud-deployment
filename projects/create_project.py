@@ -190,6 +190,8 @@ def generate_config(context):
                 )
             else:
                 bindings.append(action)
+        else:
+            bindings.append(action)
 
     resources.extend(bindings)
 

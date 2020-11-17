@@ -181,15 +181,15 @@ def generate_config(context):
                     }
                 })
 
+    # Fix: merge serviceaccount iam binding actions
     bindings = []
     for action in actions:
         for binding in bindings:
-            if binding["name"] == action["name"]:
+            if action["name"] == binding["name"]:
                 binding["properties"]["policy"]["bindings"].extend(
                     action["properties"]["policy"]["bindings"]
                 )
-            else:
-                bindings.append(action)
+                break
         else:
             bindings.append(action)
 

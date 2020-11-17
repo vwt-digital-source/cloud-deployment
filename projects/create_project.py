@@ -1,4 +1,3 @@
-import re
 from hashlib import sha256
 
 
@@ -85,6 +84,8 @@ def generate_config(context):
             })
             all_service_accounts.append(resource_name)
 
+        actions = []
+
         odrlPolicy = project.get('odrlPolicy')
         if odrlPolicy and odrlPolicy.get('permission'):
             for permission in odrlPolicy.get('permission', []):
@@ -109,9 +110,8 @@ def generate_config(context):
                 if 'serviceAccount' in permission['target']:
                     target_name = permission['target'].replace('serviceAccount:', '')
                     resource_target = 'projects/{}/serviceAccounts/{}'.format(project['projectId'], target_name)
-                    assignee_name = re.search(":(.*?)@", permission['assignee']).group(1).replace('.', '-')
-                    resource_name = target_name.split('@')[0] + assignee_name + '-sa-iampolicy'
-                    resources.append({
+                    resource_name = target_name.split('@')[0] + '-sa-iampolicy'
+                    actions.append({
                         'name': resource_name,
                         'action': 'gcp-types/iam-v1:iam.projects.serviceAccounts.setIamPolicy',
                         'metadata': {
@@ -180,5 +180,17 @@ def generate_config(context):
                         'purpose': key['purpose']
                     }
                 })
+
+    bindings = []
+    for action in actions:
+        for binding in bindings:
+            if binding["name"] == action["name"]:
+                binding["properties"]["policies"]["bindings"].extend(
+                    action["properties"]["policies"]["bindings"]
+                )
+            else:
+                bindings.append(action)
+
+    resources.extend(bindings)
 
     return {'resources': resources}

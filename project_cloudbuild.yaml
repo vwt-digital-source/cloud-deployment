@@ -131,6 +131,7 @@ steps:
       - create-project
       - create-virtualenv
       - manage-iam-bindings
+      - create-gae
     entrypoint: 'bash'
     args:
       - '-c'

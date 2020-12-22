@@ -1,0 +1,23 @@
+{
+  "logsinks": [
+    {
+      "logsinkId": "my-logsink",
+      "description": "Logsink for audit logs",
+      "sourceType": "folders",
+      "sourceId": "my-folder-id",
+      "destination": "bigquery.googleapis.com/projects/my-logdestination-project/datasets/audit_logs",
+      "includeChildren": "True",
+      "filter": "protoPayload.@type=type.googleapis.com/google.cloud.audit.AuditLog",
+      "usePartitionedTables": "True"
+    },
+    {
+      "logsinkId": "my-app-traffic-logsink",
+      "description": "Logsink for app traffic logs",
+      "sourceType": "folders",
+      "sourceId": "my-folder-id",
+      "destination": "pubsub.googleapis.com/projects/my-logdestination-project/topics/apptrafficlog",
+      "includeChildren": "True",
+      "filter": "resource.type=(api OR cloud_function OR cloud_run_revision OR consumed_api OR gae_app OR gce_instance OR http_load_balancer OR managed_service)"
+    }
+  ]
+}

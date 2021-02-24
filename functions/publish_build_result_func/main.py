@@ -3,6 +3,7 @@ import os
 import logging
 
 from google.cloud import pubsub_v1
+from google.api_core import exceptions as gcp_exceptions
 
 logging.getLogger().setLevel(logging.INFO)
 
@@ -28,6 +29,11 @@ def publish_build_result_func(data, context):
 
         try:
             publisher.publish(topic_name, bytes(build_status_message.encode('utf-8')))
+        except gcp_exceptions.PermissionDenied:
+            logging.error(
+                "The function does not have permission to publish a message towards " +
+                f"topic '{topic_name}'")
+            pass
         except Exception as e:
             logging.error(f"Failed to publish build status: {str(e)}")
-            pass
+            raise e

@@ -27,7 +27,10 @@ def publish_build_result_func(data, context):
         logging.info("Build status: {}".format(build_status_message))
 
         try:
-            publisher.publish(topic_name, bytes(build_status_message.encode("utf-8")))
+            future = publisher.publish(
+                topic_name, bytes(build_status_message.encode("utf-8"))
+            )
+            future.result()
         except gcp_exceptions.PermissionDenied:
             logging.error(
                 "The function does not have permission to publish a message towards "

@@ -159,5 +159,7 @@ steps:
           --entry-point=publish_build_result_func \
           --trigger-topic=cloud-builds \
           --region=europe-west1 \
+          --memory=128MB \
+          --timeout=5s \
           --project=${_DEST_PROJECT} \
           --set-env-vars=TOPIC_PROJECT_ID=$${_TOPIC_PROJECT_ID},TOPIC_NAME=$${_TOPIC_NAME}

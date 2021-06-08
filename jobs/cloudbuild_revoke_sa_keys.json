@@ -2,7 +2,8 @@
     "timeout": "1200s",
     "steps": [
         {
-            "name": "gcr.io/cloud-builders/git",
+            "name": "gcr.io/google.com/cloudsdktool/cloud-sdk:latest",
+            "entrypoint": "git",
             "args": [
                 "clone",
                 "--branch=${_BRANCH_NAME}",
@@ -10,7 +11,7 @@
             ]
         },
         {
-            "name": "gcr.io/cloud-builders/gcloud",
+            "name": "gcr.io/google.com/cloudsdktool/cloud-sdk:latest",
             "dir": "cloud-deployment/jobs",
             "entrypoint": "bash",
             "args": [
@@ -19,7 +20,7 @@
             ]
         },
         {
-            "name": "gcr.io/cloud-builders/gcloud",
+            "name": "gcr.io/google.com/cloudsdktool/cloud-sdk:latest",
             "dir": "cloud-deployment/jobs",
             "entrypoint": "bash",
             "args": [

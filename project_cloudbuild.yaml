@@ -8,7 +8,7 @@ options:
   substitution_option: 'ALLOW_LOOSE'
 steps:
   # Create python3 virtualenv
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
     id: 'create-virtualenv'
     dir: 'projects'
     entrypoint: 'bash'
@@ -21,7 +21,7 @@ steps:
         pip install -r requirements.txt
 
   # Create project using deployment manager
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
     id: 'create-project'
     dir: 'projects'
     entrypoint: 'bash'
@@ -37,7 +37,7 @@ steps:
           $${_PARENT_ID}
 
   # Create default app engine
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
     id: 'create-gae'
     dir: 'projects'
     waitFor:
@@ -60,7 +60,7 @@ steps:
             --role='roles/editor' || true
 
   # Create default cloud build buckets in Europe
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
     id: 'create-cloudbuild-buckets'
     dir: 'projects'
     waitFor:
@@ -73,7 +73,7 @@ steps:
         ./create_cloudbuild_buckets.sh ${_DEST_PROJECT} $${_REGION} $${_GROUP}
 
   # Enable/disable services based on projects.json
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
     id: 'manage-services'
     dir: 'projects'
     waitFor:
@@ -85,7 +85,7 @@ steps:
         ./manage_services.sh ${_DEST_PROJECT} ${_CONFIG}/projects/${_DEST_PROJECT}/project.json ${_CONFIG}/services.json
 
   # Create cloud build triggers on source repo commit
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
     id: 'create-cloudbuild-triggers'
     dir: 'projects'
     waitFor:
@@ -97,7 +97,7 @@ steps:
         ./create_cloudbuild_triggers.sh ${_DEST_PROJECT} ${_CONFIG}/projects/${_DEST_PROJECT}/project.json
 
   # Update IAM roles based on projects.json
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
     id: 'manage-service-accounts'
     dir: 'projects'
     waitFor:
@@ -112,7 +112,7 @@ steps:
                                             -s ${_CONFIG}/service_accounts.json
 
   # Update IAM bindings based on projects.json
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
     id: 'manage-iam-bindings'
     dir: 'projects'
     waitFor:
@@ -127,7 +127,7 @@ steps:
                                         -i ${_CONFIG}/iam_bindings.json
 
   # Set cloud audit logs
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
     id: 'set-audit-logs'
     dir: 'projects'
     waitFor:
@@ -144,7 +144,7 @@ steps:
         python3 set_iam_policy.py -p ${_DEST_PROJECT} -s "$${_AUDIT_LOGS}" -c auditConfigs
 
   # Deploy publish_build_result function to every project
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - name: 'eu.gcr.io/vwt-p-gew1-dat-cloudbuilders/cloudbuilder-function-deploy:latest'
     id: 'publish-build-result-function'
     dir: 'functions/publish_build_result_func'
     waitFor:
@@ -154,12 +154,9 @@ steps:
       - '-c'
       - |
         source ${_ENV}
-        gcloud functions deploy publish_build_result_func \
-          --runtime=python37 \
+        function_deploy.py publish_build_result_func \
+          --project="${PROJECT_ID}" \
           --entry-point=publish_build_result_func \
           --trigger-topic=cloud-builds \
-          --region=europe-west1 \
-          --memory=128MB \
           --timeout=5s \
-          --project=${_DEST_PROJECT} \
           --set-env-vars=TOPIC_PROJECT_ID=$${_TOPIC_PROJECT_ID},TOPIC_NAME=$${_TOPIC_NAME}

@@ -155,7 +155,7 @@ steps:
       - |
         source ${_ENV}
         function_deploy.py publish_build_result_func \
-          --project="${PROJECT_ID}" \
+          --project="${_DEST_PROJECT}" \
           --entry-point=publish_build_result_func \
           --trigger-topic=cloud-builds \
           --timeout=5s \

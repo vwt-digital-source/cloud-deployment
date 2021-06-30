@@ -1,0 +1,5 @@
+{
+  "entry-point": "publish_build_result_func",
+  "memory": "128MB",
+  "runtime": "python37"
+}

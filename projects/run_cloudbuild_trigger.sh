@@ -29,6 +29,7 @@ then
       --branch="${BRANCH_NAME}" \
       --project="${PROJECT_ID}"
 else
+  echo "Getting trigger for ${REPO_NAME}/${BRANCH_NAME}"
   trigger_ids=$(gcloud beta builds triggers list --format="json")
   trigger_id_via_python=$(python3 ./get_trigger_from_json.py -r "${REPO_NAME}" -b "${BRANCH_NAME}" -t "${trigger_ids}" -f "${FILE_NAME}")
   if [[ -z "${trigger_id_via_python}" ]]

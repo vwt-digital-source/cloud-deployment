@@ -33,4 +33,10 @@ if __name__ == "__main__":
     file_name = args.file_name
     trigger_list = args.trigger_list
     trigger_list_json = json.loads(trigger_list)
-    print(get_trigger(repo_name, branch_name, file_name, trigger_list_json))
+    trigger = get_trigger(repo_name, branch_name, file_name, trigger_list_json)
+
+    # If trigger is 'None' print empty string instead of "None"
+    if not trigger:
+        print()
+    else:
+        print(trigger)

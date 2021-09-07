@@ -18,6 +18,7 @@ def get_trigger(repo_name, branch_name, file_name, trigger_list_json):
             and github_push_branch == branch_name
         ):
             return trigger.get("id")
+    return None
 
 
 if __name__ == "__main__":

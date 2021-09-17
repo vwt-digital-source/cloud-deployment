@@ -115,7 +115,7 @@ def list_projects(service, parent_id, field):
     request = service.projects().list(filter=filter)
     response = request.execute()
 
-    projects = [project.get(field) for project in response.get('projects')]
+    projects = [project.get(field) for project in response.get('projects', [])]
 
     return projects
 
